@@ -10,11 +10,13 @@
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",
+    "autoprefixer": "^10.4.22",
     "axios": "^1.13.2",
     "clsx": "^2.1.1",
     "currency.js": "^2.0.4",
     "lodash": "^4.17.21",
     "lucide-react": "^0.560.0",
+    "material-symbols": "^0.40.2",
     "next": "16.0.10",
     "next-cloudinary": "^6.17.5",
     "react": "19.2.1",
@@ -37,5 +39,6 @@
     "eslint-config-next": "16.0.10",
     "tailwindcss": "^4",
     "typescript": "^5"
-  }
+  },
+  "type": "module"
 }

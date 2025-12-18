@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@config "../tailwind.config.ts";
 
 :root {
   --background: #ffffff;
@@ -23,4 +24,39 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #101d22;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #283539;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #37474f;
+}
+
+input[type="text"],
+input[type="number"],
+textarea,
+select {
+  background-color: #111618;
+  border-color: #283539;
+  color: white;
+}
+
+input[type="text"]:focus,
+input[type="number"]:focus,
+textarea:focus,
+select:focus {
+  border-color: #13b6ec;
+  --tw-ring-color: #13b6ec;
 }
