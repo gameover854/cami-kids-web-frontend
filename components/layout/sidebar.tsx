@@ -1,4 +1,5 @@
 'use client'
+import Link from 'next/link';
 import { usePathname } from 'next/navigation'
 export default function Sidebar() {
     const pathName = usePathname();
@@ -58,10 +59,12 @@ export default function Sidebar() {
                 {/* <!-- Navigation --> */}
                 <nav className="flex flex-col gap-2">
                     {sideBarItems.map((item) => (
-                        <a className={`flex items-center gap-3 px-3 py-2.5 rounded-lg ${item.isActive}`} key={item.id} href={item.href}>
-                            <span className="material-symbols-outlined">{item.icon}</span>
-                            <span className="text-sm font-semibold">{item.label}</span>
-                        </a>
+                        <Link key={item.id} href={item.href}>
+                            <span className={`flex items-center gap-3 px-3 py-2.5 rounded-lg ${item.isActive}`}>
+                                <span className="material-symbols-outlined">{item.icon}</span>
+                                <span className="text-sm font-semibold">{item.label}</span>
+                            </span>
+                        </Link>
                     ))
                     }
                 </nav>

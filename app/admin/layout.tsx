@@ -1,4 +1,5 @@
 import Sidebar from "@/components/layout/sidebar"
+// import Notification from "@/components/notification/notification"
 export default function adminLayout({
     children,
 }: {
@@ -10,6 +11,7 @@ export default function adminLayout({
             <main className="flex-1 flex flex-col h-full overflow-hidden relative">
                 {children}
             </main>
+            {/* <Notification /> */}
         </div>
     </div>
 }

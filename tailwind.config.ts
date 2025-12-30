@@ -16,6 +16,8 @@ export default {
         "text-secondary-dark": "#9db2b9",
         "border-dark": "#283539",
         "surface-dark": "#1c2b31",
+        "border-error": 'red',
+        // "success": "#10B981",
       },
       fontFamily: {
         "display": ["Inter", "sans-serif"]

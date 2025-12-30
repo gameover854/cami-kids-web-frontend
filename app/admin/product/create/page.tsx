@@ -1,13 +1,133 @@
 'use client'
 
 import { createProduct } from "@/services/product.services";
+import { useEffect, useState } from "react"
+import { v4 as uuidv4 } from "uuid";
 
 export default function CreateProductPage() {
-    async function create() {
-        await createProduct({ data: 123 });
-    }
-    return (
+    const [dataProduct, setDataProduct] = useState({
+        name: "",
+        original_price: 0,
+        compare_price: 0,
+        description: "",
+        category_id: undefined,
+        promotion_id: undefined,
+        is_active: false,
+    });
 
+    const [dataAttribute, setDataAttribute] = useState<ProductAttribute>([])
+
+    const generateVariants = (dataAttribute: ProductAttribute) => {
+        let variants: ProductVariant = [];
+        let combo: string[] = [];
+        const attributeValues = dataAttribute.filter(item => item.values.length > 0).map(item => item.values);
+        if (attributeValues.length === 0) return variants;
+        if (attributeValues.length === 1) {
+            for (let item of attributeValues[0]) {
+                variants.push({
+                    id: uuidv4(),
+                    price: 0,
+                    stock_quantity: 0,
+                    combo: item
+                })
+            }
+            return variants;
+        }
+
+        combo = attributeValues.reduce((before, after) => {
+            return before.flatMap(val_1 => (
+                after.map(val_2 => val_1 ? `${val_1} / ${val_2}` : val_2)
+            ))
+        });
+
+        for (let item of combo) {
+            variants.push({
+                id: uuidv4(),
+                price: 0,
+                stock_quantity: 0,
+                combo: item
+            })
+        }
+
+        return variants;
+    }
+
+    const [dataVariant, setDataVariant] = useState(() => generateVariants(dataAttribute))
+
+    useEffect(() => {
+        setDataVariant(generateVariants(dataAttribute))
+    }, [dataAttribute])
+
+    const handleAddAttribute = () => {
+        setDataAttribute([...dataAttribute, { id: uuidv4(), name: "", values: [] }])
+    }
+
+    const handleRemoveAttribute = (attributeId: string) => {
+        setDataAttribute(dataAttribute.filter(item => item.id !== attributeId))
+    }
+
+    const handleAttributeName = (attributeId: string, attributeName: string) => {
+        setDataAttribute(dataAttribute.map(item =>
+            item.id === attributeId ? { ...item, name: attributeName } : item
+        ))
+    }
+
+    const handleAddAttributeItem = (event: React.KeyboardEvent<HTMLInputElement>, attributeItemId: string) => {
+        if (event.key !== "Enter") return
+
+        const value = String(event.currentTarget.value).trim()
+        if (!value) return
+
+        setDataAttribute(prev => prev.map(item =>
+            item.id === attributeItemId && !item.values.includes(value) ? { ...item, values: [...item.values, value] } : item
+        ))
+
+        event.currentTarget.value = ''
+    }
+
+    const handleRemoveAttributeItem = (attributeItemId: string, attributeItemValue: string) => {
+        setDataAttribute(dataAttribute.map(item =>
+            item.id === attributeItemId ?
+                {
+                    ...item,
+                    values: item.values.filter(value => value !== attributeItemValue)
+                }
+                : item
+        ))
+    }
+
+    const handleVariantItem = (value: string, variantItemId: string, type: string) => {
+        setDataVariant(dataVariant.map(item =>
+            (item.id === variantItemId ? { ...item, [type]: value } : item)
+        ));
+    }
+
+    const parseData = (dataProduct: Product, dataAttribute: ProductAttribute, dataVariant: ProductVariant) => {
+        return {
+            product: {
+                name: dataProduct.name.toString(),
+                original_price: Number(dataProduct.original_price),
+                compare_price: Number(dataProduct.compare_price),
+                description: String(dataProduct.name),
+                category_id: Number(dataProduct.category_id),
+                promotion_id: Number(dataProduct.promotion_id),
+                is_active: Boolean(dataProduct.is_active),
+            },
+            attribute: dataAttribute.filter(item => item.values.length > 0 && item.name.length > 0),
+            variant: dataVariant
+        }
+    }
+
+    async function create() {
+        const payload = parseData(dataProduct, dataAttribute, dataVariant);
+        const response = await createProduct(payload);
+        console.log('--->respónse<---', response);
+        console.log('>>>>>payload', payload);
+    }
+
+
+
+    return (
         <div className="flex-1 flex flex-col h-full overflow-hidden relative">
             <header
                 className="h-16 border-b border-border-dark bg-background-dark/80 backdrop-blur-md flex items-center justify-between px-6 sticky top-0 z-20">
@@ -45,10 +165,10 @@ export default function CreateProductPage() {
                         </div>
                         <div className="flex gap-3">
                             <button
-                                className="px-5 h-10 rounded-lg bg-surface-dark text-[#9db2b9] text-sm font-bold border border-border-dark hover:text-white hover:bg-[#283539] transition-all">
+                                className="cursor-pointer px-5 h-10 rounded-lg bg-surface-dark text-[#9db2b9] text-sm font-bold border border-border-dark hover:text-white hover:bg-[#283539] transition-all">
                                 Hủy bỏ
                             </button>
-                            <div className="flex items-center justify-center gap-2 px-6 h-10 rounded-lg bg-primary text-background-dark text-sm font-bold hover:bg-[#3ec4f1] transition-all shadow-lg shadow-primary/20">
+                            <div className="cursor-pointer flex items-center justify-center gap-2 px-6 h-10 rounded-lg bg-primary text-background-dark text-sm font-bold hover:bg-[#3ec4f1] transition-all shadow-lg shadow-primary/20">
                                 <span className="material-symbols-outlined text-[20px]">save</span>
                                 <span onClick={create}>Lưu sản phẩm</span>
                             </div>
@@ -63,11 +183,13 @@ export default function CreateProductPage() {
                                 </h2>
                                 <div className="space-y-4">
                                     <div>
-                                        <label className="block text-sm font-medium text-[#9db2b9] mb-1">Tên sản phẩm <span
+                                        <label className="block text-sm font-medium text-[#9db2b9] mb-1">Tên sản phẩm<span
                                             className="text-red-500">*</span></label>
                                         <input
                                             className="w-full rounded-lg text-sm px-3 py-2.5 focus:ring-1 focus:ring-primary placeholder-[#9db2b9]/50"
-                                            placeholder="Ví dụ: Áo Thun Polo Bé Trai Cotton" type="text" />
+                                            placeholder="Ví dụ: Áo Thun Polo Bé Trai Cotton" type="text" onChange={e => {
+                                                setDataProduct({ ...dataProduct, name: e.target.value })
+                                            }} />
                                     </div>
                                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                                         <div>
@@ -76,7 +198,9 @@ export default function CreateProductPage() {
                                             <div className="relative">
                                                 <input
                                                     className="w-full rounded-lg text-sm pl-3 pr-10 py-2.5 text-right font-medium focus:ring-1 focus:ring-primary"
-                                                    placeholder="0" type="number" />
+                                                    placeholder="0" type="number" onChange={e => {
+                                                        setDataProduct({ ...dataProduct, original_price: Number(e.target.value) })
+                                                    }} />
                                                 <div
                                                     className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
                                                     <span className="text-[#9db2b9] text-xs">₫</span>
@@ -84,17 +208,18 @@ export default function CreateProductPage() {
                                             </div>
                                         </div>
                                         <div>
-                                            <label className="block text-sm font-medium text-[#9db2b9] mb-1">Mã SKU Mặc
-                                                định</label>
-                                            <div className="flex gap-2">
+                                            <label className="block text-sm font-medium text-[#9db2b9] mb-1">Giá so sánh
+                                            </label>
+                                            <div className="relative">
                                                 <input
-                                                    className="w-full rounded-lg text-sm px-3 py-2.5 focus:ring-1 focus:ring-primary"
-                                                    placeholder="SKU-001" type="text" />
-                                                <button
-                                                    className="px-3 py-2 bg-[#111618] border border-border-dark rounded-lg text-[#9db2b9] hover:text-white hover:border-primary transition-colors"
-                                                    title="Tạo tự động">
-                                                    <span className="material-symbols-outlined text-[20px]">autorenew</span>
-                                                </button>
+                                                    className="w-full rounded-lg text-sm pl-3 pr-10 py-2.5 text-right font-medium focus:ring-1 focus:ring-primary"
+                                                    placeholder="0" type="number" onChange={e => {
+                                                        setDataProduct({ ...dataProduct, compare_price: Number(e.target.value) })
+                                                    }} />
+                                                <div
+                                                    className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+                                                    <span className="text-[#9db2b9] text-xs">₫</span>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
@@ -102,156 +227,106 @@ export default function CreateProductPage() {
                                         <label className="block text-sm font-medium text-[#9db2b9] mb-1">Mô tả sản phẩm</label>
                                         <div
                                             className="rounded-lg border border-border-dark overflow-hidden bg-[#111618] focus-within:ring-1 focus-within:ring-primary focus-within:border-primary">
-                                            <div
-                                                className="flex items-center gap-1 p-2 border-b border-border-dark bg-[#152025]">
-                                                <button
-                                                    className="p-1 text-[#9db2b9] hover:text-white hover:bg-[#283539] rounded"><span
-                                                        className="material-symbols-outlined text-[18px]">format_bold</span></button>
-                                                <button
-                                                    className="p-1 text-[#9db2b9] hover:text-white hover:bg-[#283539] rounded"><span
-                                                        className="material-symbols-outlined text-[18px]">format_italic</span></button>
-                                                <button
-                                                    className="p-1 text-[#9db2b9] hover:text-white hover:bg-[#283539] rounded"><span
-                                                        className="material-symbols-outlined text-[18px]">format_underlined</span></button>
-                                                <div className="w-px h-4 bg-border-dark mx-1"></div>
-                                                <button
-                                                    className="p-1 text-[#9db2b9] hover:text-white hover:bg-[#283539] rounded"><span
-                                                        className="material-symbols-outlined text-[18px]">format_list_bulleted</span></button>
-                                                <button
-                                                    className="p-1 text-[#9db2b9] hover:text-white hover:bg-[#283539] rounded"><span
-                                                        className="material-symbols-outlined text-[18px]">link</span></button>
-                                                <button
-                                                    className="p-1 text-[#9db2b9] hover:text-white hover:bg-[#283539] rounded"><span
-                                                        className="material-symbols-outlined text-[18px]">image</span></button>
-                                            </div>
                                             <textarea
                                                 className="w-full border-none p-3 text-sm focus:ring-0 resize-y bg-transparent"
                                                 placeholder="Nhập mô tả chi tiết về chất liệu, kiểu dáng..."
-                                                rows={4}></textarea>
+                                                rows={4}
+                                                onChange={e => {
+                                                    setDataProduct({ ...dataProduct, description: e.target.value })
+                                                }} ></textarea>
                                         </div>
                                     </div>
                                 </div>
                             </section>
                             <section className="bg-surface-dark rounded-xl border border-border-dark p-5 shadow-sm">
-                                <div className="flex items-center justify-between mb-4">
-                                    <h2 className="text-lg font-bold text-white flex items-center gap-2">
-                                        <span className="material-symbols-outlined text-primary">style</span>
-                                        Biến thể sản phẩm
-                                    </h2>
-                                    <button
-                                        className="text-primary text-sm font-bold hover:text-[#3ec4f1] flex items-center gap-1 bg-primary/10 px-3 py-1.5 rounded-lg border border-primary/20 transition-colors">
-                                        <span className="material-symbols-outlined text-[18px]">add</span>
-                                        Thêm biến thể
+                                <h2 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
+                                    <span className="material-symbols-outlined text-primary">style</span>
+                                    Biến thể sản phẩm
+                                </h2>
+                                <div className="space-y-4 mb-8">
+                                    {dataAttribute.map(item => (
+                                        <div key={item.id}
+                                            className="bg-[#111618] border border-border-dark rounded-lg p-4 relative group hover:border-border-dark/80 transition-colors">
+                                            <div className="flex flex-col md:flex-row gap-4 items-start">
+                                                <div className="w-full md:w-1/4">
+                                                    <label className="block text-xs font-medium text-[#9db2b9] mb-1.5">Tên thuộc
+                                                        tính</label>
+                                                    <input
+                                                        className="w-full rounded text-sm px-3 py-2 bg-surface-dark border border-border-dark focus:border-primary focus:ring-primary"
+                                                        type="text" value={item.name} onChange={(e) => handleAttributeName(item.id, e.target.value)} />
+                                                </div>
+                                                <div className="w-full md:w-3/4">
+                                                    <label className="block text-xs font-medium text-[#9db2b9] mb-1.5">Giá trị của
+                                                        thuộc tính</label>
+                                                    <div
+                                                        className="w-full min-h-[38px] rounded px-2 py-1.5 bg-surface-dark border border-border-dark focus-within:border-primary focus-within:ring-1 focus-within:ring-primary flex flex-wrap gap-2 items-center">
+                                                        {item.values.map((value, index) => (
+                                                            <span key={index}
+                                                                className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-primary/20 text-primary text-xs font-medium border border-primary/20">
+                                                                {value}
+                                                                <button className="cursor-pointer hover:text-white" onClick={(e) => handleRemoveAttributeItem(item.id, value)}>
+                                                                    <span className="material-symbols-outlined text-[14px]">close</span>
+                                                                </button>
+                                                            </span>
+                                                        ))}
+                                                        <input id={item.id}
+                                                            className="bg-transparent border-none p-0 text-sm focus:ring-0 placeholder-[#9db2b9]/50 min-w-[80px] flex-1"
+                                                            placeholder="Nhập giá trị biến thể" type="text" onKeyDown={e => handleAddAttributeItem(e, item.id)}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <button
+                                                className="cursor-pointer absolute -top-2.5 -right-2.5 bg-surface-dark border border-border-dark text-[#9db2b9] hover:text-red-500 rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-all"
+                                                title="Xóa thuộc tính" id={item.id} onClick={(e) => handleRemoveAttribute(item.id)}>
+                                                <span className="material-symbols-outlined text-[16px]">delete</span>
+                                            </button>
+                                        </div>
+                                    ))}
+                                    <button onClick={handleAddAttribute}
+                                        className="cursor-pointer text-primary text-sm font-bold hover:text-[#3ec4f1] flex items-center gap-1.5 px-2 py-1 -ml-2 rounded hover:bg-primary/10 transition-colors">
+                                        <span className="material-symbols-outlined text-[20px]">add</span>
+                                        Thêm thuộc tính mới
                                     </button>
                                 </div>
-                                <div className="overflow-x-auto rounded-lg border border-border-dark">
-                                    <table className="w-full text-left border-collapse min-w-[600px]">
-                                        <thead>
-                                            <tr
-                                                className="bg-[#152025] text-xs uppercase tracking-wider text-[#9db2b9] border-b border-border-dark">
-                                                <th className="px-4 py-3 font-semibold w-1/6">Màu sắc</th>
-                                                <th className="px-4 py-3 font-semibold w-1/6">Kích cỡ</th>
-                                                <th className="px-4 py-3 font-semibold w-1/4">SKU <span
-                                                    className="text-red-500">*</span></th>
-                                                <th className="px-4 py-3 font-semibold text-right w-1/6">Giá bán <span
-                                                    className="text-red-500">*</span></th>
-                                                <th className="px-4 py-3 font-semibold text-right w-1/6">Tồn kho</th>
-                                                <th className="px-4 py-3 font-semibold w-10"></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody className="divide-y divide-border-dark bg-[#111618]">
-                                            <tr>
-                                                <td className="px-4 py-3 align-top">
-                                                    <div className="flex items-center gap-2">
-                                                        <input
-                                                            className="h-8 w-8 rounded cursor-pointer border-none bg-transparent p-0 flex-shrink-0"
-                                                            type="color" value="#ef4444" />
-                                                        <input
-                                                            className="w-full min-w-[60px] rounded px-2 py-1 text-sm bg-surface-dark border-border-dark focus:border-primary focus:ring-primary"
-                                                            type="text" value="Đỏ" />
-                                                    </div>
-                                                </td>
-                                                <td className="px-4 py-3 align-top">
-                                                    <select
-                                                        className="w-full min-w-[70px] rounded px-2 py-1 text-sm bg-surface-dark border-border-dark focus:border-primary focus:ring-primary">
-                                                        <option>XS</option>
-                                                        <option>S</option>
-                                                        <option selected={true}>M</option>
-                                                        <option>L</option>
-                                                        <option>XL</option>
-                                                    </select>
-                                                </td>
-                                                <td className="px-4 py-3 align-top">
-                                                    <input
-                                                        className="w-full rounded px-2 py-1 text-sm bg-surface-dark border-border-dark focus:border-primary focus:ring-primary"
-                                                        required={true} type="text" value="AT-DIN-RED-M" />
-                                                </td>
-                                                <td className="px-4 py-3 align-top">
-                                                    <input
-                                                        className="w-full rounded px-2 py-1 text-sm text-right bg-surface-dark border-border-dark focus:border-primary focus:ring-primary"
-                                                        type="number" value="150000" />
-                                                </td>
-                                                <td className="px-4 py-3 align-top">
-                                                    <input
-                                                        className="w-full rounded px-2 py-1 text-sm text-right bg-surface-dark border-border-dark focus:border-primary focus:ring-primary"
-                                                        min="0" type="number" value="50" />
-                                                </td>
-                                                <td className="px-4 py-3 align-top text-right">
-                                                    <button
-                                                        className="text-[#9db2b9] hover:text-red-400 p-1 bg-surface-dark rounded hover:bg-[#283539] transition-colors"><span
-                                                            className="material-symbols-outlined text-[20px]">delete</span></button>
-                                                </td>
-                                            </tr>
-                                            <tr>
-                                                <td className="px-4 py-3 align-top">
-                                                    <div className="flex items-center gap-2">
-                                                        <input
-                                                            className="h-8 w-8 rounded cursor-pointer border-none bg-transparent p-0 flex-shrink-0"
-                                                            type="color" value="#3b82f6" />
-                                                        <input
-                                                            className="w-full min-w-[60px] rounded px-2 py-1 text-sm bg-surface-dark border-border-dark focus:border-primary focus:ring-primary"
-                                                            type="text" value="Xanh" />
-                                                    </div>
-                                                </td>
-                                                <td className="px-4 py-3 align-top">
-                                                    <select
-                                                        className="w-full min-w-[70px] rounded px-2 py-1 text-sm bg-surface-dark border-border-dark focus:border-primary focus:ring-primary">
-                                                        <option>XS</option>
-                                                        <option>S</option>
-                                                        <option>M</option>
-                                                        <option selected={true}>L</option>
-                                                        <option>XL</option>
-                                                    </select>
-                                                </td>
-                                                <td className="px-4 py-3 align-top">
-                                                    <input
-                                                        className="w-full rounded px-2 py-1 text-sm bg-surface-dark border-border-dark focus:border-primary focus:ring-primary"
-                                                        type="text" value="AT-DIN-BLU-L" />
-                                                </td>
-                                                <td className="px-4 py-3 align-top">
-                                                    <input
-                                                        className="w-full rounded px-2 py-1 text-sm text-right bg-surface-dark border-border-dark focus:border-primary focus:ring-primary"
-                                                        required type="number" value="150000" />
-                                                </td>
-                                                <td className="px-4 py-3 align-top">
-                                                    <input
-                                                        className="w-full rounded px-2 py-1 text-sm text-right bg-surface-dark border-border-dark focus:border-primary focus:ring-primary"
-                                                        min="0" type="number" value="32" />
-                                                </td>
-                                                <td className="px-4 py-3 align-top text-right">
-                                                    <button
-                                                        className="text-[#9db2b9] hover:text-red-400 p-1 bg-surface-dark rounded hover:bg-[#283539] transition-colors"><span
-                                                            className="material-symbols-outlined text-[20px]">delete</span></button>
-                                                </td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                    <div className="p-3 bg-[#111618] border-t border-border-dark flex justify-center">
-                                        <button
-                                            className="text-sm text-[#9db2b9] hover:text-primary flex items-center gap-1 transition-colors">
-                                            <span className="material-symbols-outlined text-[18px]">add_circle</span>
-                                            Thêm nhanh dòng mới
-                                        </button>
+                                <div className="border-t border-border-dark pt-6">
+                                    <div className="flex items-center justify-between mb-3">
+                                        <h3 className="text-sm font-bold text-white">Danh sách biến thể đã sinh ({dataVariant.length})</h3>
+                                    </div>
+                                    <div className="overflow-x-auto rounded-lg border border-border-dark">
+                                        <table className="w-full text-left border-collapse min-w-[700px]">
+                                            <thead>
+                                                <tr
+                                                    className="bg-[#152025] text-xs uppercase tracking-wider text-[#9db2b9] border-b border-border-dark">
+                                                    <th className="px-4 py-3 font-semibold">Biến thể</th>
+                                                    <th className="px-4 py-3 font-semibold text-right w-1/5">Giá bán <span
+                                                        className="text-red-500">*</span></th>
+                                                    <th className="px-4 py-3 font-semibold text-right w-1/6">Tồn kho <span
+                                                        className="text-red-500">*</span></th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="divide-y divide-border-dark bg-[#111618]">
+                                                {dataVariant.map(item => (
+                                                    <tr className="hover:bg-surface-dark/50 transition-colors" key={item.id}>
+                                                        <td className="px-4 py-3 align-middle">
+                                                            <div className="flex flex-col gap-0.5">
+                                                                <span className="text-[#9db2b9]">{item.combo}</span>
+                                                            </div>
+                                                        </td>
+                                                        <td className="px-4 py-3 align-middle">
+                                                            <input
+                                                                className="w-full rounded px-2 py-1.5 text-sm text-right bg-surface-dark border-border-dark focus:border-primary focus:ring-primary"
+                                                                type="number" value={item.price} onChange={e => handleVariantItem(e.target.value, item.id, "price")} />
+                                                        </td>
+                                                        <td className="px-4 py-3 align-middle">
+                                                            <input
+                                                                className="w-full rounded px-2 py-1.5 text-sm text-right bg-surface-dark border-border-dark focus:border-primary focus:ring-primary"
+                                                                min="0" type="number" value={item.stock_quantity} onChange={e => handleVariantItem(e.target.value, item.id, "stock_quantity")} />
+                                                        </td>
+                                                    </tr>
+                                                ))}
+                                            </tbody>
+                                        </table>
                                     </div>
                                 </div>
                             </section>
@@ -332,7 +407,7 @@ export default function CreateProductPage() {
                                             <span className="text-xs text-[#9db2b9]">Cho phép bán</span>
                                         </div>
                                         <label className="relative inline-flex items-center cursor-pointer">
-                                            <input checked className="sr-only peer" type="checkbox" value="" />
+                                            <input className="sr-only peer" type="checkbox" onChange={(e) => setDataProduct({ ...dataProduct, is_active: Boolean(e.target.checked) })} />
                                             <div
                                                 className="w-11 h-6 bg-[#283539] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500">
                                             </div>
@@ -347,11 +422,6 @@ export default function CreateProductPage() {
                                                 <option value="bt-ao">Bé Trai / Áo Thun</option>
                                                 <option value="bt-quan">Bé Trai / Quần</option>
                                             </optgroup>
-                                            <optgroup label="Bé Gái">
-                                                <option value="bg-vay">Bé Gái / Váy Đầm</option>
-                                                <option value="bg-ao">Bé Gái / Áo</option>
-                                            </optgroup>
-                                            <option value="phukien">Phụ kiện</option>
                                         </select>
                                     </div>
                                     <div>
@@ -375,27 +445,6 @@ export default function CreateProductPage() {
                                                         type="checkbox" />
                                                     <span className="text-sm text-white">Hàng Mới Về</span>
                                                 </label>
-                                                <label
-                                                    className="flex items-center gap-2 p-1.5 hover:bg-surface-dark rounded cursor-pointer">
-                                                    <input
-                                                        className="rounded border-border-dark bg-transparent text-primary focus:ring-primary"
-                                                        type="checkbox" />
-                                                    <span className="text-sm text-white">Bộ Sưu Tập Mùa Hè</span>
-                                                </label>
-                                                <label
-                                                    className="flex items-center gap-2 p-1.5 hover:bg-surface-dark rounded cursor-pointer bg-surface-dark/50">
-                                                    <input checked
-                                                        className="rounded border-border-dark bg-transparent text-primary focus:ring-primary"
-                                                        type="checkbox" />
-                                                    <span className="text-sm text-white">Back to School</span>
-                                                </label>
-                                                <label
-                                                    className="flex items-center gap-2 p-1.5 hover:bg-surface-dark rounded cursor-pointer">
-                                                    <input
-                                                        className="rounded border-border-dark bg-transparent text-primary focus:ring-primary"
-                                                        type="checkbox" />
-                                                    <span className="text-sm text-white">Giảm giá Flash Sale</span>
-                                                </label>
                                             </div>
                                         </div>
                                         <p className="text-xs text-[#9db2b9] mt-1">Chọn một hoặc nhiều bộ sưu tập.</p>
@@ -404,8 +453,8 @@ export default function CreateProductPage() {
                             </section>
                         </div>
                     </div>
-                </div>
-            </main>
-        </div>
+                </div >
+            </main >
+        </div >
     )
 }

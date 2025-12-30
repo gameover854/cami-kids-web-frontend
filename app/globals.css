@@ -60,3 +60,17 @@ select:focus {
   border-color: #13b6ec;
   --tw-ring-color: #13b6ec;
 }
+
+/* @keyframes shrink-width {
+  from {
+    width: 100%;
+  }
+
+  to {
+    width: 0%;
+  }
+}
+
+.animate-progress {
+  animation: shrink-width 4s linear forwards;
+} */
