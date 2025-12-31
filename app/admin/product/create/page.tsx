@@ -96,7 +96,7 @@ export default function CreateProductPage() {
         ))
     }
 
-    const handleVariantItem = (value: string, variantItemId: string, type: string) => {
+    const handleVariantItem = (value: number, variantItemId: string, type: string) => {
         setDataVariant(dataVariant.map(item =>
             (item.id === variantItemId ? { ...item, [type]: value } : item)
         ));
@@ -121,7 +121,6 @@ export default function CreateProductPage() {
     async function create() {
         const payload = parseData(dataProduct, dataAttribute, dataVariant);
         const response = await createProduct(payload);
-        console.log('--->respónse<---', response);
         console.log('>>>>>payload', payload);
     }
 
@@ -316,12 +315,12 @@ export default function CreateProductPage() {
                                                         <td className="px-4 py-3 align-middle">
                                                             <input
                                                                 className="w-full rounded px-2 py-1.5 text-sm text-right bg-surface-dark border-border-dark focus:border-primary focus:ring-primary"
-                                                                type="number" value={item.price} onChange={e => handleVariantItem(e.target.value, item.id, "price")} />
+                                                                type="number" value={item.price} onChange={e => handleVariantItem(Number(e.target.value), item.id, "price")} />
                                                         </td>
                                                         <td className="px-4 py-3 align-middle">
                                                             <input
                                                                 className="w-full rounded px-2 py-1.5 text-sm text-right bg-surface-dark border-border-dark focus:border-primary focus:ring-primary"
-                                                                min="0" type="number" value={item.stock_quantity} onChange={e => handleVariantItem(e.target.value, item.id, "stock_quantity")} />
+                                                                min="0" type="number" value={item.stock_quantity} onChange={e => handleVariantItem(Number(e.target.value), item.id, "stock_quantity")} />
                                                         </td>
                                                     </tr>
                                                 ))}
