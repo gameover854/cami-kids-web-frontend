@@ -1,13 +1,5 @@
-'use client'
-
-import { createProduct } from "@/services/product.services";
-import { useParams } from "next/navigation";
-import { useEffect, useState } from "react"
-import { v4 as uuidv4 } from "uuid";
+"use client";
 
 export default function CreateProductPage() {
-    const param = useParams()
-    return (
-        <div></div>
-    )
+  return <h1>Product Details</h1>;
 }
