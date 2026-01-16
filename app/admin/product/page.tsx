@@ -6,6 +6,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { getProduct } from "@/services/product.services";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { getCategory } from "@/services/category.services";
+import Loading from "@/components/notification/loading";
 
 export default function ProductPage() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -22,6 +23,7 @@ export default function ProductPage() {
     isActive[0]
   );
   const [isReady, setIsReady] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
   const pathName = usePathname();
   const searchParams = useSearchParams();
@@ -70,12 +72,19 @@ export default function ProductPage() {
     if (!isReady) return;
 
     const fetchProduct = async () => {
-      const res = await getProduct(
-        Number(pageParams ?? 1),
-        Number(limitParams ?? 5),
-        filters
-      );
-      setProducts(res.data.products);
+      try {
+        setIsLoading(true);
+        const res = await getProduct(
+          Number(pageParams ?? 1),
+          Number(limitParams ?? 5),
+          filters
+        );
+        setProducts(res.data.products);
+      } catch (error) {
+        console.log("--->Error<---", error);
+      } finally {
+        setIsLoading(false);
+      }
     };
     fetchProduct();
 
@@ -85,7 +94,7 @@ export default function ProductPage() {
       currentsParams.delete("category_id");
     }
 
-    if (filters.is_active) {
+    if (filters.is_active || filters.is_active === 0) {
       currentsParams.set("is_active", String(filters.is_active));
     } else {
       currentsParams.delete("is_active");
@@ -174,6 +183,8 @@ export default function ProductPage() {
           )}
           <ProductTable products={products} />
         </div>
+
+        {isLoading && <Loading />}
       </main>
     </div>
   );

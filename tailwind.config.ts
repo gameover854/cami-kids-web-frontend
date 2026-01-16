@@ -1,13 +1,10 @@
 export default {
-  content: [
-    "./app/**/*.{js,ts,jsx,tsx}",
-    "./components/**/*.{js,ts,jsx,tsx}",
-  ],
+  content: ["./app/**/*.{js,ts,jsx,tsx}", "./components/**/*.{js,ts,jsx,tsx}"],
   darkMode: "class",
   theme: {
     extend: {
       colors: {
-        "primary": "#13b6ec",
+        primary: "#13b6ec",
         "background-light": "#f6f8f8",
         "background-dark": "#101d22",
         "card-light": "#ffffff",
@@ -16,13 +13,22 @@ export default {
         "text-secondary-dark": "#9db2b9",
         "border-dark": "#283539",
         "surface-dark": "#1c2b31",
-        "border-error": 'red',
+        "border-error": "red",
         // "success": "#10B981",
       },
       fontFamily: {
-        "display": ["Inter", "sans-serif"]
+        display: ["Inter", "sans-serif"],
       },
-      borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+      borderRadius: {
+        DEFAULT: "0.25rem",
+        lg: "0.5rem",
+        xl: "0.75rem",
+        full: "9999px",
+      },
+      animation: {
+        "spin-slow": "spin 2s linear infinite",
+        "pulse-fast": "pulse 1.5s cubic-bezier(0.4, 0, 0.6, 1) infinite",
+      },
     },
   },
 };

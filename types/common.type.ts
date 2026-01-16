@@ -1,15 +1,15 @@
 type Product = {
-  id: number;
-  category_id: number | undefined;
-  promotion_id: number | undefined;
+  id?: number ;
+  category_id?: number;
+  promotion_id?: number;
   name: string;
   original_price: number;
-  compare_price: number | undefined;
+  compare_price?: number;
   is_active: boolean;
   description: string;
-  category: Category;
-  product_attributes: ProductAttribute;
-  product_variants: ProductVariant;
+  category?: Category;
+  product_attributes?: ProductAttribute;
+  product_variants?: ProductVariant;
 };
 
 type Products = Product[];
@@ -31,10 +31,10 @@ type GetProductResponse = {
   totalProduct: number;
 };
 type AttributeItem = {
-  id: string;
+  id?: string;
   name: string;
   values: string[];
-  _count: {
+  _count?: {
     values: number;
   };
 };
@@ -42,7 +42,7 @@ type AttributeItem = {
 type ProductAttribute = AttributeItem[];
 
 type VariantItem = {
-  id: string;
+  id: string | undefined;
   price: number;
   stock_quantity: number;
   combo: string;

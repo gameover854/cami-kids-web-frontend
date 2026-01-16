@@ -1,6 +1,8 @@
 "use client";
 
+import Loading from "@/components/notification/loading";
 import { createProduct } from "@/services/product.services";
+import { redirect } from "next/navigation";
 import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
@@ -16,7 +18,7 @@ export default function CreateProductPage() {
   });
 
   const [dataAttribute, setDataAttribute] = useState<ProductAttribute>([]);
-
+  const [isLoading, setIsLoading] = useState(false);
   const generateVariants = (dataAttribute: ProductAttribute) => {
     let variants: ProductVariant = [];
     let combo: string[] = [];
@@ -141,7 +143,7 @@ export default function CreateProductPage() {
         name: dataProduct.name.toString(),
         original_price: Number(dataProduct.original_price),
         compare_price: Number(dataProduct.compare_price),
-        description: String(dataProduct.name),
+        description: String(dataProduct.description),
         category_id: Number(dataProduct.category_id),
         promotion_id: Number(dataProduct.promotion_id),
         is_active: Boolean(dataProduct.is_active),
@@ -155,8 +157,15 @@ export default function CreateProductPage() {
 
   async function create() {
     const payload = parseData(dataProduct, dataAttribute, dataVariant);
-    const response = await createProduct(payload);
-    console.log(">>>>>payload", payload);
+    try {
+      setIsLoading(true);
+      const response = await createProduct(payload);
+    } catch (error) {
+      console.log("--->Error Create Product<---", error);
+    } finally {
+      setIsLoading(false);
+    }
+    redirect("/admin/product");
   }
 
   return (
@@ -607,6 +616,7 @@ export default function CreateProductPage() {
             </div>
           </div>
         </div>
+        {isLoading && (<Loading />)}
       </main>
     </div>
   );
