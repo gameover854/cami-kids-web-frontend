@@ -1,9 +1,10 @@
 "use client";
+
 import ProductFilter from "./ProductFilter";
 import ProductTable from "./ProductTable";
 import Link from "next/link";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { getProduct } from "@/services/product.services";
+import { useEffect, useMemo, useState } from "react";
+import { deleteProduct, getProduct } from "@/services/product.services";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { getCategory } from "@/services/category.services";
 import Loading from "@/components/notification/loading";
@@ -30,7 +31,7 @@ export default function ProductPage() {
   const currentsParams = new URLSearchParams(searchParams.toString());
   const params = Object.fromEntries(searchParams.entries());
   const { category_id, is_active, pageParams, limitParams } = params;
-
+  const [version, setVersion] = useState(0);
   // -------1. Fetch Category--------
   useEffect(() => {
     const fetchCategory = async () => {
@@ -102,7 +103,19 @@ export default function ProductPage() {
 
     const queryString = currentsParams.toString();
     router.replace(`${pathName}?${queryString}`);
-  }, [filters]);
+  }, [filters, version]);
+
+  async function remove(id: number) {
+    try {
+      setIsLoading(true);
+      await deleteProduct(id);
+      setVersion(version + 1);
+    } catch (error) {
+      console.log("--->Error Delete Product<---", error);
+    } finally {
+      setIsLoading(false);
+    }
+  }
 
   return (
     <div className="flex-1 flex flex-col  h-full bg-background-dark relative">
@@ -171,7 +184,7 @@ export default function ProductPage() {
             </div>
           </div>
 
-          {categories.length && (
+          {categories.length ? (
             <ProductFilter
               categories={categories}
               isActive={isActive}
@@ -180,8 +193,10 @@ export default function ProductPage() {
               selectedIsActive={selectedIsActive}
               setSelectedIsActive={setSelectedIsActive}
             />
+          ) : (
+            ""
           )}
-          <ProductTable products={products} />
+          <ProductTable products={products} remove={remove} />
         </div>
 
         {isLoading && <Loading />}

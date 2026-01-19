@@ -2,7 +2,7 @@
 
 import Loading from "@/components/notification/loading";
 import { createProduct } from "@/services/product.services";
-import { redirect } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
@@ -19,6 +19,8 @@ export default function CreateProductPage() {
 
   const [dataAttribute, setDataAttribute] = useState<ProductAttribute>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const router = useRouter();
+
   const generateVariants = (dataAttribute: ProductAttribute) => {
     let variants: ProductVariant = [];
     let combo: string[] = [];
@@ -165,7 +167,7 @@ export default function CreateProductPage() {
     } finally {
       setIsLoading(false);
     }
-    redirect("/admin/product");
+    router.push("/admin/product");
   }
 
   return (
@@ -616,7 +618,7 @@ export default function CreateProductPage() {
             </div>
           </div>
         </div>
-        {isLoading && (<Loading />)}
+        {isLoading && <Loading />}
       </main>
     </div>
   );

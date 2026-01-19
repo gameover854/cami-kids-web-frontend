@@ -19,5 +19,5 @@ export function updateProduct(id: number, payload: Product) {
   return axios.put("/products", payload);
 }
 export function deleteProduct(id: number) {
-  return axios.put("/products");
+  return axios.delete(`/products/${id}`);
 }

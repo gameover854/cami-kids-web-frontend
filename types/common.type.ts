@@ -34,7 +34,7 @@ type AttributeItem = {
   id?: string;
   name: string;
   values: string[];
-  _count?: {
+  _count: {
     values: number;
   };
 };

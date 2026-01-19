@@ -1,6 +1,13 @@
+import { deleteProduct } from "@/services/product.services";
 import { formatVND } from "@/utils/formatCurrency";
 
-export default function ProductTable({ products }: { products: Product[] }) {
+export default function ProductTable({
+  products,
+  remove,
+}: {
+  products: Product[];
+  remove: any
+}) {
   return (
     <div className="bg-surface-dark rounded-xl border border-border-dark overflow-hidden shadow-xl">
       <div className="overflow-x-auto">
@@ -99,6 +106,7 @@ export default function ProductTable({ products }: { products: Product[] }) {
                     <button
                       className="p-1.5 text-[#9db2b9] hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors cursor-pointer"
                       title="Xóa"
+                      onClick={() => remove(Number(item.id))}
                     >
                       <span className="material-symbols-outlined text-[20px]">
                         delete
