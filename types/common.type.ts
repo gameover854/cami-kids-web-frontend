@@ -1,22 +1,23 @@
 type Product = {
-  id?: number ;
+  id?: number;
   category_id?: number;
   promotion_id?: number;
   name: string;
-  original_price: number;
+  selling_price: number;
   compare_price?: number;
   is_active: boolean;
   description: string;
   category?: Category;
   product_attributes?: ProductAttribute;
   product_variants?: ProductVariant;
+  images?: Image[];
 };
 
 type Products = Product[];
 
 type PayloadProduct = {
   product: Product;
-  attribute: AttributeItem[];
+  attributes: AttributeItem[];
 };
 
 type ApiResponse<T> = {
@@ -34,7 +35,7 @@ type AttributeItem = {
   id?: string;
   name: string;
   values: string[];
-  _count: {
+  _count?: {
     values: number;
   };
 };
@@ -67,3 +68,17 @@ type IsActive = {
   id: number | null;
   name: string;
 };
+
+type ProductImage = Image[];
+
+type Image = {
+  id: string;
+  url: string;
+  is_main: Boolean;
+  public_id?: string;
+};
+
+enum ACTION_UPDATE_IMAGE {
+  PRIMARY = "PRIMARY",
+  DELETE = "DELETE",
+}

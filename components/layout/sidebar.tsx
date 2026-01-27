@@ -49,7 +49,7 @@ export default function Sidebar() {
   ];
 
   function isActiveSidebar(href: string, pathName: string) {
-    return pathName.startsWith(href)
+    return pathName === href || pathName.startsWith(href)
       ? "bg-primary/10 text-primary bg-primary/10transition-colors border-primary/20 border"
       : "dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors";
   }

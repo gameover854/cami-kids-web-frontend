@@ -2,6 +2,8 @@
 
 import Loading from "@/components/notification/loading";
 import { createProduct } from "@/services/product.services";
+import { uploadMutiple } from "@/services/upload.services";
+import { convertToBase64, validateImage } from "@/utils/validateImage";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
@@ -9,7 +11,7 @@ import { v4 as uuidv4 } from "uuid";
 export default function CreateProductPage() {
   const [dataProduct, setDataProduct] = useState({
     name: "",
-    original_price: 0,
+    selling_price: 0,
     compare_price: 0,
     description: "",
     category_id: undefined,
@@ -19,6 +21,7 @@ export default function CreateProductPage() {
 
   const [dataAttribute, setDataAttribute] = useState<ProductAttribute>([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [dataImage, setDataImage] = useState<ProductImage>([]);
   const router = useRouter();
 
   const generateVariants = (dataAttribute: ProductAttribute) => {
@@ -42,7 +45,7 @@ export default function CreateProductPage() {
 
     combo = attributeValues.reduce((before, after) => {
       return before.flatMap((val_1) =>
-        after.map((val_2) => (val_1 ? `${val_1} / ${val_2}` : val_2))
+        after.map((val_2) => (val_1 ? `${val_1} / ${val_2}` : val_2)),
       );
     });
 
@@ -59,7 +62,7 @@ export default function CreateProductPage() {
   };
 
   const [dataVariant, setDataVariant] = useState(() =>
-    generateVariants(dataAttribute)
+    generateVariants(dataAttribute),
   );
 
   useEffect(() => {
@@ -78,16 +81,17 @@ export default function CreateProductPage() {
   };
 
   const handleAttributeName = (attributeId: string, attributeName: string) => {
+    if (!attributeId) return;
     setDataAttribute(
       dataAttribute.map((item) =>
-        item.id === attributeId ? { ...item, name: attributeName } : item
-      )
+        item.id === attributeId ? { ...item, name: attributeName } : item,
+      ),
     );
   };
 
   const handleAddAttributeItem = (
     event: React.KeyboardEvent<HTMLInputElement>,
-    attributeItemId: string
+    attributeItemId: string,
   ) => {
     if (event.key !== "Enter") return;
 
@@ -98,8 +102,8 @@ export default function CreateProductPage() {
       prev.map((item) =>
         item.id === attributeItemId && !item.values.includes(value)
           ? { ...item, values: [...item.values, value] }
-          : item
-      )
+          : item,
+      ),
     );
 
     event.currentTarget.value = "";
@@ -107,7 +111,7 @@ export default function CreateProductPage() {
 
   const handleRemoveAttributeItem = (
     attributeItemId: string,
-    attributeItemValue: string
+    attributeItemValue: string,
   ) => {
     setDataAttribute(
       dataAttribute.map((item) =>
@@ -115,53 +119,116 @@ export default function CreateProductPage() {
           ? {
               ...item,
               values: item.values.filter(
-                (value) => value !== attributeItemValue
+                (value) => value !== attributeItemValue,
               ),
             }
-          : item
-      )
+          : item,
+      ),
     );
   };
 
   const handleVariantItem = (
     value: number,
     variantItemId: string,
-    type: string
+    type: string,
   ) => {
     setDataVariant(
       dataVariant.map((item) =>
-        item.id === variantItemId ? { ...item, [type]: value } : item
-      )
+        item.id === variantItemId ? { ...item, [type]: value } : item,
+      ),
     );
+  };
+
+  const handleUploadImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const fileList = e.target.files;
+    if (!fileList || fileList.length === 0) return;
+
+    const validFiles = Array.from(fileList).filter((file) =>
+      validateImage(file.size, file.type),
+    );
+
+    if (validFiles.length === 0) return;
+
+    try {
+      const base64Files = await Promise.all(
+        validFiles.map((file) => convertToBase64(file)),
+      );
+
+      const { data } = await uploadMutiple(base64Files as string[]);
+
+      const newImages = data.map((image: Image) => ({
+        id: uuidv4(),
+        url: image.url,
+        public_id: image.public_id,
+        is_main: false,
+      }));
+
+      setDataImage((prev) => [...prev, ...newImages]);
+    } catch (error) {
+      console.error("Upload failed:", error);
+    } finally {
+      e.target.value = "";
+    }
+  };
+
+  const handleUpdateImage = (imageId: string, action: string) => {
+    switch (action) {
+      case "PRIMARY":
+        setDataImage((images) =>
+          images.map((image) =>
+            image.id === imageId
+              ? { ...image, is_main: true }
+              : { ...image, is_main: false },
+          ),
+        );
+        break;
+
+      case "DELETE":
+        setDataImage((images) =>
+          images.filter((image) => image.id !== imageId),
+        );
+        break;
+
+      default:
+        break;
+    }
   };
 
   const parseData = (
     dataProduct: Product,
     dataAttribute: ProductAttribute,
-    dataVariant: ProductVariant
+    dataVariant: ProductVariant,
+    dataImage: ProductImage,
   ) => {
     return {
       product: {
         name: dataProduct.name.toString(),
-        original_price: Number(dataProduct.original_price),
+        selling_price: Number(dataProduct.selling_price),
         compare_price: Number(dataProduct.compare_price),
         description: String(dataProduct.description),
         category_id: Number(dataProduct.category_id),
         promotion_id: Number(dataProduct.promotion_id),
         is_active: Boolean(dataProduct.is_active),
       },
-      attribute: dataAttribute.filter(
-        (item) => item.values.length > 0 && item.name.length > 0
+      attributes: dataAttribute.filter(
+        (item) => item.values.length > 0 && item.name.length > 0,
       ),
-      variant: dataVariant,
+      variants: dataVariant,
+      images: dataImage,
     };
   };
 
   async function create() {
-    const payload = parseData(dataProduct, dataAttribute, dataVariant);
+    const payload = parseData(
+      dataProduct,
+      dataAttribute,
+      dataVariant,
+      dataImage,
+    );
+    console.log("--->payload<---", payload);
     try {
       setIsLoading(true);
-      const response = await createProduct(payload);
+      await createProduct(payload);
     } catch (error) {
       console.log("--->Error Create Product<---", error);
     } finally {
@@ -251,17 +318,17 @@ export default function CreateProductPage() {
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
                       <label className="block text-sm font-medium text-[#9db2b9] mb-1">
-                        Giá gốc (VNĐ)
+                        Giá bán (VNĐ)
                       </label>
                       <div className="relative">
                         <input
                           className="w-full rounded-lg text-sm pl-3 pr-10 py-2.5 text-right font-medium focus:ring-1 focus:ring-primary"
-                          placeholder="0"
+                          placeholder="Nhập giá bán"
                           type="number"
                           onChange={(e) => {
                             setDataProduct({
                               ...dataProduct,
-                              original_price: Number(e.target.value),
+                              selling_price: Number(e.target.value),
                             });
                           }}
                         />
@@ -272,12 +339,12 @@ export default function CreateProductPage() {
                     </div>
                     <div>
                       <label className="block text-sm font-medium text-[#9db2b9] mb-1">
-                        Giá so sánh
+                        Giá so sánh (VNĐ)
                       </label>
                       <div className="relative">
                         <input
                           className="w-full rounded-lg text-sm pl-3 pr-10 py-2.5 text-right font-medium focus:ring-1 focus:ring-primary"
-                          placeholder="0"
+                          placeholder="Nhập giá so sánh"
                           type="number"
                           onChange={(e) => {
                             setDataProduct({
@@ -335,7 +402,7 @@ export default function CreateProductPage() {
                             type="text"
                             value={item.name}
                             onChange={(e) =>
-                              handleAttributeName(item.id, e.target.value)
+                              handleAttributeName(item.id!, e.target.value)
                             }
                           />
                         </div>
@@ -353,7 +420,7 @@ export default function CreateProductPage() {
                                 <button
                                   className="cursor-pointer hover:text-white"
                                   onClick={(e) =>
-                                    handleRemoveAttributeItem(item.id, value)
+                                    handleRemoveAttributeItem(item.id!, value)
                                   }
                                 >
                                   <span className="material-symbols-outlined text-[14px]">
@@ -368,7 +435,7 @@ export default function CreateProductPage() {
                               placeholder="Nhập giá trị biến thể"
                               type="text"
                               onKeyDown={(e) =>
-                                handleAddAttributeItem(e, item.id)
+                                handleAddAttributeItem(e, item.id!)
                               }
                             />
                           </div>
@@ -378,7 +445,7 @@ export default function CreateProductPage() {
                         className="cursor-pointer absolute -top-2.5 -right-2.5 bg-surface-dark border border-border-dark text-[#9db2b9] hover:text-red-500 rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-all"
                         title="Xóa thuộc tính"
                         id={item.id}
-                        onClick={(e) => handleRemoveAttribute(item.id)}
+                        onClick={(e) => handleRemoveAttribute(item.id!)}
                       >
                         <span className="material-symbols-outlined text-[16px]">
                           delete
@@ -436,8 +503,8 @@ export default function CreateProductPage() {
                                 onChange={(e) =>
                                   handleVariantItem(
                                     Number(e.target.value),
-                                    item.id,
-                                    "price"
+                                    item.id!,
+                                    "price",
                                   )
                                 }
                               />
@@ -451,8 +518,8 @@ export default function CreateProductPage() {
                                 onChange={(e) =>
                                   handleVariantItem(
                                     Number(e.target.value),
-                                    item.id,
-                                    "stock_quantity"
+                                    item.id!,
+                                    "stock_quantity",
                                   )
                                 }
                               />
@@ -476,6 +543,14 @@ export default function CreateProductPage() {
                     <span className="material-symbols-outlined text-primary text-3xl">
                       cloud_upload
                     </span>
+                    <input
+                      type="file"
+                      name="uploadImage"
+                      id="uploadImage"
+                      accept="image/*"
+                      multiple
+                      onChange={(e) => handleUploadImage(e)}
+                    />
                   </div>
                   <p className="text-white font-medium text-sm">
                     Kéo thả hình ảnh vào đây hoặc click để chọn
@@ -485,60 +560,47 @@ export default function CreateProductPage() {
                   </p>
                 </div>
                 <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-4">
-                  <div className="relative group aspect-square rounded-lg border-2 border-primary overflow-hidden bg-[#111618]">
-                    <img
-                      alt="Product Image"
-                      className="w-full h-full object-cover"
-                      src="https://lh3.googleusercontent.com/aida-public/AB6AXuA5Ei6li-VXZbwLWbO-hLipU9tGzSC_lsRINbTEpAkwPeBZpoQLLDZfvM5Ig5ZB2nB-h2UJuC9Jw76TAnvpDL4Bwb9gv1jNn0NL5Z-2QA2jg-XLsVsg-eKDUzWaXMPu89oAuuqPpviEYrTp3qUYhgyMfcKqC-tdYEQ19cdrpCAVxhBZUaR6BUefQrW0zbqfCU-NxXejkSee5fl04qLrYGIp26nWE-sGeL3hK38K0GOf-rhVB5LwmQLoRKp0jSEDNON0pqpYluDZiiIa"
-                    />
-                    <div className="absolute top-2 left-2 bg-primary text-background-dark text-[10px] font-bold px-2 py-0.5 rounded shadow-sm">
-                      Ảnh chính
-                    </div>
-                    <button className="absolute top-2 right-2 bg-black/60 hover:bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm">
-                      <span className="material-symbols-outlined text-[16px]">
-                        close
-                      </span>
-                    </button>
-                    <div className="absolute inset-x-0 bottom-0 bg-black/60 p-1 opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm flex justify-center cursor-move">
-                      <span className="material-symbols-outlined text-white text-[16px]">
-                        drag_handle
-                      </span>
-                    </div>
-                  </div>
-                  <div className="relative group aspect-square rounded-lg border border-border-dark overflow-hidden bg-[#111618] hover:border-[#9db2b9] transition-colors">
-                    <img
-                      alt="Product Image"
-                      className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
-                      src="https://lh3.googleusercontent.com/aida-public/AB6AXuAeCFHPHTIlwj8Kt6iJvGdY5lEnr7hJPinO-NzXnnoQrTGjFNArSa8pb6uYeEx2qFmGg7MQO9muajCboj4QDVqsyNYfSDWuR2QEijdk6L2oKabWFeASu9nimeij9THgJ_ayoArZ9331kI5gckhmE6W-bc5YvSZ_cL_pSRuWzakp-FNqqm62uvak5eUCfZRvV-O6bRCCB_z8GOftAuSWiDPEO_V_9q20vROT1muc9xtbrp08gSYedQrQIWbO4YFJ5nV2xNm6OZtuqkqe"
-                    />
-                    <button className="absolute top-2 right-2 bg-black/60 hover:bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm">
-                      <span className="material-symbols-outlined text-[16px]">
-                        close
-                      </span>
-                    </button>
-                    <div className="absolute inset-x-0 bottom-0 bg-black/60 p-2 opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm flex justify-center gap-2">
-                      <button className="text-xs text-white hover:text-primary underline">
-                        Đặt làm chính
+                  {dataImage.map((image) => (
+                    <div
+                      className="relative group aspect-square rounded-lg border-2 border-primary overflow-hidden bg-[#111618]"
+                      key={image.id}
+                    >
+                      <img
+                        alt="Product Image"
+                        className="w-full h-full object-cover"
+                        src={image.url}
+                      />
+                      {image.is_main && (
+                        <div className="absolute top-2 left-2 bg-primary text-background-dark text-[10px] font-bold px-2 py-0.5 rounded shadow-sm">
+                          Ảnh chính
+                        </div>
+                      )}
+
+                      <button
+                        className="absolute top-2 right-2 bg-black/60 hover:bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm"
+                        onClick={(e) => handleUpdateImage(image.id, "DELETE")}
+                      >
+                        <span className="material-symbols-outlined text-[16px]">
+                          close
+                        </span>
                       </button>
+                      <div className="absolute inset-x-0 bottom-0 bg-black/60 p-2 opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm flex justify-center gap-2">
+                        <button
+                          className="text-xs text-white hover:text-primary underline"
+                          onClick={(e) =>
+                            handleUpdateImage(image.id, "PRIMARY")
+                          }
+                        >
+                          Đặt làm chính
+                        </button>
+                      </div>
+                      {/* <div className="absolute inset-x-0 bottom-0 bg-black/60 p-1 opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm flex justify-center cursor-move">
+                        <span className="material-symbols-outlined text-white text-[16px]">
+                          drag_handle
+                        </span>
+                      </div> */}
                     </div>
-                  </div>
-                  <div className="relative group aspect-square rounded-lg border border-border-dark overflow-hidden bg-[#111618] hover:border-[#9db2b9] transition-colors">
-                    <img
-                      alt="Product Image"
-                      className="w-full h-full object-cover opacity-80 group-hover:opacity-100 transition-opacity"
-                      src="https://lh3.googleusercontent.com/aida-public/AB6AXuBDJNK9os0IdPlUmjX4MATjlClUc6mLFQ_OwJ5qUyMXIXB0Bhmv_kMkB1P_QMvBCNUnbJWC_ngvJP2E9wO4EmfTH-d1Z5eobIjxjDIPTux4CEBeIsakNhQluqVTPjXaaoOcJylcDqo7Y0Yu5xpaD0U1XvTTv01x0f2ul-3FYpSJ6_A2YBgAnmtQtfgl0fIF2VGKw2nfgRV_hiEzubgJgjzd1sl67NzmBK7F3iEsEU1sulIeQ6OVb3f32Xsqb3m2cV1VLGIM8QD-Empz"
-                    />
-                    <button className="absolute top-2 right-2 bg-black/60 hover:bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm">
-                      <span className="material-symbols-outlined text-[16px]">
-                        close
-                      </span>
-                    </button>
-                    <div className="absolute inset-x-0 bottom-0 bg-black/60 p-2 opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm flex justify-center gap-2">
-                      <button className="text-xs text-white hover:text-primary underline">
-                        Đặt làm chính
-                      </button>
-                    </div>
-                  </div>
+                  ))}
                 </div>
               </section>
             </div>

@@ -6,7 +6,7 @@ export default function ProductTable({
   remove,
 }: {
   products: Product[];
-  remove: any
+  remove: any;
 }) {
   return (
     <div className="bg-surface-dark rounded-xl border border-border-dark overflow-hidden shadow-xl">
@@ -46,7 +46,7 @@ export default function ProductTable({
                       <img
                         alt="Green dinosaur t-shirt thumbnail"
                         className="w-full h-full object-cover rounded"
-                        src="https://lh3.googleusercontent.com/aida-public/AB6AXuA5Ei6li-VXZbwLWbO-hLipU9tGzSC_lsRINbTEpAkwPeBZpoQLLDZfvM5Ig5ZB2nB-h2UJuC9Jw76TAnvpDL4Bwb9gv1jNn0NL5Z-2QA2jg-XLsVsg-eKDUzWaXMPu89oAuuqPpviEYrTp3qUYhgyMfcKqC-tdYEQ19cdrpCAVxhBZUaR6BUefQrW0zbqfCU-NxXejkSee5fl04qLrYGIp26nWE-sGeL3hK38K0GOf-rhVB5LwmQLoRKp0jSEDNON0pqpYluDZiiIa"
+                        src={item.images?.at(-1)?.url ?? "/item_example.png"}
                       />
                     </div>
                     <div>
@@ -66,18 +66,22 @@ export default function ProductTable({
                 </td>
                 <td className="px-6 py-4 text-right">
                   <p className="text-white font-medium text-sm">
-                    {formatVND(item.original_price)}{" "}
+                    {formatVND(item.selling_price)}{" "}
                   </p>
                 </td>
                 <td className="px-6 py-4 text-center">
                   <div className="flex flex-col items-center gap-1">
-                    <p className="text-xs text-[#9db2b9]">
-                      {item.product_attributes?.length
-                        ? item.product_attributes.map(
-                            (attr) => `${attr._count.values}  ${attr.name}`
-                          )
-                        : "Không có biến thể"}
-                    </p>
+                    {item.product_attributes?.length ? (
+                      item.product_attributes.map((attr) => (
+                        <p className="text-xs text-[#9db2b9]">
+                          {attr._count?.values} - {attr.name}
+                        </p>
+                      ))
+                    ) : (
+                      <p className="text-xs text-[#9db2b9] italic">
+                        Không có biến thể
+                      </p>
+                    )}
                   </div>
                 </td>
                 <td className="px-6 py-4">
