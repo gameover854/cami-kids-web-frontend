@@ -1,5 +1,6 @@
 import { deleteProduct } from "@/services/product.services";
 import { formatVND } from "@/utils/formatCurrency";
+import Link from "next/link";
 
 export default function ProductTable({
   products,
@@ -41,23 +42,25 @@ export default function ProductTable({
                   />
                 </td>
                 <td className="px-6 py-4">
-                  <div className="flex items-center gap-4">
-                    <div className="size-12 rounded-lg bg-[#111618] p-1 border border-border-dark relative group-hover:border-primary/50 transition-colors">
-                      <img
-                        alt="Green dinosaur t-shirt thumbnail"
-                        className="w-full h-full object-cover rounded"
-                        src={item.images?.at(-1)?.url ?? "/item_example.png"}
-                      />
+                  <Link href={`/admin/product/${item.id}`}>
+                    <div className="flex items-center gap-4">
+                      <div className="size-12 rounded-lg bg-[#111618] p-1 border border-border-dark relative group-hover:border-primary/50 transition-colors">
+                        <img
+                          alt="Green dinosaur t-shirt thumbnail"
+                          className="w-full h-full object-cover rounded"
+                          src={item.images?.at(-1)?.url ?? "/item_example.png"}
+                        />
+                      </div>
+                      <div>
+                        <p className="text-white font-medium text-sm">
+                          {item.name}
+                        </p>
+                        <p className="text-[#9db2b9] text-xs mt-0.5">
+                          ID:{item.id}
+                        </p>
+                      </div>
                     </div>
-                    <div>
-                      <p className="text-white font-medium text-sm">
-                        {item.name}
-                      </p>
-                      <p className="text-[#9db2b9] text-xs mt-0.5">
-                        ID:{item.id}
-                      </p>
-                    </div>
-                  </div>
+                  </Link>
                 </td>
                 <td className="px-6 py-4">
                   <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#111618] text-[#9db2b9] border border-border-dark">

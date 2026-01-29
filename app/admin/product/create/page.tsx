@@ -1,15 +1,17 @@
 "use client";
 
 import Loading from "@/components/notification/loading";
+import { getCategory } from "@/services/category.services";
+import { getPromotion } from "@/services/promotion.services";
 import { createProduct } from "@/services/product.services";
 import { uploadMutiple } from "@/services/upload.services";
 import { convertToBase64, validateImage } from "@/utils/validateImage";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { Fragment, useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
 export default function CreateProductPage() {
-  const [dataProduct, setDataProduct] = useState({
+  const [dataProduct, setDataProduct] = useState<Product>({
     name: "",
     selling_price: 0,
     compare_price: 0,
@@ -22,6 +24,9 @@ export default function CreateProductPage() {
   const [dataAttribute, setDataAttribute] = useState<ProductAttribute>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [dataImage, setDataImage] = useState<ProductImage>([]);
+  const [dataVariant, setDataVariant] = useState<ProductVariant>([]);
+  const [dataCategories, setDataCategories] = useState<Categories>([]);
+  const [dataPromotions, setDataPromotions] = useState<Promotions>([]);
   const router = useRouter();
 
   const generateVariants = (dataAttribute: ProductAttribute) => {
@@ -61,9 +66,28 @@ export default function CreateProductPage() {
     return variants;
   };
 
-  const [dataVariant, setDataVariant] = useState(() =>
-    generateVariants(dataAttribute),
-  );
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const res = await getCategory();
+        const list = [{ id: null, name: "Tất cả" }, ...res.data.categories];
+        setDataCategories(list);
+      } catch (error) {
+        console.error("Failed to fetch categories:", error);
+      }
+    };
+    const fetchPromotions = async () => {
+      try {
+        const res = await getPromotion();
+        const list = [{ id: null, name: "Tất cả" }, ...res.data.promotions];
+        setDataPromotions(list);
+      } catch (error) {
+        console.error("Failed to fetch promotions:", error);
+      }
+    };
+    fetchCategories();
+    fetchPromotions();
+  }, []);
 
   useEffect(() => {
     setDataVariant(generateVariants(dataAttribute));
@@ -203,12 +227,12 @@ export default function CreateProductPage() {
     return {
       product: {
         name: dataProduct.name.toString(),
-        selling_price: Number(dataProduct.selling_price),
-        compare_price: Number(dataProduct.compare_price),
-        description: String(dataProduct.description),
-        category_id: Number(dataProduct.category_id),
-        promotion_id: Number(dataProduct.promotion_id),
-        is_active: Boolean(dataProduct.is_active),
+        selling_price: dataProduct.selling_price,
+        compare_price: dataProduct.compare_price,
+        description: dataProduct.description,
+        category_id: dataProduct.category_id,
+        promotion_id: dataProduct.promotion_id,
+        is_active: dataProduct.is_active,
       },
       attributes: dataAttribute.filter(
         (item) => item.values.length > 0 && item.name.length > 0,
@@ -270,7 +294,7 @@ export default function CreateProductPage() {
         <div className="max-w-[1200px] mx-auto flex flex-col gap-6">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="flex flex-col gap-1">
-              <h1 className="text-2xl md:text-3xl font-black tracking-tight text-white">
+              <h1 className="text-2xl md:text-3xl font-black tracking-tight dark:text-white white:text-gray-400">
                 Thêm sản phẩm mới
               </h1>
               <p className="text-[#9db2b9] text-sm">
@@ -635,45 +659,46 @@ export default function CreateProductPage() {
                     <label className="block text-sm font-medium text-[#9db2b9] mb-1">
                       Danh mục
                     </label>
-                    <select className="w-full rounded-lg text-sm px-3 py-2.5 focus:ring-1 focus:ring-primary">
-                      <option value="">-- Chọn danh mục --</option>
-                      <optgroup label="Bé Trai">
-                        <option value="bt-ao">Bé Trai / Áo Thun</option>
-                        <option value="bt-quan">Bé Trai / Quần</option>
-                      </optgroup>
+                    <select
+                      className="w-full rounded-lg text-sm px-3 py-2.5 focus:ring-1 focus:ring-primary"
+                      onChange={(e) =>
+                        setDataProduct({
+                          ...dataProduct,
+                          category_id: Number(e.target.value),
+                        })
+                      }
+                    >
+                      {dataCategories.map((parent) => (
+                        <Fragment key={parent.id}>
+                          <option value={parent.id}>{parent.name}</option>
+                          {parent.children?.map((child) => (
+                            <option key={child.id} value={child.id}>
+                              └─ {child.name}
+                            </option>
+                          ))}
+                        </Fragment>
+                      ))}
                     </select>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-[#9db2b9] mb-1">
                       Bộ sưu tập
                     </label>
-                    <div className="relative">
-                      <div className="flex items-center gap-1 flex-wrap p-2 border border-border-dark rounded-t-lg bg-[#111618]">
-                        <span className="bg-primary/20 text-primary text-xs px-2 py-1 rounded flex items-center gap-1">
-                          Back to School{" "}
-                          <button className="hover:text-white">×</button>
-                        </span>
-                        <input
-                          className="flex-1 bg-transparent border-none text-sm p-1 focus:ring-0 min-w-[50px]"
-                          placeholder="Tìm bộ sưu tập..."
-                          type="text"
-                        />
-                      </div>
-                      <div className="max-h-40 overflow-y-auto border border-border-dark border-t-0 rounded-b-lg bg-[#111618] p-2 space-y-1">
-                        <label className="flex items-center gap-2 p-1.5 hover:bg-surface-dark rounded cursor-pointer">
-                          <input
-                            className="rounded border-border-dark bg-transparent text-primary focus:ring-primary"
-                            type="checkbox"
-                          />
-                          <span className="text-sm text-white">
-                            Hàng Mới Về
-                          </span>
-                        </label>
-                      </div>
-                    </div>
-                    <p className="text-xs text-[#9db2b9] mt-1">
-                      Chọn một hoặc nhiều bộ sưu tập.
-                    </p>
+                    <select
+                      className="w-full rounded-lg text-sm px-3 py-2.5 focus:ring-1 focus:ring-primary"
+                      onChange={(e) =>
+                        setDataProduct({
+                          ...dataProduct,
+                          promotion_id: Number(e.target.value),
+                        })
+                      }
+                    >
+                      {dataPromotions.map((promotion) => (
+                        <option key={promotion.id} value={promotion.id}>
+                          {promotion.name}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                 </div>
               </section>

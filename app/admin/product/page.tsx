@@ -82,7 +82,7 @@ export default function ProductPage() {
         );
         setProducts(res.data.products);
       } catch (error) {
-        console.log("--->Error<---", error);
+        console.error("--->Error<---", error);
       } finally {
         setIsLoading(false);
       }

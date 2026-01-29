@@ -55,6 +55,7 @@ type Category = {
   id: number;
   name: string;
   parent_id: number;
+  children: Categories;
 };
 
 type Categories = Category[];
@@ -82,3 +83,16 @@ enum ACTION_UPDATE_IMAGE {
   PRIMARY = "PRIMARY",
   DELETE = "DELETE",
 }
+
+type Promotions = Promotion[];
+
+type Promotion = {
+  id: number;
+  name: string;
+  code: string;
+  type: string;
+  value: number;
+  start_date: string;
+  end_date: string;
+  is_active: boolean;
+};
