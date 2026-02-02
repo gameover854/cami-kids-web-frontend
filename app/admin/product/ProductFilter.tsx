@@ -6,8 +6,6 @@ import {
   ListboxOptions,
 } from "@headlessui/react";
 import { CheckIcon, ChevronDownIcon } from "@heroicons/react/20/solid";
-import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
 
 export default function ProductFilter({
   categories,

@@ -1,7 +1,8 @@
 type Product = {
   id?: number;
   category_id?: number;
-  promotion_id?: number;
+  collection_id: number[];
+  brand_id?: number;
   name: string;
   selling_price: number;
   compare_price?: number;
@@ -11,6 +12,8 @@ type Product = {
   product_attributes?: ProductAttribute;
   product_variants?: ProductVariant;
   images?: Image[];
+  brand?: Brand;
+  collections?: Collections;
 };
 
 type Products = Product[];
@@ -56,6 +59,18 @@ type Category = {
   name: string;
   parent_id: number;
   children: Categories;
+  parent: Category;
+};
+
+type Brands = Brand[];
+
+type Brand = {
+  id: number;
+  name: string;
+  slug: string;
+  logo?: string;
+  description?: string;
+  is_active: string;
 };
 
 type Categories = Category[];
@@ -94,5 +109,14 @@ type Promotion = {
   value: number;
   start_date: string;
   end_date: string;
+  is_active: boolean;
+};
+
+type Collections = Collection[];
+
+type Collection = {
+  id: string;
+  name: string;
+  slug: string;
   is_active: boolean;
 };

@@ -22,6 +22,7 @@ export default function ProductTable({
                 />
               </th>
               <th className="px-6 py-4 font-semibold">Sản phẩm</th>
+              <th className="px-6 py-4 font-semibold">Thương hiệu</th>
               <th className="px-6 py-4 font-semibold">Danh mục</th>
               <th className="px-6 py-4 font-semibold text-right">Giá bán</th>
               <th className="px-6 py-4 font-semibold text-center">Biến thể</th>
@@ -62,8 +63,18 @@ export default function ProductTable({
                     </div>
                   </Link>
                 </td>
+                <td className="px-6 py-4 text-center">
+                  <div className="flex flex-col items-center gap-1">
+                    <p className="text-xs bold border-border-dark">
+                      {item.brand ? item.brand.name : "Không có thương hiệu"}
+                    </p>
+                  </div>
+                </td>
                 <td className="px-6 py-4">
                   <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#111618] text-[#9db2b9] border border-border-dark">
+                    {item.category?.parent
+                      ? item.category?.parent.name + " / "
+                      : ""}{" "}
                     {item.category?.name ?? "Không có danh mục"}
                   </span>
                 </td>
@@ -72,6 +83,7 @@ export default function ProductTable({
                     {formatVND(item.selling_price)}{" "}
                   </p>
                 </td>
+
                 <td className="px-6 py-4 text-center">
                   <div className="flex flex-col items-center gap-1">
                     {item.product_attributes?.length ? (

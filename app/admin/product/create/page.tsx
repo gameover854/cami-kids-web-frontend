@@ -2,13 +2,15 @@
 
 import Loading from "@/components/notification/loading";
 import { getCategory } from "@/services/category.services";
-import { getPromotion } from "@/services/promotion.services";
+import { getBrand } from "@/services/brand.services";
 import { createProduct } from "@/services/product.services";
 import { uploadMutiple } from "@/services/upload.services";
 import { convertToBase64, validateImage } from "@/utils/validateImage";
 import { useRouter } from "next/navigation";
 import { Fragment, useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
+import { Checkbox, Label, Field } from "@headlessui/react";
+import { getCollection } from "@/services/collections.services";
 
 export default function CreateProductPage() {
   const [dataProduct, setDataProduct] = useState<Product>({
@@ -17,7 +19,8 @@ export default function CreateProductPage() {
     compare_price: 0,
     description: "",
     category_id: undefined,
-    promotion_id: undefined,
+    collection_id: [],
+    brand_id: undefined,
     is_active: false,
   });
 
@@ -26,7 +29,8 @@ export default function CreateProductPage() {
   const [dataImage, setDataImage] = useState<ProductImage>([]);
   const [dataVariant, setDataVariant] = useState<ProductVariant>([]);
   const [dataCategories, setDataCategories] = useState<Categories>([]);
-  const [dataPromotions, setDataPromotions] = useState<Promotions>([]);
+  const [dataCollections, setDataCollections] = useState<Collections>([]);
+  const [dataBrand, setDataBrand] = useState<Brands>([]);
   const router = useRouter();
 
   const generateVariants = (dataAttribute: ProductAttribute) => {
@@ -67,26 +71,31 @@ export default function CreateProductPage() {
   };
 
   useEffect(() => {
-    const fetchCategories = async () => {
+    const fetchData = async () => {
+      setIsLoading(true);
       try {
-        const res = await getCategory();
-        const list = [{ id: null, name: "Tất cả" }, ...res.data.categories];
-        setDataCategories(list);
+        const [categoryRes, collectionRes, brandRes] = await Promise.all([
+          getCategory(),
+          getCollection(),
+          getBrand(),
+        ]);
+
+        setDataCategories([
+          { id: null, name: "Tất cả" },
+          ...categoryRes.data.categories,
+        ]);
+
+        setDataCollections(collectionRes.data.collections);
+
+        setDataBrand([{ id: null, name: "Tất cả" }, ...brandRes.data.brands]);
       } catch (error) {
-        console.error("Failed to fetch categories:", error);
+        console.error("Failed to fetch data:", error);
+      } finally {
+        setIsLoading(false);
       }
     };
-    const fetchPromotions = async () => {
-      try {
-        const res = await getPromotion();
-        const list = [{ id: null, name: "Tất cả" }, ...res.data.promotions];
-        setDataPromotions(list);
-      } catch (error) {
-        console.error("Failed to fetch promotions:", error);
-      }
-    };
-    fetchCategories();
-    fetchPromotions();
+
+    fetchData();
   }, []);
 
   useEffect(() => {
@@ -218,7 +227,18 @@ export default function CreateProductPage() {
     }
   };
 
-  const parseData = (
+  const handleCheckCollections = (checked: Boolean, collectionId: string) => {
+    const id = Number(collectionId);
+
+    setDataProduct((prev) => ({
+      ...prev,
+      collection_id: checked
+        ? [...prev.collection_id, id]
+        : prev.collection_id.filter((item) => item !== id),
+    }));
+  };
+
+  const transformData = (
     dataProduct: Product,
     dataAttribute: ProductAttribute,
     dataVariant: ProductVariant,
@@ -231,8 +251,9 @@ export default function CreateProductPage() {
         compare_price: dataProduct.compare_price,
         description: dataProduct.description,
         category_id: dataProduct.category_id,
-        promotion_id: dataProduct.promotion_id,
         is_active: dataProduct.is_active,
+        brand_id: dataProduct.brand_id,
+        collection_id: dataProduct.collection_id,
       },
       attributes: dataAttribute.filter(
         (item) => item.values.length > 0 && item.name.length > 0,
@@ -243,22 +264,21 @@ export default function CreateProductPage() {
   };
 
   async function create() {
-    const payload = parseData(
+    const payload = transformData(
       dataProduct,
       dataAttribute,
       dataVariant,
       dataImage,
     );
-    console.log("--->payload<---", payload);
     try {
       setIsLoading(true);
       await createProduct(payload);
+      router.push("/admin/product");
     } catch (error) {
-      console.log("--->Error Create Product<---", error);
+      console.error("--->Error Create Product<---", error);
     } finally {
       setIsLoading(false);
     }
-    router.push("/admin/product");
   }
 
   return (
@@ -328,7 +348,7 @@ export default function CreateProductPage() {
                       Tên sản phẩm<span className="text-red-500">*</span>
                     </label>
                     <input
-                      className="w-full rounded-lg text-sm px-3 py-2.5 focus:ring-1 focus:ring-primary placeholder-[#9db2b9]/50"
+                      className="w-full rounded-lg text-sm px-3 py-2.5 focus:ring-1 focus:ring-primary placeholder-[#9db2b9]/50 outline-none dark:bg-background-dark"
                       placeholder="Ví dụ: Áo Thun Polo Bé Trai Cotton"
                       type="text"
                       onChange={(e) => {
@@ -346,7 +366,7 @@ export default function CreateProductPage() {
                       </label>
                       <div className="relative">
                         <input
-                          className="w-full rounded-lg text-sm pl-3 pr-10 py-2.5 text-right font-medium focus:ring-1 focus:ring-primary"
+                          className="w-full rounded-lg text-sm pl-3 pr-10 py-2.5 text-right font-medium focus:ring-1 focus:ring-primary placeholder-[#9db2b9]/50 outline-none dark:bg-background-dark"
                           placeholder="Nhập giá bán"
                           type="number"
                           onChange={(e) => {
@@ -367,7 +387,7 @@ export default function CreateProductPage() {
                       </label>
                       <div className="relative">
                         <input
-                          className="w-full rounded-lg text-sm pl-3 pr-10 py-2.5 text-right font-medium focus:ring-1 focus:ring-primary"
+                          className="w-full rounded-lg text-sm pl-3 pr-10 py-2.5 text-right font-medium focus:ring-1 focus:ring-primary placeholder-[#9db2b9]/50 outline-none dark:bg-background-dark"
                           placeholder="Nhập giá so sánh"
                           type="number"
                           onChange={(e) => {
@@ -387,9 +407,9 @@ export default function CreateProductPage() {
                     <label className="block text-sm font-medium text-[#9db2b9] mb-1">
                       Mô tả sản phẩm
                     </label>
-                    <div className="rounded-lg border border-border-dark overflow-hidden bg-[#111618] focus-within:ring-1 focus-within:ring-primary focus-within:border-primary">
+                    <div className="rounded-lg border border-border-dark overflow-hidden bg-[#111618] focus-within:ring-1 focus-within:ring-primary focus-within:border-primary ">
                       <textarea
-                        className="w-full border-none p-3 text-sm focus:ring-0 resize-y bg-transparent"
+                        className="w-full border-none p-3 text-sm focus:ring-0 resize-y bg-transparent outline-none"
                         placeholder="Nhập mô tả chi tiết về chất liệu, kiểu dáng..."
                         rows={4}
                         onChange={(e) => {
@@ -563,7 +583,7 @@ export default function CreateProductPage() {
                   Hình ảnh sản phẩm
                 </h2>
                 <div className="border-2 border-dashed border-border-dark rounded-xl p-8 flex flex-col items-center justify-center text-center hover:border-primary/50 transition-colors bg-[#111618] cursor-pointer group">
-                  <div className="bg-surface-dark p-3 rounded-full mb-3 group-hover:scale-110 transition-transform">
+                  <div className="bg-surface-dark p-3 rounded-full mb-3 group-hover:scale-110 transition-transform relative">
                     <span className="material-symbols-outlined text-primary text-3xl">
                       cloud_upload
                     </span>
@@ -572,9 +592,14 @@ export default function CreateProductPage() {
                       name="uploadImage"
                       id="uploadImage"
                       accept="image/*"
+                      className="hidden"
                       multiple
                       onChange={(e) => handleUploadImage(e)}
                     />
+                    <label
+                      htmlFor="uploadImage"
+                      className="cursor-pointer absolute left-0 h-full w-full"
+                    ></label>
                   </div>
                   <p className="text-white font-medium text-sm">
                     Kéo thả hình ảnh vào đây hoặc click để chọn
@@ -657,10 +682,30 @@ export default function CreateProductPage() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-[#9db2b9] mb-1">
+                      Thương Hiệu
+                    </label>
+                    <select
+                      className="w-full rounded-lg text-sm px-3 py-2.5 focus:ring-1 focus:ring-primary outline-none dark:bg-background-dark"
+                      onChange={(e) =>
+                        setDataProduct({
+                          ...dataProduct,
+                          brand_id: Number(e.target.value),
+                        })
+                      }
+                    >
+                      {dataBrand.map((brand) => (
+                        <option key={brand.id} value={brand.id}>
+                          {brand.name}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-[#9db2b9] mb-1">
                       Danh mục
                     </label>
                     <select
-                      className="w-full rounded-lg text-sm px-3 py-2.5 focus:ring-1 focus:ring-primary"
+                      className="w-full rounded-lg text-sm px-3 py-2.5 focus:ring-1 focus:ring-primary outline-none dark:bg-background-dark"
                       onChange={(e) =>
                         setDataProduct({
                           ...dataProduct,
@@ -684,21 +729,36 @@ export default function CreateProductPage() {
                     <label className="block text-sm font-medium text-[#9db2b9] mb-1">
                       Bộ sưu tập
                     </label>
-                    <select
-                      className="w-full rounded-lg text-sm px-3 py-2.5 focus:ring-1 focus:ring-primary"
-                      onChange={(e) =>
-                        setDataProduct({
-                          ...dataProduct,
-                          promotion_id: Number(e.target.value),
-                        })
-                      }
-                    >
-                      {dataPromotions.map((promotion) => (
-                        <option key={promotion.id} value={promotion.id}>
-                          {promotion.name}
-                        </option>
+                    <div className="mt-2 overflow-y-scroll h-50">
+                      {dataCollections.map((collection) => (
+                        <Field key={collection.id} className="flex items-start">
+                          <Checkbox
+                            key={collection.id}
+                            value={collection.id}
+                            onChange={(e) =>
+                              handleCheckCollections(e, String(collection.id))
+                            }
+                            className="group block size-4 rounded border bg-white data-checked:bg-blue-500 mb-4"
+                          >
+                            <svg
+                              className="stroke-white opacity-0 group-data-checked:opacity-100"
+                              viewBox="0 0 14 14"
+                              fill="none"
+                            >
+                              <path
+                                d="M3 8L6 11L11 3.5"
+                                strokeWidth={2}
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                            </svg>
+                          </Checkbox>
+                          <Label className="ml-2 text-sm text-[#9db2b9]">
+                            {collection.name}
+                          </Label>
+                        </Field>
                       ))}
-                    </select>
+                    </div>
                   </div>
                 </div>
               </section>

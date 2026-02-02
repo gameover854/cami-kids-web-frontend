@@ -213,7 +213,7 @@ export default function EditProductPage({
         compare_price: Number(dataProduct.compare_price),
         description: String(dataProduct.description),
         category_id: Number(dataProduct.category_id),
-        promotion_id: Number(dataProduct.promotion_id),
+        promotion_id: dataProduct.promotion_id,
         is_active: Boolean(dataProduct.is_active),
       },
       attributes: dataAttribute.filter(

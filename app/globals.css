@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@config "../tailwind.config.ts";
+/* @config "../tailwind.config.ts"; */
 
 :root {
   --background: #ffffff;
@@ -51,26 +51,13 @@ select {
   background-color: #111618;
   border-color: #283539;
   color: white;
-}
+  outline:none
+} 
 
-input[type="text"]:focus,
+ /* input[type="text"]:focus,
 input[type="number"]:focus,
 textarea:focus,
 select:focus {
   border-color: #13b6ec;
   --tw-ring-color: #13b6ec;
-}
-
-/* @keyframes shrink-width {
-  from {
-    width: 100%;
-  }
-
-  to {
-    width: 0%;
-  }
-}
-
-.animate-progress {
-  animation: shrink-width 4s linear forwards;
 } */
