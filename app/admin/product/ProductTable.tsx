@@ -10,14 +10,14 @@ export default function ProductTable({
   remove: any;
 }) {
   return (
-    <div className="bg-surface-dark rounded-xl border border-border-dark overflow-hidden shadow-xl">
+    <div className="dark:bg-background-dark rounded-xl border dark:border-border-gray overflow-hidden shadow-xl">
       <div className="overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>
-            <tr className="bg-[#152025] border-b border-border-dark text-xs uppercase tracking-wider text-[#9db2b9]">
+            <tr className="border-b border-border-dark text-xs uppercase tracking-wider text-text-gray-100">
               <th className="px-6 py-4 font-semibold w-12">
                 <input
-                  className="rounded border-[#9db2b9] bg-transparent text-primary focus:ring-0 focus:ring-offset-0 size-4"
+                  className="rounded bg-transparent text-primary focus:ring-0 focus:ring-offset-0 size-4"
                   type="checkbox"
                 />
               </th>
@@ -33,19 +33,19 @@ export default function ProductTable({
           <tbody className="divide-y divide-border-dark">
             {products.map((item) => (
               <tr
-                className="group hover:bg-[#1f2b30] transition-colors"
+                className="group hover:bg-hover transition-colors"
                 key={item.id}
               >
                 <td className="px-6 py-4">
                   <input
-                    className="rounded border-[#9db2b9] bg-transparent text-primary focus:ring-0 focus:ring-offset-0 size-4"
+                    className="rounded bg-transparent text-primary focus:ring-0 focus:ring-offset-0 size-4"
                     type="checkbox"
                   />
                 </td>
                 <td className="px-6 py-4">
                   <Link href={`/admin/product/${item.id}`}>
                     <div className="flex items-center gap-4">
-                      <div className="size-12 rounded-lg bg-[#111618] p-1 border border-border-dark relative group-hover:border-primary/50 transition-colors">
+                      <div className="size-12 rounded-lg p-1 border border-border-gray relative group-hover:border-primary/50 transition-colors">
                         <img
                           alt="Green dinosaur t-shirt thumbnail"
                           className="w-full h-full object-cover rounded"
@@ -53,10 +53,10 @@ export default function ProductTable({
                         />
                       </div>
                       <div>
-                        <p className="text-white font-medium text-sm">
+                        <p className="text-text-gray-100 font-medium text-sm">
                           {item.name}
                         </p>
-                        <p className="text-[#9db2b9] text-xs mt-0.5">
+                        <p className="text-text-gray-100 text-xs mt-0.5">
                           ID:{item.id}
                         </p>
                       </div>
@@ -65,13 +65,13 @@ export default function ProductTable({
                 </td>
                 <td className="px-6 py-4 text-center">
                   <div className="flex flex-col items-center gap-1">
-                    <p className="text-xs bold border-border-dark">
+                    <p className="text-xs bold text-text-gray-100">
                       {item.brand ? item.brand.name : "Không có thương hiệu"}
                     </p>
                   </div>
                 </td>
                 <td className="px-6 py-4">
-                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-[#111618] text-[#9db2b9] border border-border-dark">
+                  <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-background-gray text-text-light border border-border-gray">
                     {item.category?.parent
                       ? item.category?.parent.name + " / "
                       : ""}{" "}
@@ -79,7 +79,7 @@ export default function ProductTable({
                   </span>
                 </td>
                 <td className="px-6 py-4 text-right">
-                  <p className="text-white font-medium text-sm">
+                  <p className="text-text-gray-200 font-medium text-sm">
                     {formatVND(item.selling_price)}{" "}
                   </p>
                 </td>
@@ -88,12 +88,12 @@ export default function ProductTable({
                   <div className="flex flex-col items-center gap-1">
                     {item.product_attributes?.length ? (
                       item.product_attributes.map((attr) => (
-                        <p className="text-xs text-[#9db2b9]">
+                        <p className="text-xs text-text-gray-100">
                           {attr._count?.values} - {attr.name}
                         </p>
                       ))
                     ) : (
-                      <p className="text-xs text-[#9db2b9] italic">
+                      <p className="text-xs text-text-gray-100 italic">
                         Không có biến thể
                       </p>
                     )}
@@ -115,7 +115,7 @@ export default function ProductTable({
                 <td className="px-6 py-4 text-right">
                   <div className="flex items-center justify-end gap-2 opacity-60 group-hover:opacity-100 transition-opacity">
                     <button
-                      className="p-1.5 text-[#9db2b9] hover:text-white hover:bg-[#283539] rounded-lg transition-colors cursor-pointer"
+                      className="p-1.5 text-text-gray-100 hover:text-white hover:bg-[#283539] rounded-lg transition-colors cursor-pointer"
                       title="Chỉnh sửa"
                     >
                       <span className="material-symbols-outlined text-[20px]">
@@ -123,7 +123,7 @@ export default function ProductTable({
                       </span>
                     </button>
                     <button
-                      className="p-1.5 text-[#9db2b9] hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors cursor-pointer"
+                      className="p-1.5 text-text-gray-100 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors cursor-pointer"
                       title="Xóa"
                       onClick={() => remove(Number(item.id))}
                     >
@@ -138,31 +138,31 @@ export default function ProductTable({
           </tbody>
         </table>
       </div>
-      <div className="bg-[#152025] px-6 py-4 border-t border-border-dark flex items-center justify-between">
-        <div className="text-sm text-[#9db2b9]">
-          Hiển thị <span className="font-medium text-white">1</span> đến{" "}
-          <span className="font-medium text-white">5</span> trong{" "}
-          <span className="font-medium text-white">{products.length}</span> kết
+      <div className="dark:bg-background-dark px-6 py-4 border-t border-border-dark flex items-center justify-between">
+        <div className="text-sm text-text-gray-100">
+          Hiển thị <span className="font-medium ">1</span> đến{" "}
+          <span className="font-medium ">5</span> trong{" "}
+          <span className="font-medium">{products.length}</span> kết
           quả
         </div>
         <div className="flex items-center gap-2">
-          <button className="px-3 py-1 rounded border border-border-dark text-[#9db2b9] text-sm hover:bg-[#283539] hover:text-white disabled:opacity-50 transition-colors">
+          <button className="px-3 py-1 rounded border border-border-gray text-text-gray-100 text-sm hover:bg-background-gray hover:text-white disabled transition-colors">
             Trước
           </button>
-          <button className="px-3 py-1 rounded bg-primary text-background-dark font-bold text-sm">
+          <button className="px-3 py-1 rounded border border-border-gray text-text-gray-100 text-sm hover:bg-background-gray hover:text-white disabled transition-colors">
             1
           </button>
-          <button className="px-3 py-1 rounded border border-border-dark text-[#9db2b9] text-sm hover:bg-[#283539] hover:text-white transition-colors">
+          <button className="px-3 py-1 rounded border border-border-gray text-text-gray-100 text-sm hover:bg-background-gray hover:text-white disabled transition-colors">
             2
           </button>
-          <button className="px-3 py-1 rounded border border-border-dark text-[#9db2b9] text-sm hover:bg-[#283539] hover:text-white transition-colors">
+          <button className="px-3 py-1 rounded border border-border-gray text-text-gray-100 text-sm hover:bg-background-gray hover:text-white disabled transition-colors">
             3
           </button>
-          <span className="text-[#9db2b9] px-1">...</span>
-          <button className="px-3 py-1 rounded border border-border-dark text-[#9db2b9] text-sm hover:bg-[#283539] hover:text-white transition-colors">
+          <span className="text-text-gray-100 px-1">...</span>
+          <button className="px-3 py-1 rounded border border-border-gray text-text-gray-100 text-sm hover:bg-background-gray hover:text-white disabled transition-colors">
             8
           </button>
-          <button className="px-3 py-1 rounded border border-border-dark text-[#9db2b9] text-sm hover:bg-[#283539] hover:text-white transition-colors">
+          <button className="px-3 py-1 rounded border border-border-gray text-text-gray-100 text-sm hover:bg-background-gray hover:text-white disabled transition-colors">
             Sau
           </button>
         </div>

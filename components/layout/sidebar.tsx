@@ -1,6 +1,7 @@
 "use client";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import Switch from "../button/switch";
 export default function Sidebar() {
   const pathName = usePathname();
   const sideBarItems = [
@@ -23,6 +24,7 @@ export default function Sidebar() {
       icon: "checkroom",
       label: "Sản phẩm",
       href: "/admin/product",
+      keys: ["product", "product/create"],
       isActive: isActiveSidebar("/admin/product", pathName),
     },
     {
@@ -45,17 +47,17 @@ export default function Sidebar() {
       label: "Cài đặt",
       href: "/admin/setting",
       isActive: isActiveSidebar("/admin/setting", pathName),
-    },
+    }
   ];
 
-  function isActiveSidebar(href: string, pathName: string) {
-    return pathName === href
-      ? "bg-primary/10 text-primary bg-primary/10transition-colors border-primary/20 border"
+  function isActiveSidebar(href: string, pathName: string, index: number = 0) {
+    return pathName.includes(href)
+      ? "bg-primary/10 text-text-primary bg-background-primary/10 transition-colors border-primary/20 border"
       : "dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors";
   }
 
   return (
-    <aside className="w-64 bg-card-light dark:bg-card-dark border-r border-gray-200 dark:border-gray-800 flex flex-col hidden lg:flex flex-shrink-0 z-20">
+    <aside className="w-64 bg-background-light dark:bg-background-dark border-r border-gray-200 dark:border-gray-800 flex flex-col hidden lg:flex flex-shrink-0 z-20">
       <div className="p-6 flex flex-col gap-6">
         <div className="flex items-center gap-3">
           <div
@@ -67,7 +69,7 @@ export default function Sidebar() {
           ></div>
           <div className="flex flex-col">
             <h1 className="text-base font-bold leading-tight">Admin Kids</h1>
-            <p className="text-text-secondary-dark text-xs font-normal">
+            <p className="text-text-gray-100 text-xs font-normal">
               Quản trị viên
             </p>
           </div>

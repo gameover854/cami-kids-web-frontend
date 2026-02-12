@@ -8,6 +8,7 @@ import { deleteProduct, getProduct } from "@/services/product.services";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { getCategory } from "@/services/category.services";
 import Loading from "@/components/notification/loading";
+import Header from "@/components/layout/header";
 
 export default function ProductPage() {
   const [products, setProducts] = useState<Product[]>([]);
@@ -21,7 +22,7 @@ export default function ProductPage() {
     Category | undefined
   >();
   const [selectedIsActive, setSelectedIsActive] = useState<IsActive>(
-    isActive[0]
+    isActive[0],
   );
   const [isReady, setIsReady] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -78,7 +79,7 @@ export default function ProductPage() {
         const res = await getProduct(
           Number(pageParams ?? 1),
           Number(limitParams ?? 5),
-          filters
+          filters,
         );
         setProducts(res.data.products);
       } catch (error) {
@@ -118,66 +119,30 @@ export default function ProductPage() {
   }
 
   return (
-    <div className="flex-1 flex flex-col  h-full bg-background-dark relative">
+    <div className="flex-1 flex flex-col  h-full bg-background-light dark:bg-background-dark-2 relative">
       {/* <!-- Top Navbar --> */}
-      <header className="h-16 border-b border-border-dark bg-background-dark/80 backdrop-blur-md flex items-center justify-between px-6 sticky top-0 z-20">
-        <div className="flex items-center gap-4 lg:hidden">
-          <button className="text-white p-1">
-            <span className="material-symbols-outlined">menu</span>
-          </button>
-        </div>
-        <div className="hidden lg:flex items-center gap-2 text-[#9db2b9] text-sm">
-          <span>Trang chủ</span>
-          <span className="material-symbols-outlined text-[16px]">
-            chevron_right
-          </span>
-          <span className="text-white font-medium">Sản phẩm</span>
-        </div>
-        <div className="flex items-center gap-4 ml-auto">
-          <div className="hidden sm:flex relative">
-            <input
-              className="bg-surface-dark border-none rounded-full h-9 pl-10 pr-4 text-sm text-white placeholder-[#9db2b9] focus:ring-1 focus:ring-primary w-64 transition-all focus:w-80"
-              placeholder="Tìm nhanh..."
-              type="text"
-            />
-            <span className="material-symbols-outlined absolute left-3 top-2 text-[#9db2b9] text-[20px]">
-              search
-            </span>
-          </div>
-          <button className="relative p-2 text-[#9db2b9] hover:text-white transition-colors rounded-full hover:bg-surface-dark">
-            <span className="material-symbols-outlined">notifications</span>
-            <span className="absolute top-2 right-2 size-2 bg-red-500 rounded-full border-2 border-background-dark"></span>
-          </button>
-          <button className="p-2 text-[#9db2b9] hover:text-white transition-colors rounded-full hover:bg-surface-dark">
-            <span className="material-symbols-outlined">help</span>
-          </button>
-        </div>
-      </header>
+      <Header />
       {/* <!-- Page Content Scrollable --> */}
       <main className="flex-1 overflow-y-auto p-4 md:p-8 scroll-smooth">
         <div className="max-w-[1200px] mx-auto flex flex-col gap-6">
           {/* <!-- Page Heading & Actions --> */}
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div className="flex flex-col gap-1">
-              <h1 className="text-3xl md:text-4xl font-black tracking-tight text-white">
+              <h1 className="text-3xl md:text-4xl font-black tracking-tight dark:text-text-light text-text-gray-200">
                 Quản lý Sản phẩm
               </h1>
-              <p className="text-[#9db2b9] text-base">
-                Danh sách và quản lý kho hàng thời trang trẻ em
+              <p className="text-text-gray-100 text-base">
+                Danh sách và quản lý kho hàng
               </p>
             </div>
             <div className="flex gap-3">
-              <button className="flex items-center justify-center gap-2 px-4 h-10 rounded-lg bg-surface-dark text-white text-sm font-bold border border-border-dark hover:bg-[#233339] transition-all cursor-pointer">
-                <span className="material-symbols-outlined text-[20px]">
-                  file_upload
-                </span>
+              <button className="flex items-center justify-center gap-2 px-5 h-10 rounded-lg border-1 border-border-gray text-text-gray-200 text-sm font-bold cursor-pointer hover:ring-1">
+                <span className="material-symbols-outlined">file_upload</span>
                 <span>Xuất Excel</span>
               </button>
               <Link href="/admin/product/create">
-                <button className="flex items-center justify-center gap-2 px-5 h-10 rounded-lg bg-primary text-background-dark text-sm font-bold hover:bg-[#3ec4f1] transition-all shadow-lg shadow-primary/20 cursor-pointer">
-                  <span className="material-symbols-outlined text-[20px]">
-                    add
-                  </span>
+                <button className="flex items-center justify-center gap-2 px-5 h-10 rounded-lg border-1 border-border-gray text-text-gray-200 text-sm font-bold cursor-pointer hover:ring-1">
+                  <span className="material-symbols-outlined">add</span>
                   <span>Thêm sản phẩm</span>
                 </button>
               </Link>

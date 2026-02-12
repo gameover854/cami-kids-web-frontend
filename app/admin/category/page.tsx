@@ -1,4 +1,5 @@
 "use client";
+import Header from "@/components/layout/header";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
@@ -22,40 +23,14 @@ export default function CategoryPage() {
     setUsers(
       users.map((user) => {
         return { ...user, age: 10 };
-      })
+      }),
     );
   }, []);
 
   console.log("--->users<---", users);
   return (
     <div className="flex-1 flex flex-col h-full overflow-hidden bg-background-dark">
-      <header className="h-16 border-b border-border-dark bg-background-dark/80 backdrop-blur-md flex items-center justify-between px-6 sticky top-0 z-20">
-        <div className="flex items-center gap-4 lg:hidden">
-          <button className="text-white p-1">
-            <span className="material-symbols-outlined">menu</span>
-          </button>
-        </div>
-        <div className="hidden lg:flex items-center gap-2 text-[#9db2b9] text-sm">
-          <span>Trang chủ</span>
-          <span className="material-symbols-outlined text-[16px]">
-            chevron_right
-          </span>
-          <span>Sản phẩm</span>
-          <span className="material-symbols-outlined text-[16px]">
-            chevron_right
-          </span>
-          <span className="text-white font-medium">Thêm sản phẩm</span>
-        </div>
-        <div className="flex items-center gap-4 ml-auto">
-          <button className="relative p-2 text-[#9db2b9] hover:text-white transition-colors rounded-full hover:bg-surface-dark">
-            <span className="material-symbols-outlined">notifications</span>
-            <span className="absolute top-2 right-2 size-2 bg-red-500 rounded-full border-2 border-background-dark"></span>
-          </button>
-          <button className="p-2 text-[#9db2b9] hover:text-white transition-colors rounded-full hover:bg-surface-dark">
-            <span className="material-symbols-outlined">help</span>
-          </button>
-        </div>
-      </header>
+      <Header />
       <div className="flex-1 overflow-y-auto p-8">
         <div className="max-w-[1200px] mx-auto flex flex-col gap-6">
           <div className="flex flex-wrap items-end justify-between gap-4">
@@ -73,7 +48,7 @@ export default function CategoryPage() {
             </button>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div className="bg-surface-dark border border-border-dark rounded-xl p-5 flex items-center justify-between relative overflow-hidden group">
+            <div className="bg-background-dark border border-border-dark rounded-xl p-5 flex items-center justify-between relative overflow-hidden group">
               <div className="relative z-10">
                 <p className="text-text-secondary text-sm font-medium mb-1">
                   Tổng danh mục
@@ -90,7 +65,7 @@ export default function CategoryPage() {
                 <span className="material-symbols-outlined">folder</span>
               </div>
             </div>
-            <div className="bg-surface-dark border border-border-dark rounded-xl p-5 flex items-center justify-between">
+            <div className="bg-background-dark border border-border-dark rounded-xl p-5 flex items-center justify-between">
               <div>
                 <p className="text-text-secondary text-sm font-medium mb-1">
                   Danh mục hiển thị
@@ -104,7 +79,7 @@ export default function CategoryPage() {
                 <span className="material-symbols-outlined">visibility</span>
               </div>
             </div>
-            <div className="bg-surface-dark border border-border-dark rounded-xl p-5 flex items-center justify-between">
+            <div className="bg-background-dark border border-border-dark rounded-xl p-5 flex items-center justify-between">
               <div>
                 <p className="text-text-secondary text-sm font-medium mb-1">
                   Tổng sản phẩm
@@ -125,7 +100,7 @@ export default function CategoryPage() {
 
           <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 h-full min-h-[500px]">
             <div className="lg:col-span-1 flex flex-col gap-4">
-              <div className="bg-surface-dark border border-border-dark rounded-xl overflow-hidden flex flex-col h-full">
+              <div className="bg-background-dark border border-border-dark rounded-xl overflow-hidden flex flex-col h-full">
                 <div className="p-4 border-b border-border-dark flex justify-between items-center bg-background-dark/30">
                   <h3 className="font-semibold text-white">Cây thư mục</h3>
                   <button className="text-text-secondary hover:text-white p-1 rounded hover:bg-white/5">
@@ -209,7 +184,7 @@ export default function CategoryPage() {
             </div>
 
             <div className="lg:col-span-3">
-              <div className="bg-surface-dark border border-border-dark rounded-xl overflow-hidden flex flex-col h-full shadow-sm">
+              <div className="bg-background-dark border border-border-dark rounded-xl overflow-hidden flex flex-col h-full shadow-sm">
                 <div className="p-4 border-b border-border-dark flex flex-wrap items-center justify-between gap-4 bg-background-dark/30">
                   <div className="flex items-center gap-2 text-white font-medium">
                     <span className="text-text-secondary">Đang xem:</span>
@@ -263,7 +238,7 @@ export default function CategoryPage() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-border-dark">
-                      <tr className="bg-surface-dark hover:bg-background-dark/50 transition-colors group">
+                      <tr className="bg-background-dark hover:bg-background-dark/50 transition-colors group">
                         <td className="w-4 p-4">
                           <div className="flex items-center">
                             <input
@@ -334,7 +309,7 @@ export default function CategoryPage() {
                           </div>
                         </td>
                       </tr>
-                      <tr className="bg-surface-dark hover:bg-background-dark/50 transition-colors group">
+                      <tr className="bg-background-dark hover:bg-background-dark/50 transition-colors group">
                         <td className="w-4 p-4">
                           <div className="flex items-center">
                             <input
@@ -405,7 +380,7 @@ export default function CategoryPage() {
                         </td>
                       </tr>
 
-                      <tr className="bg-surface-dark hover:bg-background-dark/50 transition-colors group">
+                      <tr className="bg-background-dark hover:bg-background-dark/50 transition-colors group">
                         <td className="w-4 p-4">
                           <div className="flex items-center">
                             <input
@@ -475,7 +450,7 @@ export default function CategoryPage() {
                           </div>
                         </td>
                       </tr>
-                      <tr className="bg-surface-dark hover:bg-background-dark/50 transition-colors group">
+                      <tr className="bg-background-dark hover:bg-background-dark/50 transition-colors group">
                         <td className="w-4 p-4">
                           <div className="flex items-center">
                             <input
@@ -556,7 +531,7 @@ export default function CategoryPage() {
                     mục
                   </span>
                   <div className="inline-flex items-center -space-x-px">
-                    <button className="px-3 py-2 ml-0 leading-tight text-text-secondary bg-surface-dark border border-border-dark rounded-l-lg hover:bg-gray-700 hover:text-white">
+                    <button className="px-3 py-2 ml-0 leading-tight text-text-secondary bg-background-dark border border-border-dark rounded-l-lg hover:bg-gray-700 hover:text-white">
                       <span className="sr-only">Previous</span>
                       <span className="material-symbols-outlined text-[16px]">
                         chevron_left
@@ -565,13 +540,13 @@ export default function CategoryPage() {
                     <button className="px-3 py-2 leading-tight text-white bg-primary border border-primary hover:bg-primary/90 hover:text-white">
                       1
                     </button>
-                    <button className="px-3 py-2 leading-tight text-text-secondary bg-surface-dark border border-border-dark hover:bg-gray-700 hover:text-white">
+                    <button className="px-3 py-2 leading-tight text-text-secondary bg-background-dark border border-border-dark hover:bg-gray-700 hover:text-white">
                       2
                     </button>
-                    <button className="px-3 py-2 leading-tight text-text-secondary bg-surface-dark border border-border-dark hover:bg-gray-700 hover:text-white">
+                    <button className="px-3 py-2 leading-tight text-text-secondary bg-background-dark border border-border-dark hover:bg-gray-700 hover:text-white">
                       3
                     </button>
-                    <button className="px-3 py-2 leading-tight text-text-secondary bg-surface-dark border border-border-dark rounded-r-lg hover:bg-gray-700 hover:text-white">
+                    <button className="px-3 py-2 leading-tight text-text-secondary bg-background-dark border border-border-dark rounded-r-lg hover:bg-gray-700 hover:text-white">
                       <span className="sr-only">Next</span>
                       <span className="material-symbols-outlined text-[16px]">
                         chevron_right

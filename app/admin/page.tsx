@@ -10,12 +10,12 @@ export default function AdminPage() {
               <h2 className="text-3xl font-black tracking-tight text-[#111618] dark:text-white">
                 Tổng quan
               </h2>
-              <p className="text-text-secondary-light dark:text-text-secondary-dark text-base">
+              <p className="text-text-gray-200 dark:text-text-gray-100 text-base">
                 Chào mừng trở lại, đây là tình hình kinh doanh hôm nay.
               </p>
             </div>
             <div className="flex items-center gap-3">
-              <button className="p-2 rounded-lg bg-card-light dark:bg-card-dark border border-gray-200 dark:border-gray-700 text-gray-500 hover:text-primary transition-colors">
+              <button className="p-2 rounded-lg bg-background-light dark:bg-background-dark border border-gray-200 dark:border-gray-700 text-gray-500 hover:text-primary transition-colors">
                 <span className="material-symbols-outlined">notifications</span>
               </button>
               <button className="flex items-center justify-center h-10 px-4 rounded-lg bg-primary hover:bg-primary/90 text-white text-sm font-bold shadow-lg shadow-primary/20 transition-all">
@@ -28,9 +28,9 @@ export default function AdminPage() {
           </header>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-            <div className="bg-card-light dark:bg-card-dark p-6 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm flex flex-col gap-3 group hover:border-primary/50 transition-colors">
+            <div className="bg-background-light dark:bg-background-dark p-6 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm flex flex-col gap-3 group hover:border-primary/50 transition-colors">
               <div className="flex items-center justify-between">
-                <p className="text-text-secondary-light dark:text-text-secondary-dark text-sm font-medium">
+                <p className="text-text-gray-200 dark:text-text-gray-100 text-sm font-medium">
                   Tổng doanh thu
                 </p>
                 <div className="p-2 rounded-lg bg-primary/10 text-primary">
@@ -51,15 +51,15 @@ export default function AdminPage() {
                   </span>
                   12%
                 </span>
-                <span className="text-text-secondary-light dark:text-text-secondary-dark text-xs ml-1">
+                <span className="text-text-gray-200 dark:text-text-gray-100 text-xs ml-1">
                   so với tháng trước
                 </span>
               </div>
             </div>
 
-            <div className="bg-card-light dark:bg-card-dark p-6 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm flex flex-col gap-3 group hover:border-primary/50 transition-colors">
+            <div className="bg-background-light dark:bg-background-dark p-6 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm flex flex-col gap-3 group hover:border-primary/50 transition-colors">
               <div className="flex items-center justify-between">
-                <p className="text-text-secondary-light dark:text-text-secondary-dark text-sm font-medium">
+                <p className="text-text-gray-200 dark:text-text-gray-100 text-sm font-medium">
                   Đơn hàng
                 </p>
                 <div className="p-2 rounded-lg bg-primary/10 text-primary">
@@ -78,15 +78,15 @@ export default function AdminPage() {
                   </span>
                   5%
                 </span>
-                <span className="text-text-secondary-light dark:text-text-secondary-dark text-xs ml-1">
+                <span className="text-text-gray-200 dark:text-text-gray-100 text-xs ml-1">
                   so với tháng trước
                 </span>
               </div>
             </div>
 
-            <div className="bg-card-light dark:bg-card-dark p-6 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm flex flex-col gap-3 group hover:border-primary/50 transition-colors">
+            <div className="bg-background-light dark:bg-background-dark p-6 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm flex flex-col gap-3 group hover:border-primary/50 transition-colors">
               <div className="flex items-center justify-between">
-                <p className="text-text-secondary-light dark:text-text-secondary-dark text-sm font-medium">
+                <p className="text-text-gray-200 dark:text-text-gray-100 text-sm font-medium">
                   Khách hàng mới
                 </p>
                 <div className="p-2 rounded-lg bg-primary/10 text-primary">
@@ -105,15 +105,15 @@ export default function AdminPage() {
                   </span>
                   2%
                 </span>
-                <span className="text-text-secondary-light dark:text-text-secondary-dark text-xs ml-1">
+                <span className="text-text-gray-200 dark:text-text-gray-100 text-xs ml-1">
                   so với tháng trước
                 </span>
               </div>
             </div>
 
-            <div className="bg-card-light dark:bg-card-dark p-6 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm flex flex-col gap-3 group hover:border-primary/50 transition-colors">
+            <div className="bg-background-light dark:bg-background-dark p-6 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm flex flex-col gap-3 group hover:border-primary/50 transition-colors">
               <div className="flex items-center justify-between">
-                <p className="text-text-secondary-light dark:text-text-secondary-dark text-sm font-medium">
+                <p className="text-text-gray-200 dark:text-text-gray-100 text-sm font-medium">
                   Giá trị TB đơn
                 </p>
                 <div className="p-2 rounded-lg bg-primary/10 text-primary">
@@ -132,7 +132,7 @@ export default function AdminPage() {
                   </span>
                   1%
                 </span>
-                <span className="text-text-secondary-light dark:text-text-secondary-dark text-xs ml-1">
+                <span className="text-text-gray-200 dark:text-text-gray-100 text-xs ml-1">
                   so với tháng trước
                 </span>
               </div>
@@ -140,13 +140,13 @@ export default function AdminPage() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <div className="lg:col-span-2 bg-card-light dark:bg-card-dark rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm p-6">
+            <div className="lg:col-span-2 bg-background-light dark:bg-background-dark rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm p-6">
               <div className="flex justify-between items-center mb-6">
                 <div>
                   <h3 className="text-lg font-bold text-[#111618] dark:text-white">
                     Hiệu suất bán hàng
                   </h3>
-                  <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark">
+                  <p className="text-sm text-text-gray-200 dark:text-text-gray-100">
                     Doanh thu theo tuần (Tháng 10)
                   </p>
                 </div>
@@ -174,26 +174,26 @@ export default function AdminPage() {
                                 </svg> */}
               </div>
               <div className="flex justify-between mt-4 px-2">
-                <span className="text-xs font-semibold text-text-secondary-light dark:text-text-secondary-dark">
+                <span className="text-xs font-semibold text-text-gray-200 dark:text-text-gray-100">
                   Tuần 1
                 </span>
-                <span className="text-xs font-semibold text-text-secondary-light dark:text-text-secondary-dark">
+                <span className="text-xs font-semibold text-text-gray-200 dark:text-text-gray-100">
                   Tuần 2
                 </span>
-                <span className="text-xs font-semibold text-text-secondary-light dark:text-text-secondary-dark">
+                <span className="text-xs font-semibold text-text-gray-200 dark:text-text-gray-100">
                   Tuần 3
                 </span>
-                <span className="text-xs font-semibold text-text-secondary-light dark:text-text-secondary-dark">
+                <span className="text-xs font-semibold text-text-gray-200 dark:text-text-gray-100">
                   Tuần 4
                 </span>
               </div>
             </div>
-            <div className="bg-card-light dark:bg-card-dark rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm p-6 flex flex-col justify-between">
+            <div className="bg-background-light dark:bg-background-dark rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm p-6 flex flex-col justify-between">
               <div>
                 <h3 className="text-lg font-bold text-[#111618] dark:text-white mb-1">
                   Top danh mục
                 </h3>
-                <p className="text-sm text-text-secondary-light dark:text-text-secondary-dark mb-6">
+                <p className="text-sm text-text-gray-200 dark:text-text-gray-100 mb-6">
                   Phân loại theo số lượng bán
                 </p>
               </div>
@@ -251,7 +251,7 @@ export default function AdminPage() {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-6">
-            <div className="bg-card-light dark:bg-card-dark rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
+            <div className="bg-background-light dark:bg-background-dark rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
               <div className="p-5 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center bg-red-50 dark:bg-red-900/10">
                 <h3 className="text-lg font-bold text-red-600 dark:text-red-400 flex items-center gap-2">
                   <span className="material-symbols-outlined">warning</span>
@@ -274,7 +274,7 @@ export default function AdminPage() {
                     <h4 className="text-sm font-semibold truncate text-[#111618] dark:text-white">
                       Áo khoác Denim (Size 4)
                     </h4>
-                    <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark">
+                    <p className="text-xs text-text-gray-200 dark:text-text-gray-100">
                       Mã: SP-0012
                     </p>
                   </div>
@@ -297,7 +297,7 @@ export default function AdminPage() {
                     <h4 className="text-sm font-semibold truncate text-[#111618] dark:text-white">
                       Váy hoa nhí (Size 2)
                     </h4>
-                    <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark">
+                    <p className="text-xs text-text-gray-200 dark:text-text-gray-100">
                       Mã: SP-0034
                     </p>
                   </div>
@@ -320,7 +320,7 @@ export default function AdminPage() {
                     <h4 className="text-sm font-semibold truncate text-[#111618] dark:text-white">
                       Giày thể thao vàng (Size 30)
                     </h4>
-                    <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark">
+                    <p className="text-xs text-text-gray-200 dark:text-text-gray-100">
                       Mã: SP-0089
                     </p>
                   </div>
@@ -334,7 +334,7 @@ export default function AdminPage() {
               </div>
             </div>
 
-            <div className="bg-card-light dark:bg-card-dark rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
+            <div className="bg-background-light dark:bg-background-dark rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm overflow-hidden">
               <div className="p-5 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center">
                 <h3 className="text-lg font-bold text-[#111618] dark:text-white flex items-center gap-2">
                   <span className="material-symbols-outlined text-yellow-500">
@@ -347,7 +347,7 @@ export default function AdminPage() {
                 </button>
               </div>
               <div className="p-0">
-                <div className="grid grid-cols-12 px-4 py-3 bg-background-light dark:bg-background-dark/50 text-xs font-semibold text-text-secondary-light dark:text-text-secondary-dark uppercase tracking-wider">
+                <div className="grid grid-cols-12 px-4 py-3 bg-background-light dark:bg-background-dark/50 text-xs font-semibold text-text-gray-200 dark:text-text-gray-100 uppercase tracking-wider">
                   <div className="col-span-7">Sản phẩm</div>
                   <div className="col-span-3 text-right">Đã bán</div>
                   <div className="col-span-2 text-right">Doanh thu</div>
@@ -366,7 +366,7 @@ export default function AdminPage() {
                       <p className="text-sm font-medium truncate text-[#111618] dark:text-white">
                         Áo thun Gấu Teddy
                       </p>
-                      <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark">
+                      <p className="text-xs text-text-gray-200 dark:text-text-gray-100">
                         150.000 ₫
                       </p>
                     </div>
@@ -374,7 +374,7 @@ export default function AdminPage() {
                   <div className="col-span-3 text-right text-sm font-semibold text-[#111618] dark:text-white">
                     245
                   </div>
-                  <div className="col-span-2 text-right text-sm text-text-secondary-light dark:text-text-secondary-dark">
+                  <div className="col-span-2 text-right text-sm text-text-gray-200 dark:text-text-gray-100">
                     36tr
                   </div>
                 </div>
@@ -392,7 +392,7 @@ export default function AdminPage() {
                       <p className="text-sm font-medium truncate text-[#111618] dark:text-white">
                         Bộ đồ ngủ Cotton
                       </p>
-                      <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark">
+                      <p className="text-xs text-text-gray-200 dark:text-text-gray-100">
                         200.000 ₫
                       </p>
                     </div>
@@ -400,7 +400,7 @@ export default function AdminPage() {
                   <div className="col-span-3 text-right text-sm font-semibold text-[#111618] dark:text-white">
                     189
                   </div>
-                  <div className="col-span-2 text-right text-sm text-text-secondary-light dark:text-text-secondary-dark">
+                  <div className="col-span-2 text-right text-sm text-text-gray-200 dark:text-text-gray-100">
                     37tr
                   </div>
                 </div>
@@ -418,7 +418,7 @@ export default function AdminPage() {
                       <p className="text-sm font-medium truncate text-[#111618] dark:text-white">
                         Mũ Khủng Long
                       </p>
-                      <p className="text-xs text-text-secondary-light dark:text-text-secondary-dark">
+                      <p className="text-xs text-text-gray-200 dark:text-text-gray-100">
                         95.000 ₫
                       </p>
                     </div>
@@ -426,7 +426,7 @@ export default function AdminPage() {
                   <div className="col-span-3 text-right text-sm font-semibold text-[#111618] dark:text-white">
                     156
                   </div>
-                  <div className="col-span-2 text-right text-sm text-text-secondary-light dark:text-text-secondary-dark">
+                  <div className="col-span-2 text-right text-sm text-text-gray-200 dark:text-text-gray-100">
                     14tr
                   </div>
                 </div>

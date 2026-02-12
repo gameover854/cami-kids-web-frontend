@@ -1,7 +1,7 @@
 export default function Loading() {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-[#101d22]/80 backdrop-blur-sm transition-opacity duration-300">
-      <div className="relative flex flex-col items-center justify-center bg-surface-dark rounded-2xl p-10 shadow-2xl border border-border-dark max-w-sm w-full mx-4 animate-[fadeIn_0.3s_ease-out]">
+      <div className="relative flex flex-col items-center justify-center bg-background-dark rounded-2xl p-10 shadow-2xl border border-border-dark max-w-sm w-full mx-4 animate-[fadeIn_0.3s_ease-out]">
         <div className="absolute top-4 right-4 group cursor-not-allowed">
           <span className="material-symbols-outlined text-gray-600">close</span>
 
@@ -13,9 +13,9 @@ export default function Loading() {
         <div className="relative size-20 mb-8 flex items-center justify-center">
           <div className="absolute inset-0 rounded-full border-[3px] border-border-dark"></div>
 
-          <div className="absolute inset-0 rounded-full border-[3px] border-transparent border-t-primary border-r-primary animate-spin"></div>
+          <div className="absolute inset-0 rounded-full border-[3px] border-transparent border-top-primary border-right-primary animate-spin"></div>
 
-          <span className="material-symbols-outlined text-primary text-[32px] animate-pulse">
+          <span className="material-symbols-outlined text-text-primary text-[32px] animate-pulse">
             checkroom
           </span>
         </div>
@@ -30,7 +30,7 @@ export default function Loading() {
         </div>
 
         <div className="w-full h-1 bg-border-dark rounded-full mt-8 overflow-hidden">
-          <div className="h-full bg-primary w-2/3 rounded-full animate-[loadingBar_2s_ease-in-out_infinite]"></div>
+          <div className="h-full bg-background-primary w-2/3 rounded-full animate-[loadingBar_2s_ease-in-out_infinite]"></div>
         </div>
 
         <button className="mt-6 text-xs text-gray-500 hover:text-primary transition-colors border-b border-transparent hover:border-primary pb-0.5">

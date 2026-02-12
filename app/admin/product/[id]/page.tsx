@@ -251,7 +251,7 @@ export default function EditProductPage({
             <span className="material-symbols-outlined">menu</span>
           </button>
         </div>
-        <div className="hidden lg:flex items-center gap-2 text-[#9db2b9] text-sm">
+        <div className="hidden lg:flex items-center gap-2 text-text-gray-100 text-sm">
           <span>Trang chủ</span>
           <span className="material-symbols-outlined text-[16px]">
             chevron_right
@@ -263,11 +263,11 @@ export default function EditProductPage({
           <span className="text-white font-medium">Thêm sản phẩm</span>
         </div>
         <div className="flex items-center gap-4 ml-auto">
-          <button className="relative p-2 text-[#9db2b9] hover:text-white transition-colors rounded-full hover:bg-surface-dark">
+          <button className="relative p-2 text-text-gray-100 hover:text-white transition-colors rounded-full hover:bg-background-dark">
             <span className="material-symbols-outlined">notifications</span>
             <span className="absolute top-2 right-2 size-2 bg-red-500 rounded-full border-2 border-background-dark"></span>
           </button>
-          <button className="p-2 text-[#9db2b9] hover:text-white transition-colors rounded-full hover:bg-surface-dark">
+          <button className="p-2 text-text-gray-100 hover:text-white transition-colors rounded-full hover:bg-background-dark">
             <span className="material-symbols-outlined">help</span>
           </button>
         </div>
@@ -279,12 +279,12 @@ export default function EditProductPage({
               <h1 className="text-2xl md:text-3xl font-black tracking-tight text-white">
                 Thêm sản phẩm mới
               </h1>
-              <p className="text-[#9db2b9] text-sm">
+              <p className="text-text-gray-100 text-sm">
                 Điền thông tin chi tiết cho sản phẩm thời trang
               </p>
             </div>
             <div className="flex gap-3">
-              <button className="cursor-pointer px-5 h-10 rounded-lg bg-surface-dark text-[#9db2b9] text-sm font-bold border border-border-dark hover:text-white hover:bg-[#283539] transition-all">
+              <button className="cursor-pointer px-5 h-10 rounded-lg bg-background-dark text-text-gray-100 text-sm font-bold border border-border-dark hover:text-white hover:bg-[#283539] transition-all">
                 Hủy bỏ
               </button>
               <div className="cursor-pointer flex items-center justify-center gap-2 px-6 h-10 rounded-lg bg-primary text-background-dark text-sm font-bold hover:bg-[#3ec4f1] transition-all shadow-lg shadow-primary/20">
@@ -297,7 +297,7 @@ export default function EditProductPage({
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
             <div className="lg:col-span-2 flex flex-col gap-6">
-              <section className="bg-surface-dark rounded-xl border border-border-dark p-5 shadow-sm">
+              <section className="bg-background-dark rounded-xl border border-border-dark p-5 shadow-sm">
                 <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
                   <span className="material-symbols-outlined text-primary">
                     info
@@ -306,11 +306,11 @@ export default function EditProductPage({
                 </h2>
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-[#9db2b9] mb-1">
+                    <label className="block text-sm font-medium text-text-gray-100 mb-1">
                       Tên sản phẩm<span className="text-red-500">*</span>
                     </label>
                     <input
-                      className="w-full rounded-lg text-sm px-3 py-2.5 focus:ring-1 focus:ring-primary placeholder-[#9db2b9]/50"
+                      className="w-full rounded-lg text-sm px-3 py-2.5 focus:ring-1 focus:ring-primary placeholder-text-gray-100/50"
                       placeholder="Ví dụ: Áo Thun Polo Bé Trai Cotton"
                       type="text"
                       onChange={(e) => {
@@ -323,7 +323,7 @@ export default function EditProductPage({
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-[#9db2b9] mb-1">
+                      <label className="block text-sm font-medium text-text-gray-100 mb-1">
                         Giá bán (VNĐ)
                       </label>
                       <div className="relative">
@@ -339,12 +339,12 @@ export default function EditProductPage({
                           }}
                         />
                         <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                          <span className="text-[#9db2b9] text-xs">₫</span>
+                          <span className="text-text-gray-100 text-xs">₫</span>
                         </div>
                       </div>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-[#9db2b9] mb-1">
+                      <label className="block text-sm font-medium text-text-gray-100 mb-1">
                         Giá so sánh (VNĐ)
                       </label>
                       <div className="relative">
@@ -360,13 +360,13 @@ export default function EditProductPage({
                           }}
                         />
                         <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                          <span className="text-[#9db2b9] text-xs">₫</span>
+                          <span className="text-text-gray-100 text-xs">₫</span>
                         </div>
                       </div>
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-[#9db2b9] mb-1">
+                    <label className="block text-sm font-medium text-text-gray-100 mb-1">
                       Mô tả sản phẩm
                     </label>
                     <div className="rounded-lg border border-border-dark overflow-hidden bg-[#111618] focus-within:ring-1 focus-within:ring-primary focus-within:border-primary">
@@ -385,7 +385,7 @@ export default function EditProductPage({
                   </div>
                 </div>
               </section>
-              <section className="bg-surface-dark rounded-xl border border-border-dark p-5 shadow-sm">
+              <section className="bg-background-dark rounded-xl border border-border-dark p-5 shadow-sm">
                 <h2 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
                   <span className="material-symbols-outlined text-primary">
                     style
@@ -400,11 +400,11 @@ export default function EditProductPage({
                     >
                       <div className="flex flex-col md:flex-row gap-4 items-start">
                         <div className="w-full md:w-1/4">
-                          <label className="block text-xs font-medium text-[#9db2b9] mb-1.5">
+                          <label className="block text-xs font-medium text-text-gray-100 mb-1.5">
                             Tên thuộc tính
                           </label>
                           <input
-                            className="w-full rounded text-sm px-3 py-2 bg-surface-dark border border-border-dark focus:border-primary focus:ring-primary"
+                            className="w-full rounded text-sm px-3 py-2 bg-background-dark border border-border-dark focus:border-primary focus:ring-primary"
                             type="text"
                             value={item.name}
                             onChange={(e) =>
@@ -413,10 +413,10 @@ export default function EditProductPage({
                           />
                         </div>
                         <div className="w-full md:w-3/4">
-                          <label className="block text-xs font-medium text-[#9db2b9] mb-1.5">
+                          <label className="block text-xs font-medium text-text-gray-100 mb-1.5">
                             Giá trị của thuộc tính
                           </label>
-                          <div className="w-full min-h-[38px] rounded px-2 py-1.5 bg-surface-dark border border-border-dark focus-within:border-primary focus-within:ring-1 focus-within:ring-primary flex flex-wrap gap-2 items-center">
+                          <div className="w-full min-h-[38px] rounded px-2 py-1.5 bg-background-dark border border-border-dark focus-within:border-primary focus-within:ring-1 focus-within:ring-primary flex flex-wrap gap-2 items-center">
                             {item.values.map((value, index) => (
                               <span
                                 key={index}
@@ -437,7 +437,7 @@ export default function EditProductPage({
                             ))}
                             <input
                               id={item.id}
-                              className="bg-transparent border-none p-0 text-sm focus:ring-0 placeholder-[#9db2b9]/50 min-w-[80px] flex-1"
+                              className="bg-transparent border-none p-0 text-sm focus:ring-0 placeholder-placeholder min-w-[80px] flex-1"
                               placeholder="Nhập giá trị biến thể"
                               type="text"
                               onKeyDown={(e) =>
@@ -448,7 +448,7 @@ export default function EditProductPage({
                         </div>
                       </div>
                       <button
-                        className="cursor-pointer absolute -top-2.5 -right-2.5 bg-surface-dark border border-border-dark text-[#9db2b9] hover:text-red-500 rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-all"
+                        className="cursor-pointer absolute -top-2.5 -right-2.5 bg-background-dark border border-border-dark text-text-gray-100 hover:text-red-500 rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-all"
                         title="Xóa thuộc tính"
                         id={item.id}
                         onClick={(e) => handleRemoveAttribute(item.id!)}
@@ -478,7 +478,7 @@ export default function EditProductPage({
                   <div className="overflow-x-auto rounded-lg border border-border-dark">
                     <table className="w-full text-left border-collapse min-w-[700px]">
                       <thead>
-                        <tr className="bg-[#152025] text-xs uppercase tracking-wider text-[#9db2b9] border-b border-border-dark">
+                        <tr className="bg-[#152025] text-xs uppercase tracking-wider text-text-gray-100 border-b border-border-dark">
                           <th className="px-4 py-3 font-semibold">Biến thể</th>
                           <th className="px-4 py-3 font-semibold text-right w-1/5">
                             Giá bán <span className="text-red-500">*</span>
@@ -491,19 +491,19 @@ export default function EditProductPage({
                       <tbody className="divide-y divide-border-dark bg-[#111618]">
                         {dataVariant.map((item) => (
                           <tr
-                            className="hover:bg-surface-dark/50 transition-colors"
+                            className="hover:bg-background-dark/50 transition-colors"
                             key={item.id}
                           >
                             <td className="px-4 py-3 align-middle">
                               <div className="flex flex-col gap-0.5">
-                                <span className="text-[#9db2b9]">
+                                <span className="text-text-gray-100">
                                   {item.combo}
                                 </span>
                               </div>
                             </td>
                             <td className="px-4 py-3 align-middle">
                               <input
-                                className="w-full rounded px-2 py-1.5 text-sm text-right bg-surface-dark border-border-dark focus:border-primary focus:ring-primary"
+                                className="w-full rounded px-2 py-1.5 text-sm text-right bg-background-dark border-border-dark focus:border-primary focus:ring-primary"
                                 type="number"
                                 value={item.price}
                                 onChange={(e) =>
@@ -517,7 +517,7 @@ export default function EditProductPage({
                             </td>
                             <td className="px-4 py-3 align-middle">
                               <input
-                                className="w-full rounded px-2 py-1.5 text-sm text-right bg-surface-dark border-border-dark focus:border-primary focus:ring-primary"
+                                className="w-full rounded px-2 py-1.5 text-sm text-right bg-background-dark border-border-dark focus:border-primary focus:ring-primary"
                                 min="0"
                                 type="number"
                                 value={item.stock_quantity}
@@ -537,7 +537,7 @@ export default function EditProductPage({
                   </div>
                 </div>
               </section>
-              <section className="bg-surface-dark rounded-xl border border-border-dark p-5 shadow-sm">
+              <section className="bg-background-dark rounded-xl border border-border-dark p-5 shadow-sm">
                 <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
                   <span className="material-symbols-outlined text-primary">
                     imagesmode
@@ -545,7 +545,7 @@ export default function EditProductPage({
                   Hình ảnh sản phẩm
                 </h2>
                 <div className="border-2 border-dashed border-border-dark rounded-xl p-8 flex flex-col items-center justify-center text-center hover:border-primary/50 transition-colors bg-[#111618] cursor-pointer group">
-                  <div className="bg-surface-dark p-3 rounded-full mb-3 group-hover:scale-110 transition-transform">
+                  <div className="bg-background-dark p-3 rounded-full mb-3 group-hover:scale-110 transition-transform">
                     <span className="material-symbols-outlined text-primary text-3xl">
                       cloud_upload
                     </span>
@@ -561,7 +561,7 @@ export default function EditProductPage({
                   <p className="text-white font-medium text-sm">
                     Kéo thả hình ảnh vào đây hoặc click để chọn
                   </p>
-                  <p className="text-[#9db2b9] text-xs mt-1">
+                  <p className="text-text-gray-100 text-xs mt-1">
                     Hỗ trợ JPG, PNG, WEBP. Tối đa 5MB/ảnh.
                   </p>
                 </div>
@@ -611,7 +611,7 @@ export default function EditProductPage({
               </section>
             </div>
             <div className="flex flex-col gap-6">
-              <section className="bg-surface-dark rounded-xl border border-border-dark p-5 shadow-sm sticky top-24">
+              <section className="bg-background-dark rounded-xl border border-border-dark p-5 shadow-sm sticky top-24">
                 <h2 className="text-lg font-bold text-white mb-4">Tổ chức</h2>
                 <div className="space-y-5">
                   <div className="flex items-center justify-between pb-4 border-b border-border-dark">
@@ -619,7 +619,7 @@ export default function EditProductPage({
                       <span className="text-sm font-medium text-white">
                         Trạng thái
                       </span>
-                      <span className="text-xs text-[#9db2b9]">
+                      <span className="text-xs text-text-gray-100">
                         Cho phép bán
                       </span>
                     </div>
@@ -638,7 +638,7 @@ export default function EditProductPage({
                     </label>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-[#9db2b9] mb-1">
+                    <label className="block text-sm font-medium text-text-gray-100 mb-1">
                       Danh mục
                     </label>
                     <select className="w-full rounded-lg text-sm px-3 py-2.5 focus:ring-1 focus:ring-primary">
@@ -650,7 +650,7 @@ export default function EditProductPage({
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-[#9db2b9] mb-1">
+                    <label className="block text-sm font-medium text-text-gray-100 mb-1">
                       Bộ sưu tập
                     </label>
                     <div className="relative">
@@ -666,7 +666,7 @@ export default function EditProductPage({
                         />
                       </div>
                       <div className="max-h-40 overflow-y-auto border border-border-dark border-t-0 rounded-b-lg bg-[#111618] p-2 space-y-1">
-                        <label className="flex items-center gap-2 p-1.5 hover:bg-surface-dark rounded cursor-pointer">
+                        <label className="flex items-center gap-2 p-1.5 hover:bg-background-dark rounded cursor-pointer">
                           <input
                             className="rounded border-border-dark bg-transparent text-primary focus:ring-primary"
                             type="checkbox"
@@ -677,7 +677,7 @@ export default function EditProductPage({
                         </label>
                       </div>
                     </div>
-                    <p className="text-xs text-[#9db2b9] mt-1">
+                    <p className="text-xs text-text-gray-100 mt-1">
                       Chọn một hoặc nhiều bộ sưu tập.
                     </p>
                   </div>

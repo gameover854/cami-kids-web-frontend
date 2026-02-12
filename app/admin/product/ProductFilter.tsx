@@ -23,17 +23,17 @@ export default function ProductFilter({
   setSelectedIsActive: any;
 }) {
   return (
-    <div className="bg-surface-dark rounded-xl border border-border-dark p-4 flex flex-col lg:flex-row gap-4 justify-between items-start lg:items-center">
+    <div className="dark:bg-background-dark bg-background-light rounded-xl border-1 border-border-gray p-4 flex flex-col lg:flex-row gap-4 justify-between items-start lg:items-center">
       {/* <!-- Search --> */}
 
       <div className="relative w-full lg:w-96">
         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <span className="material-symbols-outlined text-[#9db2b9]">
+          <span className="material-symbols-outlined text-text-gray-100">
             search
           </span>
         </div>
         <input
-          className="block w-full pl-10 pr-3 py-2.5 border-none rounded-lg leading-5 bg-[#111618] text-white placeholder-[#9db2b9] focus:outline-none focus:ring-1 focus:ring-primary sm:text-sm"
+          className="block w-full pl-10 pr-3 py-2.5 border-1  border-border-gray rounded-lg leading-5 dark:bg-background-dark bg-background-light dark:text-text-light text-text-gray-200 placeholder-placeholder focus:outline-none focus:ring-1 hover:ring-1 text-sm"
           placeholder="Tìm kiếm tên sản phẩm, mã SKU..."
           type="text"
         />
@@ -41,30 +41,32 @@ export default function ProductFilter({
       {/* <!-- Filter Chips --> */}
       <div className="flex flex-wrap gap-3 w-full lg:w-auto">
         <div className="relative group">
-          <div className="flex h-10 items-center gap-2 rounded-lg bg-[#111618] pl-4 pr-8 text-sm font-medium text-white hover:ring-1 hover:ring-primary/50 transition-all">
+          <div className="flex h-10 items-center gap-2 border-1  border-border-gray rounded-lg dark:bg-background-dark bg-background-light pl-4 pr-8 text-sm font-medium dark:text-text-gray-200 text-text-gray-200 hover:ring-1 transition-all">
             {selectedCategory ? (
               <Listbox value={selectedCategory} onChange={setSelectedCategory}>
                 <p> Danh mục: </p>
                 <ListboxButton className="cursor-pointer">
                   {selectedCategory.name}
                   <ChevronDownIcon
-                    className="group pointer-events-none absolute top-2.5 right-2.5 size-4 fill-white/60"
+                    className="group pointer-events-none absolute top-2.5 right-2.5 size-4 dark:fill-text-light fill-text-gray-200/60"
                     aria-hidden="true"
                   />
                 </ListboxButton>
 
                 <ListboxOptions anchor="bottom" className="focus:outline-none">
                   {categories.map((category) => (
-                    <ListboxOption
-                      key={category.id}
-                      value={category}
-                      className="group flex cursor-pointer items-center gap-2 rounded-lg px-3 py-1.5 select-none bg-[#111618] data-focus:bg-white/60"
-                    >
-                      <CheckIcon className="invisible size-4 fill-white group-data-selected:visible" />
-                      <div className="text-sm/6 text-white">
-                        {category.name}
-                      </div>
-                    </ListboxOption>
+                    <div key={category.id}>
+                      <ListboxOption
+                        key={category.id}
+                        value={category}
+                        className="group flex cursor-pointer border-1 border-boder-gray items-center gap-2 px-3 py-1.5 select-none dark:bg-background-dark bg-background-gray data-focus:bg-hover text-gray-200"
+                      >
+                        <CheckIcon className="invisible size-4 fill-white group-data-selected:visible" />
+                        <div className="text-sm/6 text-white">
+                          {category.name}
+                        </div>
+                      </ListboxOption>
+                    </div>
                   ))}
                 </ListboxOptions>
               </Listbox>
@@ -74,14 +76,14 @@ export default function ProductFilter({
           </div>
         </div>
         <div className="relative group">
-          <div className="flex h-10 items-center gap-2 rounded-lg bg-[#111618] pl-4 pr-8 text-sm font-medium text-white hover:ring-1 hover:ring-primary/50 transition-all">
+          <div className="flex h-10 items-center gap-2 border-1  border-border-gray rounded-lg dark:bg-background-dark bg-background-light pl-4 pr-8 text-sm font-medium dark:text-text-gray-200 text-text-gray-200 hover:ring-1 transition-all">
             <p>Trạng thái: </p>
             {selectedIsActive ? (
               <Listbox value={selectedIsActive} onChange={setSelectedIsActive}>
                 <ListboxButton className="cursor-pointer">
                   {selectedIsActive.name}
                   <ChevronDownIcon
-                    className="group pointer-events-none absolute top-2.5 right-2.5 size-4 fill-white/60"
+                    className="group pointer-events-none absolute top-2.5 right-2.5 size-4 dark:fill-text-light fill-text-gray-200/60"
                     aria-hidden="true"
                   />
                 </ListboxButton>
@@ -91,7 +93,7 @@ export default function ProductFilter({
                     <ListboxOption
                       key={status.id}
                       value={status}
-                      className="group flex cursor-pointer items-center gap-2 rounded-lg px-3 py-1.5 select-none bg-[#111618] data-focus:bg-white/60"
+                      className="group flex cursor-pointer border-1 border-boder-gray items-center gap-2 px-3 py-1.5 select-none dark:bg-background-dark bg-background-gray data-focus:bg-hover text-gray-200"
                     >
                       <CheckIcon className="invisible size-4 fill-white group-data-selected:visible" />
                       <div className="text-sm/6 text-white">{status.name}</div>
@@ -103,14 +105,6 @@ export default function ProductFilter({
               "Chưa có dữ liệu"
             )}
           </div>
-        </div>
-        <div className="relative group">
-          <button className="flex h-10 items-center gap-2 rounded-lg bg-[#111618] px-4 text-sm font-medium text-white hover:ring-1 hover:ring-primary/50 transition-all">
-            <span>Giá: Tất cả</span>
-            <span className="material-symbols-outlined text-[18px] text-[#9db2b9]">
-              expand_more
-            </span>
-          </button>
         </div>
       </div>
     </div>

@@ -11,6 +11,7 @@ import { Fragment, useEffect, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import { Checkbox, Label, Field } from "@headlessui/react";
 import { getCollection } from "@/services/collections.services";
+import Header from "@/components/layout/header";
 
 export default function CreateProductPage() {
   const [dataProduct, setDataProduct] = useState<Product>({
@@ -283,49 +284,23 @@ export default function CreateProductPage() {
 
   return (
     <div className="flex-1 flex flex-col h-full overflow-hidden relative">
-      <header className="h-16 border-b border-border-dark bg-background-dark/80 backdrop-blur-md flex items-center justify-between px-6 sticky top-0 z-20">
-        <div className="flex items-center gap-4 lg:hidden">
-          <button className="text-white p-1">
-            <span className="material-symbols-outlined">menu</span>
-          </button>
-        </div>
-        <div className="hidden lg:flex items-center gap-2 text-[#9db2b9] text-sm">
-          <span>Trang chủ</span>
-          <span className="material-symbols-outlined text-[16px]">
-            chevron_right
-          </span>
-          <span>Sản phẩm</span>
-          <span className="material-symbols-outlined text-[16px]">
-            chevron_right
-          </span>
-          <span className="text-white font-medium">Thêm sản phẩm</span>
-        </div>
-        <div className="flex items-center gap-4 ml-auto">
-          <button className="relative p-2 text-[#9db2b9] hover:text-white transition-colors rounded-full hover:bg-surface-dark">
-            <span className="material-symbols-outlined">notifications</span>
-            <span className="absolute top-2 right-2 size-2 bg-red-500 rounded-full border-2 border-background-dark"></span>
-          </button>
-          <button className="p-2 text-[#9db2b9] hover:text-white transition-colors rounded-full hover:bg-surface-dark">
-            <span className="material-symbols-outlined">help</span>
-          </button>
-        </div>
-      </header>
-      <main className="flex-1 overflow-y-auto p-4 md:p-8 scroll-smooth">
+      <Header />
+      <main className="flex-1 overflow-y-auto p-4 md:p-8 scroll-smooth dark:bg-background-dark-2">
         <div className="max-w-[1200px] mx-auto flex flex-col gap-6">
           <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
             <div className="flex flex-col gap-1">
-              <h1 className="text-2xl md:text-3xl font-black tracking-tight dark:text-white white:text-gray-400">
+              <h1 className="text-2xl md:text-3xl font-black tracking-tight dark:text-white text-text-gray-100">
                 Thêm sản phẩm mới
               </h1>
-              <p className="text-[#9db2b9] text-sm">
+              <p className="text-text-gray-100 text-sm">
                 Điền thông tin chi tiết cho sản phẩm thời trang
               </p>
             </div>
             <div className="flex gap-3">
-              <button className="cursor-pointer px-5 h-10 rounded-lg bg-surface-dark text-[#9db2b9] text-sm font-bold border border-border-dark hover:text-white hover:bg-[#283539] transition-all">
+              <button className="cursor-pointer px-5 h-10 rounded-lg bg-background-dark text-text-gray-100 text-sm font-bold border border-border-dark hover:text-white hover:bg-[#283539] transition-all">
                 Hủy bỏ
               </button>
-              <div className="cursor-pointer flex items-center justify-center gap-2 px-6 h-10 rounded-lg bg-primary text-background-dark text-sm font-bold hover:bg-[#3ec4f1] transition-all shadow-lg shadow-primary/20">
+              <div className="cursor-pointer flex items-center justify-center gap-2 px-6 h-10 rounded-lg bg-background-primary text-background-dark text-sm font-bold hover:bg-[#3ec4f1] transition-all shadow-lg shadow-primary/20">
                 <span className="material-symbols-outlined text-[20px]">
                   save
                 </span>
@@ -335,8 +310,8 @@ export default function CreateProductPage() {
           </div>
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
             <div className="lg:col-span-2 flex flex-col gap-6">
-              <section className="bg-surface-dark rounded-xl border border-border-dark p-5 shadow-sm">
-                <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+              <section className="bg-background-dark rounded-xl border border-border-dark p-5 shadow-sm">
+                <h2 className="text-lg font-bold mb-4 flex items-center gap-2 text-text-gray-100">
                   <span className="material-symbols-outlined text-primary">
                     info
                   </span>
@@ -344,11 +319,11 @@ export default function CreateProductPage() {
                 </h2>
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-sm font-medium text-[#9db2b9] mb-1">
+                    <label className="block text-sm font-medium text-text-gray-100 mb-1">
                       Tên sản phẩm<span className="text-red-500">*</span>
                     </label>
                     <input
-                      className="w-full rounded-lg text-sm px-3 py-2.5 focus:ring-1 focus:ring-primary placeholder-[#9db2b9]/50 outline-none dark:bg-background-dark"
+                      className="w-full rounded-lg text-sm px-3 py-2.5 focus:ring-1 focus:ring-primary placeholder-placeholder outline-none dark:bg-background-dark border-1  border-border-dark"
                       placeholder="Ví dụ: Áo Thun Polo Bé Trai Cotton"
                       type="text"
                       onChange={(e) => {
@@ -361,12 +336,12 @@ export default function CreateProductPage() {
                   </div>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-sm font-medium text-[#9db2b9] mb-1">
+                      <label className="block text-sm font-medium text-text-gray-100 mb-1">
                         Giá bán (VNĐ)
                       </label>
                       <div className="relative">
                         <input
-                          className="w-full rounded-lg text-sm pl-3 pr-10 py-2.5 text-right font-medium focus:ring-1 focus:ring-primary placeholder-[#9db2b9]/50 outline-none dark:bg-background-dark"
+                          className="w-full rounded-lg text-sm border-1 border-border-dark pl-3 pr-10 py-2.5 text-right font-medium focus:ring-1 focus:ring-primary placeholder-placeholder outline-none dark:bg-background-dark"
                           placeholder="Nhập giá bán"
                           type="number"
                           onChange={(e) => {
@@ -377,17 +352,17 @@ export default function CreateProductPage() {
                           }}
                         />
                         <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                          <span className="text-[#9db2b9] text-xs">₫</span>
+                          <span className="text-text-gray-100 text-xs">₫</span>
                         </div>
                       </div>
                     </div>
                     <div>
-                      <label className="block text-sm font-medium text-[#9db2b9] mb-1">
+                      <label className="block text-sm font-medium text-text-gray-100 mb-1">
                         Giá so sánh (VNĐ)
                       </label>
                       <div className="relative">
                         <input
-                          className="w-full rounded-lg text-sm pl-3 pr-10 py-2.5 text-right font-medium focus:ring-1 focus:ring-primary placeholder-[#9db2b9]/50 outline-none dark:bg-background-dark"
+                          className="w-full rounded-lg  border-1 border-border-dark text-sm pl-3 pr-10 py-2.5 text-right font-medium focus:ring-1 focus:ring-primary placeholder-placeholder outline-none dark:bg-background-dark"
                           placeholder="Nhập giá so sánh"
                           type="number"
                           onChange={(e) => {
@@ -398,18 +373,18 @@ export default function CreateProductPage() {
                           }}
                         />
                         <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                          <span className="text-[#9db2b9] text-xs">₫</span>
+                          <span className="text-text-gray-100 text-xs">₫</span>
                         </div>
                       </div>
                     </div>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-[#9db2b9] mb-1">
+                    <label className="block text-sm font-medium text-text-gray-100 mb-1">
                       Mô tả sản phẩm
                     </label>
-                    <div className="rounded-lg border border-border-dark overflow-hidden bg-[#111618] focus-within:ring-1 focus-within:ring-primary focus-within:border-primary ">
+                    <div className="rounded-lg border border-border-dark overflow-hidden dark:bg-background-dark focus-within:ring-1 focus-within:ring-primary focus-within:border-primary ">
                       <textarea
-                        className="w-full border-none p-3 text-sm focus:ring-0 resize-y bg-transparent outline-none"
+                        className="w-full border-none p-3 text-sm focus:ring-0 resize-y bg-transparent outline-none dark:bg-background-dark"
                         placeholder="Nhập mô tả chi tiết về chất liệu, kiểu dáng..."
                         rows={4}
                         onChange={(e) => {
@@ -423,7 +398,7 @@ export default function CreateProductPage() {
                   </div>
                 </div>
               </section>
-              <section className="bg-surface-dark rounded-xl border border-border-dark p-5 shadow-sm">
+              <section className="bg-background-dark rounded-xl border border-border-dark p-5 shadow-sm">
                 <h2 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
                   <span className="material-symbols-outlined text-primary">
                     style
@@ -438,12 +413,13 @@ export default function CreateProductPage() {
                     >
                       <div className="flex flex-col md:flex-row gap-4 items-start">
                         <div className="w-full md:w-1/4">
-                          <label className="block text-xs font-medium text-[#9db2b9] mb-1.5">
+                          <label className="block text-xs font-medium text-text-gray-100 mb-1.5">
                             Tên thuộc tính
                           </label>
                           <input
-                            className="w-full rounded text-sm px-3 py-2 bg-surface-dark border border-border-dark focus:border-primary focus:ring-primary"
+                            className="w-full rounded text-sm px-3 py-2 bg-background-dark border border-border-dark focus:border-primary focus:ring-primary"
                             type="text"
+                            placeholder="Nhập tên thuộc tính"
                             value={item.name}
                             onChange={(e) =>
                               handleAttributeName(item.id!, e.target.value)
@@ -451,10 +427,10 @@ export default function CreateProductPage() {
                           />
                         </div>
                         <div className="w-full md:w-3/4">
-                          <label className="block text-xs font-medium text-[#9db2b9] mb-1.5">
+                          <label className="block text-xs font-medium text-text-gray-100 mb-1.5">
                             Giá trị của thuộc tính
                           </label>
-                          <div className="w-full min-h-[38px] rounded px-2 py-1.5 bg-surface-dark border border-border-dark focus-within:border-primary focus-within:ring-1 focus-within:ring-primary flex flex-wrap gap-2 items-center">
+                          <div className="w-full min-h-[38px] rounded px-2 py-1.5 bg-background-dark border border-border-dark focus-within:border-primary focus-within:ring-1 focus-within:ring-primary flex flex-wrap gap-2 items-center">
                             {item.values.map((value, index) => (
                               <span
                                 key={index}
@@ -475,7 +451,7 @@ export default function CreateProductPage() {
                             ))}
                             <input
                               id={item.id}
-                              className="bg-transparent border-none p-0 text-sm focus:ring-0 placeholder-[#9db2b9]/50 min-w-[80px] flex-1"
+                              className="bg-transparent border-none p-0 text-sm focus:ring-0 placeholder-placeholder min-w-[80px] flex-1"
                               placeholder="Nhập giá trị biến thể"
                               type="text"
                               onKeyDown={(e) =>
@@ -486,7 +462,7 @@ export default function CreateProductPage() {
                         </div>
                       </div>
                       <button
-                        className="cursor-pointer absolute -top-2.5 -right-2.5 bg-surface-dark border border-border-dark text-[#9db2b9] hover:text-red-500 rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-all"
+                        className="cursor-pointer absolute -top-2.5 -right-2.5 bg-background-dark border border-border-dark text-text-gray-100 hover:text-red-500 rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-all"
                         title="Xóa thuộc tính"
                         id={item.id}
                         onClick={(e) => handleRemoveAttribute(item.id!)}
@@ -516,7 +492,7 @@ export default function CreateProductPage() {
                   <div className="overflow-x-auto rounded-lg border border-border-dark">
                     <table className="w-full text-left border-collapse min-w-[700px]">
                       <thead>
-                        <tr className="bg-[#152025] text-xs uppercase tracking-wider text-[#9db2b9] border-b border-border-dark">
+                        <tr className="bg-[#152025] text-xs uppercase tracking-wider text-text-gray-100 border-b border-border-dark">
                           <th className="px-4 py-3 font-semibold">Biến thể</th>
                           <th className="px-4 py-3 font-semibold text-right w-1/5">
                             Giá bán <span className="text-red-500">*</span>
@@ -529,19 +505,19 @@ export default function CreateProductPage() {
                       <tbody className="divide-y divide-border-dark bg-[#111618]">
                         {dataVariant.map((item) => (
                           <tr
-                            className="hover:bg-surface-dark/50 transition-colors"
+                            className="hover:bg-background-dark/50 transition-colors"
                             key={item.id}
                           >
                             <td className="px-4 py-3 align-middle">
                               <div className="flex flex-col gap-0.5">
-                                <span className="text-[#9db2b9]">
+                                <span className="text-text-gray-100">
                                   {item.combo}
                                 </span>
                               </div>
                             </td>
                             <td className="px-4 py-3 align-middle">
                               <input
-                                className="w-full rounded px-2 py-1.5 text-sm text-right bg-surface-dark border-border-dark focus:border-primary focus:ring-primary"
+                                className="w-full rounded border-1 border-border-dark px-2 py-1.5 text-sm text-right bg-background-dark border-border-dark focus:border-primary focus:ring-primary"
                                 type="number"
                                 value={item.price}
                                 onChange={(e) =>
@@ -555,7 +531,7 @@ export default function CreateProductPage() {
                             </td>
                             <td className="px-4 py-3 align-middle">
                               <input
-                                className="w-full rounded px-2 py-1.5 text-sm text-right bg-surface-dark border-border-dark focus:border-primary focus:ring-primary"
+                                className="w-full rounded px-2  border-1 border-border-dark py-1.5 text-sm text-right bg-background-dark border-border-dark focus:border-primary focus:ring-primary"
                                 min="0"
                                 type="number"
                                 value={item.stock_quantity}
@@ -575,7 +551,7 @@ export default function CreateProductPage() {
                   </div>
                 </div>
               </section>
-              <section className="bg-surface-dark rounded-xl border border-border-dark p-5 shadow-sm">
+              <section className="bg-background-dark rounded-xl border border-border-dark p-5 shadow-sm">
                 <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
                   <span className="material-symbols-outlined text-primary">
                     imagesmode
@@ -583,7 +559,7 @@ export default function CreateProductPage() {
                   Hình ảnh sản phẩm
                 </h2>
                 <div className="border-2 border-dashed border-border-dark rounded-xl p-8 flex flex-col items-center justify-center text-center hover:border-primary/50 transition-colors bg-[#111618] cursor-pointer group">
-                  <div className="bg-surface-dark p-3 rounded-full mb-3 group-hover:scale-110 transition-transform relative">
+                  <div className="bg-background-dark p-3 rounded-full mb-3 group-hover:scale-110 transition-transform relative">
                     <span className="material-symbols-outlined text-primary text-3xl">
                       cloud_upload
                     </span>
@@ -604,7 +580,7 @@ export default function CreateProductPage() {
                   <p className="text-white font-medium text-sm">
                     Kéo thả hình ảnh vào đây hoặc click để chọn
                   </p>
-                  <p className="text-[#9db2b9] text-xs mt-1">
+                  <p className="text-text-gray-100 text-xs mt-1">
                     Hỗ trợ JPG, PNG, WEBP. Tối đa 5MB/ảnh.
                   </p>
                 </div>
@@ -654,7 +630,7 @@ export default function CreateProductPage() {
               </section>
             </div>
             <div className="flex flex-col gap-6">
-              <section className="bg-surface-dark rounded-xl border border-border-dark p-5 shadow-sm sticky top-24">
+              <section className="bg-background-dark rounded-xl border border-border-dark p-5 shadow-sm sticky top-24">
                 <h2 className="text-lg font-bold text-white mb-4">Tổ chức</h2>
                 <div className="space-y-5">
                   <div className="flex items-center justify-between pb-4 border-b border-border-dark">
@@ -662,7 +638,7 @@ export default function CreateProductPage() {
                       <span className="text-sm font-medium text-white">
                         Trạng thái
                       </span>
-                      <span className="text-xs text-[#9db2b9]">
+                      <span className="text-xs text-text-gray-100">
                         Cho phép bán
                       </span>
                     </div>
@@ -681,11 +657,11 @@ export default function CreateProductPage() {
                     </label>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-[#9db2b9] mb-1">
+                    <label className="block text-sm font-medium text-text-gray-100 mb-1">
                       Thương Hiệu
                     </label>
                     <select
-                      className="w-full rounded-lg text-sm px-3 py-2.5 focus:ring-1 focus:ring-primary outline-none dark:bg-background-dark"
+                      className="w-full rounded-lg text-sm px-3 py-2.5 focus:ring-1 focus:ring-primary outline-none dark:bg-background-dark border-1 border-border-dark"
                       onChange={(e) =>
                         setDataProduct({
                           ...dataProduct,
@@ -701,11 +677,11 @@ export default function CreateProductPage() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-[#9db2b9] mb-1">
+                    <label className="block text-sm font-medium text-text-gray-100 mb-1">
                       Danh mục
                     </label>
                     <select
-                      className="w-full rounded-lg text-sm px-3 py-2.5 focus:ring-1 focus:ring-primary outline-none dark:bg-background-dark"
+                      className="w-full rounded-lg text-sm px-3 py-2.5 focus:ring-1 focus:ring-primary outline-none dark:bg-background-dark border-1 border-border-dark"
                       onChange={(e) =>
                         setDataProduct({
                           ...dataProduct,
@@ -726,7 +702,7 @@ export default function CreateProductPage() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-sm font-medium text-[#9db2b9] mb-1">
+                    <label className="block text-sm font-medium text-text-gray-100 mb-1">
                       Bộ sưu tập
                     </label>
                     <div className="mt-2 overflow-y-scroll h-50">
@@ -753,7 +729,7 @@ export default function CreateProductPage() {
                               />
                             </svg>
                           </Checkbox>
-                          <Label className="ml-2 text-sm text-[#9db2b9]">
+                          <Label className="ml-2 text-sm text-text-gray-100">
                             {collection.name}
                           </Label>
                         </Field>
