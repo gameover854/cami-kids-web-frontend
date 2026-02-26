@@ -1,4 +1,3 @@
-import { deleteProduct } from "@/services/product.services";
 import { formatVND } from "@/utils/formatCurrency";
 import Link from "next/link";
 
@@ -7,7 +6,7 @@ export default function ProductTable({
   remove,
 }: {
   products: Product[];
-  remove: any;
+  remove: (id: number) => void;
 }) {
   return (
     <div className="dark:bg-background-dark rounded-xl border dark:border-border-gray overflow-hidden shadow-xl">
@@ -86,9 +85,9 @@ export default function ProductTable({
 
                 <td className="px-6 py-4 text-center">
                   <div className="flex flex-col items-center gap-1">
-                    {item.product_attributes?.length ? (
-                      item.product_attributes.map((attr) => (
-                        <p className="text-xs text-text-gray-100">
+                    {item.attributes?.length ? (
+                      item.attributes.map((attr) => (
+                        <p className="text-xs text-text-gray-100" key={attr.id}>
                           {attr._count?.values} - {attr.name}
                         </p>
                       ))

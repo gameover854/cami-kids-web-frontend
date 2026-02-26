@@ -9,7 +9,7 @@ type Product = {
   is_active: boolean;
   description: string;
   category?: Category;
-  product_attributes?: ProductAttribute;
+  attributes?: ProductAttribute;
   product_variants?: ProductVariant;
   images?: Image[];
   brand?: Brand;
@@ -90,7 +90,7 @@ type ProductImage = Image[];
 type Image = {
   id: string;
   url: string;
-  is_main: Boolean;
+  is_main: boolean;
   public_id?: string;
 };
 
