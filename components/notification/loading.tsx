@@ -11,9 +11,9 @@ export default function Loading() {
         </div>
 
         <div className="relative size-20 mb-8 flex items-center justify-center">
-          <div className="absolute inset-0 rounded-full border-[3px] border-border-dark"></div>
+          <div className="absolute inset-0 rounded-full border-[3px] border-border-dark" />
 
-          <div className="absolute inset-0 rounded-full border-[3px] border-transparent border-top-primary border-right-primary animate-spin"></div>
+          <div className="absolute inset-0 rounded-full border-[3px] border-transparent border-top-primary border-right-primary animate-spin" />
 
           <span className="material-symbols-outlined text-text-primary text-[32px] animate-pulse">
             checkroom
@@ -25,12 +25,12 @@ export default function Loading() {
             Đang xử lý dữ liệu
           </h2>
           <p className="text-gray-400 text-sm font-normal leading-relaxed max-w-[240px]">
-            Hệ thống đang cập nhật sản phẩm. Vui lòng không tắt trình duyệt.
+            Hệ thống đang cập nhật dữ liệu. Vui lòng không tắt trình duyệt.
           </p>
         </div>
 
         <div className="w-full h-1 bg-border-dark rounded-full mt-8 overflow-hidden">
-          <div className="h-full bg-background-primary w-2/3 rounded-full animate-[loadingBar_2s_ease-in-out_infinite]"></div>
+          <div className="h-full bg-background-primary w-2/3 rounded-full animate-[loadingBar_2s_ease-in-out_infinite]" />
         </div>
 
         <button className="mt-6 text-xs text-gray-500 hover:text-primary transition-colors border-b border-transparent hover:border-primary pb-0.5">

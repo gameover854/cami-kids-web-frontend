@@ -1,7 +1,8 @@
 "use client";
 
 import { login } from "@/services/auth.services";
-import { useRouter } from "next/navigation";
+import { getSafeRedirectPath, hasAuthCookie, setAuthToken } from "@/utils/auth";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 
 export default function LoginPage() {
@@ -11,11 +12,15 @@ export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [showPassword, setShowPassword] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (token) router.replace("/admin");
-  }, [router]);
+    if (token && hasAuthCookie()) {
+      const redirectPath = getSafeRedirectPath(searchParams.get("redirect"));
+      router.replace(redirectPath);
+    }
+  }, [router, searchParams]);
 
   async function handleSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -27,18 +32,17 @@ export default function LoginPage() {
       const token = res?.data?.token;
 
       if (!token) {
-        setError("Dang nhap that bai. Vui long thu lai.");
+        setError("Đăng nhập thất bại. Vui lòng thử lại.");
         return;
       }
 
-      localStorage.setItem("token", token);
-      document.cookie = `auth_token=${token}; path=/; max-age=${8 * 60 * 60}; samesite=lax`;
-      router.push("/admin");
+      setAuthToken(token);
+      const redirectPath = getSafeRedirectPath(searchParams.get("redirect"));
+      router.push(redirectPath);
     } catch (err: unknown) {
       const errorObj = err as { response?: { data?: { message?: string } } };
       const message =
-        errorObj?.response?.data?.message ||
-        "Dang nhap that bai. Vui long thu lai.";
+        errorObj?.response?.data?.message || "Đăng nhập thất bại. Vui lòng thử lại.";
       setError(message);
     } finally {
       setIsLoading(false);
@@ -76,17 +80,17 @@ export default function LoginPage() {
           <div className="flex flex-col px-6 py-6 pt-2">
             <div className="mb-6">
               <h3 className="pb-1 text-xl font-bold leading-tight tracking-tight text-[#111418] dark:text-white">
-                Chao mung tro lai!
+                Chào mừng trở lại!
               </h3>
               <p className="text-sm font-normal leading-normal text-[#637588] dark:text-[#9db2b9]">
-                Vui long dang nhap de quan ly cua hang thoi trang.
+                Vui lòng đăng nhập để quản lý cửa hàng thời trang.
               </p>
             </div>
 
             <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
               <label className="flex flex-col">
                 <p className="pb-2 text-sm font-medium leading-normal text-[#111418] dark:text-white">
-                  Email hoac ten dang nhap
+                  Email hoặc tên đăng nhập
                 </p>
                 <div className="flex w-full items-stretch overflow-hidden rounded-lg bg-white ring-1 ring-[#dce0e5] transition-shadow focus-within:ring-2 focus-within:ring-primary dark:bg-[#101d22] dark:ring-[#3b4d54]">
                   <input
@@ -106,13 +110,13 @@ export default function LoginPage() {
               <label className="flex flex-col">
                 <div className="flex items-center justify-between pb-2">
                   <p className="text-sm font-medium leading-normal text-[#111418] dark:text-white">
-                    Mat khau
+                    Mật khẩu
                   </p>
                 </div>
                 <div className="flex w-full items-stretch overflow-hidden rounded-lg bg-white ring-1 ring-[#dce0e5] transition-shadow focus-within:ring-2 focus-within:ring-primary dark:bg-[#101d22] dark:ring-[#3b4d54]">
                   <input
                     className="h-12 w-full flex-1 border-none bg-transparent px-4 text-base font-normal leading-normal text-[#111418] placeholder:text-[#637588] focus:outline-none focus:ring-0 dark:text-white dark:placeholder:text-[#6f828a]"
-                    placeholder="Nhap mat khau"
+                    placeholder="Nhập mật khẩu"
                     type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
@@ -137,14 +141,14 @@ export default function LoginPage() {
                     type="checkbox"
                   />
                   <span className="text-sm text-[#637588] transition-colors group-hover:text-[#111418] dark:text-[#9db2b9] dark:group-hover:text-white">
-                    Ghi nho dang nhap
+                    Ghi nhớ đăng nhập
                   </span>
                 </label>
                 <button
                   className="text-sm font-medium text-primary transition-colors hover:text-[#0fa0d1]"
                   type="button"
                 >
-                  Quen mat khau?
+                  Quên mật khẩu?
                 </button>
               </div>
 
@@ -159,14 +163,14 @@ export default function LoginPage() {
                 type="submit"
                 disabled={isLoading}
               >
-                {isLoading ? "Dang dang nhap..." : "Dang nhap"}
+                {isLoading ? "Đang đăng nhập..." : "Đăng nhập"}
               </button>
             </form>
           </div>
 
           <div className="flex justify-center border-t border-[#e5e7eb] bg-[#f6f8f8] px-6 py-4 dark:border-[#2d3a42] dark:bg-[#131d21]">
             <p className="text-xs text-[#637588] dark:text-[#6f828a]">
-              © 2024 KidFashion System. Bao mat tuyet doi.
+              © 2024 KidFashion System. Bảo mật tuyệt đối.
             </p>
           </div>
         </div>

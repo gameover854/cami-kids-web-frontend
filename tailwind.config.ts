@@ -15,6 +15,7 @@ export default {
         "background-primary": "#13b6ec",
         "border-dark": "#283539",
         "border-gray": "#9db2b9",
+        "border-primary": "#13b6ec",
         placeholder: "#9db2b9",
         hover: "#24505b",
       },
