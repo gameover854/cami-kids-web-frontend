@@ -1,4 +1,4 @@
-import Header from "@/components/layout/header";
+﻿import Header from "@/components/layout/header";
 
 export default function AdminPage() {
   return (
@@ -15,10 +15,8 @@ export default function AdminPage() {
                 Chào mừng trở lại, đây là tình hình kinh doanh hôm nay.
               </p>
             </div>
-            <button className="flex items-center justify-center h-10 px-4 rounded-lg bg-primary hover:bg-primary/90 text-white text-sm font-bold shadow-lg shadow-primary/20 transition-all">
-              <span className="material-symbols-outlined text-[18px] mr-2">
-                download
-              </span>
+            <button className="flex items-center justify-center h-10 px-4 rounded-lg bg-primary hover:bg-primary/90 text-white text-sm font-bold shadow-lg shadow-primary/20 transition-all" type="button">
+              <span className="material-symbols-outlined text-[18px] mr-2">download</span>
               Xuất báo cáo
             </button>
           </header>
@@ -64,18 +62,14 @@ export default function AdminPage() {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-6">
             <section className="bg-background-light dark:bg-background-dark rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm p-6">
-              <h3 className="text-lg font-bold text-[#111618] dark:text-white">
-                Cảnh báo tồn kho
-              </h3>
+              <h3 className="text-lg font-bold text-[#111618] dark:text-white">Cảnh báo tồn kho</h3>
               <p className="text-sm text-text-gray-200 dark:text-text-gray-100 mt-1">
                 Một số sản phẩm sắp hết hàng, vui lòng nhập thêm.
               </p>
             </section>
 
             <section className="bg-background-light dark:bg-background-dark rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm p-6">
-              <h3 className="text-lg font-bold text-[#111618] dark:text-white">
-                Sản phẩm bán chạy
-              </h3>
+              <h3 className="text-lg font-bold text-[#111618] dark:text-white">Sản phẩm bán chạy</h3>
               <p className="text-sm text-text-gray-200 dark:text-text-gray-100 mt-1">
                 Theo dõi các sản phẩm có doanh thu tốt để ưu tiên tồn kho.
               </p>
@@ -86,3 +80,4 @@ export default function AdminPage() {
     </div>
   );
 }
+

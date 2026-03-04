@@ -16,6 +16,7 @@ export function createPromotion(payload: {
   start_date?: string;
   end_date?: string;
   is_active?: boolean;
+  collection_ids?: number[];
 }) {
   return axios.post("/promotions", payload);
 }
@@ -30,6 +31,7 @@ export function updatePromotion(
     start_date?: string;
     end_date?: string;
     is_active?: boolean;
+    collection_ids?: number[];
   },
 ) {
   return axios.put(`/promotions/${id}`, payload);

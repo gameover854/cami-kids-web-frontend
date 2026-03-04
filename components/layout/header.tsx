@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Switch from "../button/switch";
 
@@ -6,7 +6,7 @@ export default function Header() {
   return (
     <header className="h-16 border-b border-border-gray bg-background-light dark:bg-background-dark/80 backdrop-blur-md flex items-center justify-between px-6 sticky top-0 z-20">
       <div className="flex items-center gap-4 lg:hidden">
-        <button className="text-white p-1">
+        <button className="text-white p-1" type="button">
           <span className="material-symbols-outlined">menu</span>
         </button>
       </div>
@@ -22,14 +22,15 @@ export default function Header() {
           </span>
           <Switch />
         </div>
-        <button className="relative p-2 text-text-gray-100 hover:text-white transition-colors rounded-full hover:bg-background-gray">
+        <button className="relative p-2 text-text-gray-100 hover:text-white transition-colors rounded-full hover:bg-background-gray" type="button">
           <span className="material-symbols-outlined">notifications</span>
           <span className="absolute top-2 right-2 size-2 bg-red-500 rounded-full border-2 border-background-dark" />
         </button>
-        <button className="p-2 text-text-gray-100 hover:text-white transition-colors rounded-full hover:bg-background-gray">
+        <button className="p-2 text-text-gray-100 hover:text-white transition-colors rounded-full hover:bg-background-gray" type="button">
           <span className="material-symbols-outlined">help</span>
         </button>
       </div>
     </header>
   );
 }
+

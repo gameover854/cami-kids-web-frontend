@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
@@ -15,12 +15,13 @@ type SidebarItem = {
 const sidebarItems: SidebarItem[] = [
   { id: 1, icon: "home", label: "Tổng quan", href: "/admin", section: "main" },
   { id: 2, icon: "category", label: "Danh mục", href: "/admin/category", section: "manage" },
-  { id: 3, icon: "checkroom", label: "Sản phẩm", href: "/admin/product", section: "manage" },
-  { id: 4, icon: "shopping_bag", label: "Đơn hàng", href: "/admin/order", section: "manage" },
-  { id: 5, icon: "grid_view", label: "Bộ sưu tập", href: "/admin/collection", section: "manage" },
-  { id: 6, icon: "sell", label: "Khuyến mãi", href: "/admin/promotion", section: "manage" },
-  { id: 7, icon: "group", label: "Khách hàng", href: "/admin/customer", section: "manage" },
-  { id: 8, icon: "settings", label: "Cài đặt", href: "/admin/setting", section: "system" },
+  { id: 3, icon: "branding_watermark", label: "Thương hiệu", href: "/admin/brand", section: "manage" },
+  { id: 4, icon: "checkroom", label: "Sản phẩm", href: "/admin/product", section: "manage" },
+  { id: 5, icon: "shopping_bag", label: "Đơn hàng", href: "/admin/order", section: "manage" },
+  { id: 6, icon: "grid_view", label: "Bộ sưu tập", href: "/admin/collection", section: "manage" },
+  { id: 7, icon: "sell", label: "Khuyến mãi", href: "/admin/promotion", section: "manage" },
+  { id: 8, icon: "group", label: "Khách hàng", href: "/admin/customer", section: "manage" },
+  { id: 9, icon: "settings", label: "Cài đặt", href: "/admin/setting", section: "system" },
 ];
 
 function isActivePath(pathName: string, href: string) {
@@ -52,9 +53,7 @@ export default function Sidebar() {
     <aside className="w-64 flex-shrink-0 border-r border-border-dark bg-background-dark flex-col justify-between p-4 hidden lg:flex">
       <div className="flex flex-col gap-6">
         <div className="flex flex-col px-2">
-          <h1 className="text-white text-xl font-bold leading-normal tracking-tight">
-            Admin Fashion
-          </h1>
+          <h1 className="text-white text-xl font-bold leading-normal tracking-tight">Admin Fashion</h1>
           <p className="text-text-secondary text-xs font-normal">Quản trị viên</p>
         </div>
 

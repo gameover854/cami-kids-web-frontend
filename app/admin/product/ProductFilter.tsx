@@ -6,6 +6,7 @@ import {
   ListboxOptions,
 } from "@headlessui/react";
 import { CheckIcon, ChevronDownIcon } from "@heroicons/react/20/solid";
+import type { Dispatch, SetStateAction } from "react";
 
 export default function ProductFilter({
   categories,
@@ -18,9 +19,9 @@ export default function ProductFilter({
   categories: Category[];
   isActive: IsActive[];
   selectedCategory: Category | undefined;
-  setSelectedCategory: any;
+  setSelectedCategory: Dispatch<SetStateAction<Category | undefined>>;
   selectedIsActive: IsActive | undefined;
-  setSelectedIsActive: any;
+  setSelectedIsActive: Dispatch<SetStateAction<IsActive>>;
 }) {
   return (
     <div className="dark:bg-background-dark bg-background-light rounded-xl border-1 border-border-gray p-4 flex flex-col lg:flex-row gap-4 justify-between items-start lg:items-center">

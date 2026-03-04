@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Header from "@/components/layout/header";
 import Loading from "@/components/notification/loading";
@@ -9,7 +9,7 @@ import {
   updateOrderPayment,
   updateOrderStatus,
 } from "@/services/order.services";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 
 type OrderListItem = {
   id: number;
@@ -45,6 +45,14 @@ type OrderDetailItem = OrderListItem & {
   }>;
 };
 
+type ApiError = {
+  response?: {
+    data?: {
+      message?: string;
+    };
+  };
+};
+
 const statuses: OrderStatus[] = ["PENDING", "PAID", "SHIPPED", "COMPLETED", "CANCELLED"];
 
 export default function OrderPage() {
@@ -61,7 +69,7 @@ export default function OrderPage() {
     transaction_id: "",
   });
 
-  async function loadOrders() {
+  const loadOrders = useCallback(async () => {
     try {
       setLoading(true);
       const res = await getOrders({
@@ -71,16 +79,17 @@ export default function OrderPage() {
         sort: "desc",
       });
       setOrders(res?.data?.orders || []);
-    } catch (err: any) {
-      setError(err?.response?.data?.message || "Không thể tải đơn hàng");
+    } catch (err: unknown) {
+      const messageText = (err as ApiError)?.response?.data?.message;
+      setError(messageText || "Không thể tải đơn hàng");
     } finally {
       setLoading(false);
     }
-  }
+  }, [selectedStatus]);
 
   useEffect(() => {
     loadOrders();
-  }, [selectedStatus]);
+  }, [loadOrders]);
 
   async function openDetail(id: number) {
     try {
@@ -96,8 +105,9 @@ export default function OrderPage() {
       });
       setMessage("");
       setError("");
-    } catch (err: any) {
-      setError(err?.response?.data?.message || "Không thể lấy chi tiết đơn hàng");
+    } catch (err: unknown) {
+      const messageText = (err as ApiError)?.response?.data?.message;
+      setError(messageText || "Không thể lấy chi tiết đơn hàng");
     } finally {
       setLoading(false);
     }
@@ -112,8 +122,9 @@ export default function OrderPage() {
       if (selectedOrder?.id === id) {
         await openDetail(id);
       }
-    } catch (err: any) {
-      setError(err?.response?.data?.message || "Cập nhật trạng thái thất bại");
+    } catch (err: unknown) {
+      const messageText = (err as ApiError)?.response?.data?.message;
+      setError(messageText || "Cập nhật trạng thái thất bại");
     } finally {
       setLoading(false);
     }
@@ -141,8 +152,9 @@ export default function OrderPage() {
       setMessage("Cập nhật thanh toán thành công");
       await openDetail(selectedOrder.id);
       await loadOrders();
-    } catch (err: any) {
-      setError(err?.response?.data?.message || "Cập nhật thanh toán thất bại");
+    } catch (err: unknown) {
+      const messageText = (err as ApiError)?.response?.data?.message;
+      setError(messageText || "Cập nhật thanh toán thất bại");
     } finally {
       setLoading(false);
     }
@@ -188,7 +200,7 @@ export default function OrderPage() {
                   <th className="px-4 py-3">ID</th>
                   <th className="px-4 py-3">Khách hàng</th>
                   <th className="px-4 py-3">Tổng tiền</th>
-                  <th className="px-4 py-3">Status</th>
+                  <th className="px-4 py-3">Trạng thái</th>
                   <th className="px-4 py-3">Ngày tạo</th>
                   <th className="px-4 py-3 text-right">Hành động</th>
                 </tr>
@@ -200,9 +212,7 @@ export default function OrderPage() {
                     <td className="px-4 py-3">
                       <div className="flex flex-col">
                         <span>{order.user?.name || "-"}</span>
-                        <span className="text-xs text-text-gray-100">
-                          {order.user?.email || ""}
-                        </span>
+                        <span className="text-xs text-text-gray-100">{order.user?.email || ""}</span>
                       </div>
                     </td>
                     <td className="px-4 py-3">{order.total_amount}</td>
@@ -250,16 +260,14 @@ export default function OrderPage() {
               <div className="space-y-2">
                 <h2 className="text-lg font-bold">Order #{selectedOrder.id}</h2>
                 <p>Địa chỉ giao: {selectedOrder.shipping_address}</p>
-                <p>Status: {selectedOrder.status}</p>
+                <p>Trạng thái: {selectedOrder.status}</p>
                 <p>Tổng tiền: {selectedOrder.total_amount}</p>
                 <div className="pt-2">
-                  <h3 className="font-semibold mb-2">Order items</h3>
+                  <h3 className="font-semibold mb-2">Sản phẩm trong đơn</h3>
                   <ul className="space-y-1 text-sm">
                     {selectedOrder.items?.map((item) => (
                       <li key={item.id} className="border border-border-gray rounded px-3 py-2">
-                        {item.variant?.product?.name || "Unknown product"} | SKU:{" "}
-                        {item.variant?.sku || "-"} | Qty: {item.quantity} | Price:{" "}
-                        {item.price_at_purchase}
+                        {item.variant?.product?.name || "Unknown product"} | SKU: {item.variant?.sku || "-"} | Qty: {item.quantity} | Price: {item.price_at_purchase}
                       </li>
                     ))}
                   </ul>
@@ -322,3 +330,4 @@ export default function OrderPage() {
     </div>
   );
 }
+

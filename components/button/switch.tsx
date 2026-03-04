@@ -1,32 +1,21 @@
-import { useEffect, useState } from "react";
+﻿import { useEffect, useState } from "react";
 import styled from "styled-components";
 
 const Switch = () => {
-  const [dark, setDark] = useState(false);
+  const [dark, setDark] = useState(() => {
+    if (typeof window === "undefined") return false;
+    return localStorage.getItem("theme") === "dark";
+  });
 
-  // Load trạng thái cũ
   useEffect(() => {
-    const theme = localStorage.getItem("theme");
+    document.documentElement.classList.toggle("dark", dark);
+    localStorage.setItem("theme", dark ? "dark" : "light");
+  }, [dark]);
 
-    if (theme === "dark") {
-      setDark(true);
-      document.documentElement.classList.add("dark");
-    }
-
-  }, []);
-
-  // Khi đổi toggle
   const toggleTheme = () => {
-    setDark(!dark);
-
-    if (!dark) {
-      document.documentElement.classList.add("dark");
-      localStorage.setItem("theme", "dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-      localStorage.setItem("theme", "light");
-    }
+    setDark((prev) => !prev);
   };
+
   return (
     <StyledWrapper>
       <div>

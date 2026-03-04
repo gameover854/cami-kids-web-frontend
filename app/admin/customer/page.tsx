@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Header from "@/components/layout/header";
 
@@ -21,3 +21,4 @@ export default function CustomerPage() {
     </div>
   );
 }
+

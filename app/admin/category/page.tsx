@@ -1,7 +1,8 @@
-"use client";
+﻿"use client";
 
 import Header from "@/components/layout/header";
 import Loading from "@/components/notification/loading";
+import { getBrand } from "@/services/brand.services";
 import {
   createCategory,
   deleteCategory,
@@ -14,16 +15,32 @@ type CategoryItem = {
   id: number;
   name: string;
   parent_id: number | null;
+  brand_id: number | null;
   children?: CategoryItem[];
+};
+
+type BrandItem = {
+  id: number;
+  name: string;
+};
+
+type ApiError = {
+  response?: {
+    data?: {
+      message?: string;
+    };
+  };
 };
 
 const emptyForm = {
   name: "",
   parent_id: "",
+  brand_id: "",
 };
 
 export default function CategoryPage() {
   const [categories, setCategories] = useState<CategoryItem[]>([]);
+  const [brands, setBrands] = useState<BrandItem[]>([]);
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
@@ -41,27 +58,29 @@ export default function CategoryPage() {
     return rows;
   }, [categories]);
 
-  const parentOptions = useMemo(() => {
-    return categories.map((item) => ({
-      id: item.id,
-      name: item.name,
-    }));
-  }, [categories]);
+  const parentOptions = useMemo(
+    () => categories.map((item) => ({ id: item.id, name: item.name })),
+    [categories],
+  );
 
-  async function loadCategories() {
+  const brandMap = useMemo(() => new Map(brands.map((item) => [item.id, item.name])), [brands]);
+
+  async function loadData() {
     try {
       setLoading(true);
-      const res = await getCategory();
-      setCategories(res?.data?.categories || []);
-    } catch (err: any) {
-      setError(err?.response?.data?.message || "Không thể tải danh mục");
+      const [categoryRes, brandRes] = await Promise.all([getCategory(), getBrand()]);
+      setCategories(categoryRes?.data?.categories || []);
+      setBrands(brandRes?.data?.brands || []);
+    } catch (err: unknown) {
+      const messageText = (err as ApiError)?.response?.data?.message;
+      setError(messageText || "Không thể tải dữ liệu");
     } finally {
       setLoading(false);
     }
   }
 
   useEffect(() => {
-    loadCategories();
+    loadData();
   }, []);
 
   function resetForm() {
@@ -74,18 +93,19 @@ export default function CategoryPage() {
     setError("");
     setMessage("");
 
+    const payload = {
+      name: form.name.trim(),
+      parent_id: form.parent_id ? Number(form.parent_id) : null,
+      brand_id: form.brand_id ? Number(form.brand_id) : null,
+    };
+
+    if (!payload.name) {
+      setError("Tên danh mục không được để trống");
+      return;
+    }
+
     try {
       setLoading(true);
-      const payload = {
-        name: form.name.trim(),
-        parent_id: form.parent_id ? Number(form.parent_id) : null,
-      };
-
-      if (!payload.name) {
-        setError("Tên danh mục không được để trống");
-        return;
-      }
-
       if (editingId) {
         await updateCategory(editingId, payload);
         setMessage("Cập nhật danh mục thành công");
@@ -93,11 +113,11 @@ export default function CategoryPage() {
         await createCategory(payload);
         setMessage("Tạo danh mục thành công");
       }
-
       resetForm();
-      await loadCategories();
-    } catch (err: any) {
-      setError(err?.response?.data?.message || "Thao tác thất bại");
+      await loadData();
+    } catch (err: unknown) {
+      const messageText = (err as ApiError)?.response?.data?.message;
+      setError(messageText || "Thao tác thất bại");
     } finally {
       setLoading(false);
     }
@@ -108,6 +128,7 @@ export default function CategoryPage() {
     setForm({
       name: item.name,
       parent_id: item.parent_id ? String(item.parent_id) : "",
+      brand_id: item.brand_id ? String(item.brand_id) : "",
     });
   }
 
@@ -122,9 +143,10 @@ export default function CategoryPage() {
       await deleteCategory(id);
       if (editingId === id) resetForm();
       setMessage("Xóa danh mục thành công");
-      await loadCategories();
-    } catch (err: any) {
-      setError(err?.response?.data?.message || "Xóa danh mục thất bại");
+      await loadData();
+    } catch (err: unknown) {
+      const messageText = (err as ApiError)?.response?.data?.message;
+      setError(messageText || "Xóa danh mục thất bại");
     } finally {
       setLoading(false);
     }
@@ -141,7 +163,7 @@ export default function CategoryPage() {
                 Quản lý Danh mục
               </h1>
               <p className="text-text-gray-100 text-base">
-                CRUD danh mục theo dữ liệu thực từ backend
+                Tạo danh mục có liên kết thương hiệu
               </p>
             </div>
             <div className="text-sm text-text-gray-100">
@@ -150,7 +172,7 @@ export default function CategoryPage() {
           </div>
 
           <section className="rounded-xl border border-border-gray dark:bg-background-dark bg-background-light p-4">
-            <form onSubmit={onSubmit} className="grid grid-cols-1 md:grid-cols-4 gap-3">
+            <form onSubmit={onSubmit} className="grid grid-cols-1 md:grid-cols-5 gap-3">
               <input
                 className="rounded-lg border border-border-gray bg-transparent px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-primary"
                 placeholder="Tên danh mục"
@@ -165,6 +187,18 @@ export default function CategoryPage() {
               >
                 <option value="">Danh mục gốc</option>
                 {parentOptions.map((item) => (
+                  <option key={item.id} value={item.id}>
+                    {item.name}
+                  </option>
+                ))}
+              </select>
+              <select
+                className="rounded-lg border border-border-gray bg-transparent px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-primary"
+                value={form.brand_id}
+                onChange={(e) => setForm((prev) => ({ ...prev, brand_id: e.target.value }))}
+              >
+                <option value="">Không chọn thương hiệu</option>
+                {brands.map((item) => (
                   <option key={item.id} value={item.id}>
                     {item.name}
                   </option>
@@ -198,12 +232,14 @@ export default function CategoryPage() {
                   <th className="px-4 py-3">Tên</th>
                   <th className="px-4 py-3">Cấp</th>
                   <th className="px-4 py-3">Parent</th>
+                  <th className="px-4 py-3">Thương hiệu</th>
                   <th className="px-4 py-3 text-right">Hành động</th>
                 </tr>
               </thead>
               <tbody>
                 {flattened.map((item) => {
                   const isChild = Boolean(item.parent_id);
+                  const brandName = item.brand_id ? brandMap.get(item.brand_id) : null;
                   return (
                     <tr key={item.id} className="border-b border-border-dark/70">
                       <td className="px-4 py-3">{item.id}</td>
@@ -215,6 +251,7 @@ export default function CategoryPage() {
                       </td>
                       <td className="px-4 py-3">{isChild ? "Con" : "Gốc"}</td>
                       <td className="px-4 py-3">{item.parent_id ?? "-"}</td>
+                      <td className="px-4 py-3">{brandName || "-"}</td>
                       <td className="px-4 py-3">
                         <div className="flex items-center justify-end gap-2">
                           <button
@@ -238,7 +275,7 @@ export default function CategoryPage() {
                 })}
                 {!loading && flattened.length === 0 ? (
                   <tr>
-                    <td className="px-4 py-6 text-center text-text-gray-100" colSpan={5}>
+                    <td className="px-4 py-6 text-center text-text-gray-100" colSpan={6}>
                       Không có dữ liệu danh mục
                     </td>
                   </tr>

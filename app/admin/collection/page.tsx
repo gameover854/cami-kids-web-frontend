@@ -1,4 +1,4 @@
-"use client";
+﻿"use client";
 
 import Header from "@/components/layout/header";
 import Loading from "@/components/notification/loading";
@@ -8,13 +8,32 @@ import {
   getCollection,
   updateCollection,
 } from "@/services/collections.services";
-import { useEffect, useState } from "react";
+import { getPromotion } from "@/services/promotion.services";
+import { useEffect, useMemo, useState } from "react";
 
 type CollectionItem = {
   id: number;
   name: string;
   slug: string;
   is_active: boolean;
+};
+
+type PromotionItem = {
+  id: number;
+  code: string;
+  name: string;
+  collections?: Array<{
+    collection_id: number;
+    promotion_id: number;
+  }>;
+};
+
+type ApiError = {
+  response?: {
+    data?: {
+      message?: string;
+    };
+  };
 };
 
 const emptyForm = {
@@ -25,26 +44,46 @@ const emptyForm = {
 
 export default function CollectionPage() {
   const [collections, setCollections] = useState<CollectionItem[]>([]);
+  const [promotions, setPromotions] = useState<PromotionItem[]>([]);
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
-  async function loadCollections() {
+  const promotionsByCollection = useMemo(() => {
+    const map = new Map<number, string[]>();
+
+    promotions.forEach((promotion) => {
+      (promotion.collections || []).forEach((link) => {
+        const list = map.get(link.collection_id) || [];
+        list.push(`${promotion.code} (${promotion.name})`);
+        map.set(link.collection_id, list);
+      });
+    });
+
+    return map;
+  }, [promotions]);
+
+  async function loadData() {
     try {
       setLoading(true);
-      const res = await getCollection();
-      setCollections(res?.data?.collections || []);
-    } catch (err: any) {
-      setError(err?.response?.data?.message || "Không thể tải bộ sưu tập");
+      const [collectionRes, promotionRes] = await Promise.all([
+        getCollection(),
+        getPromotion(),
+      ]);
+      setCollections(collectionRes?.data?.collections || []);
+      setPromotions(promotionRes?.data?.promotions || []);
+    } catch (err: unknown) {
+      const messageText = (err as ApiError)?.response?.data?.message;
+      setError(messageText || "Không thể tải bộ sưu tập");
     } finally {
       setLoading(false);
     }
   }
 
   useEffect(() => {
-    loadCollections();
+    loadData();
   }, []);
 
   function resetForm() {
@@ -56,13 +95,14 @@ export default function CollectionPage() {
     event.preventDefault();
     setMessage("");
     setError("");
+
+    if (!form.name.trim() || !form.slug.trim()) {
+      setError("Tên và slug không được để trống");
+      return;
+    }
+
     try {
       setLoading(true);
-      if (!form.name.trim() || !form.slug.trim()) {
-        setError("Tên và slug không được để trống");
-        return;
-      }
-
       if (editingId) {
         await updateCollection(editingId, {
           name: form.name.trim(),
@@ -80,9 +120,10 @@ export default function CollectionPage() {
       }
 
       resetForm();
-      await loadCollections();
-    } catch (err: any) {
-      setError(err?.response?.data?.message || "Thao tác thất bại");
+      await loadData();
+    } catch (err: unknown) {
+      const messageText = (err as ApiError)?.response?.data?.message;
+      setError(messageText || "Thao tác thất bại");
     } finally {
       setLoading(false);
     }
@@ -100,6 +141,7 @@ export default function CollectionPage() {
   async function onDelete(id: number) {
     const confirmed = window.confirm("Bạn chắc chắn muốn xóa bộ sưu tập này?");
     if (!confirmed) return;
+
     setMessage("");
     setError("");
     try {
@@ -107,9 +149,10 @@ export default function CollectionPage() {
       await deleteCollection(id);
       if (editingId === id) resetForm();
       setMessage("Xóa bộ sưu tập thành công");
-      await loadCollections();
-    } catch (err: any) {
-      setError(err?.response?.data?.message || "Xóa bộ sưu tập thất bại");
+      await loadData();
+    } catch (err: unknown) {
+      const messageText = (err as ApiError)?.response?.data?.message;
+      setError(messageText || "Xóa bộ sưu tập thất bại");
     } finally {
       setLoading(false);
     }
@@ -126,7 +169,7 @@ export default function CollectionPage() {
                 Quản lý Bộ sưu tập
               </h1>
               <p className="text-text-gray-100 text-base">
-                Danh sách bộ sưu tập đang dùng trong hệ thống
+                Quản lý bộ sưu tập và các khuyến mãi đang áp dụng
               </p>
             </div>
             <div className="text-sm text-text-gray-100">
@@ -188,39 +231,60 @@ export default function CollectionPage() {
                   <th className="px-4 py-3">Tên</th>
                   <th className="px-4 py-3">Slug</th>
                   <th className="px-4 py-3">Trạng thái</th>
+                  <th className="px-4 py-3">Khuyến mãi áp dụng</th>
                   <th className="px-4 py-3 text-right">Hành động</th>
                 </tr>
               </thead>
               <tbody>
-                {collections.map((item) => (
-                  <tr key={item.id} className="border-b border-border-dark/70">
-                    <td className="px-4 py-3">{item.id}</td>
-                    <td className="px-4 py-3 font-semibold">{item.name}</td>
-                    <td className="px-4 py-3">{item.slug}</td>
-                    <td className="px-4 py-3">{item.is_active ? "Active" : "Inactive"}</td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center justify-end gap-2">
-                        <button
-                          type="button"
-                          className="rounded border border-border-gray px-3 py-1 hover:ring-1"
-                          onClick={() => onEdit(item)}
-                        >
-                          Sửa
-                        </button>
-                        <button
-                          type="button"
-                          className="rounded border border-red-500/50 px-3 py-1 text-red-400 hover:bg-red-500/10"
-                          onClick={() => onDelete(item.id)}
-                        >
-                          Xóa
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                {collections.map((item) => {
+                  const promotionNames = promotionsByCollection.get(item.id) || [];
+
+                  return (
+                    <tr key={item.id} className="border-b border-border-dark/70">
+                      <td className="px-4 py-3">{item.id}</td>
+                      <td className="px-4 py-3 font-semibold">{item.name}</td>
+                      <td className="px-4 py-3">{item.slug}</td>
+                      <td className="px-4 py-3">{item.is_active ? "Active" : "Inactive"}</td>
+                      <td className="px-4 py-3">
+                        {promotionNames.length > 0 ? (
+                          <div className="flex flex-wrap gap-1.5">
+                            {promotionNames.map((promotionText) => (
+                              <span
+                                key={`${item.id}-${promotionText}`}
+                                className="rounded-md border border-primary/30 bg-primary/10 px-2 py-1 text-xs text-text-light"
+                              >
+                                {promotionText}
+                              </span>
+                            ))}
+                          </div>
+                        ) : (
+                          <span className="text-text-gray-100">Chưa có</span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            type="button"
+                            className="rounded border border-border-gray px-3 py-1 hover:ring-1"
+                            onClick={() => onEdit(item)}
+                          >
+                            Sửa
+                          </button>
+                          <button
+                            type="button"
+                            className="rounded border border-red-500/50 px-3 py-1 text-red-400 hover:bg-red-500/10"
+                            onClick={() => onDelete(item.id)}
+                          >
+                            Xóa
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
                 {!loading && collections.length === 0 ? (
                   <tr>
-                    <td className="px-4 py-6 text-center text-text-gray-100" colSpan={5}>
+                    <td className="px-4 py-6 text-center text-text-gray-100" colSpan={6}>
                       Không có dữ liệu bộ sưu tập
                     </td>
                   </tr>
@@ -234,3 +298,4 @@ export default function CollectionPage() {
     </div>
   );
 }
+

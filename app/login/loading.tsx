@@ -1,5 +1,1 @@
-import Loading from "@/components/notification/loading";
-
-export default function LoginRouteLoading() {
-  return <Loading />;
-}
+export { default } from "@/components/notification/loading";

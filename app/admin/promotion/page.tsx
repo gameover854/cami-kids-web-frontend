@@ -1,7 +1,8 @@
-"use client";
+﻿"use client";
 
 import Header from "@/components/layout/header";
 import Loading from "@/components/notification/loading";
+import { getCollection } from "@/services/collections.services";
 import {
   createPromotion,
   deletePromotion,
@@ -10,25 +11,54 @@ import {
 } from "@/services/promotion.services";
 import { useEffect, useState } from "react";
 
+type PromotionType = "PERCENTAGE" | "FIXED_AMOUNT";
+
+type PromotionCollectionLink = {
+  collection_id: number;
+  promotion_id: number;
+  collection?: {
+    id: number;
+    name: string;
+    slug: string;
+  };
+};
+
 type PromotionItem = {
   id: number;
   code: string;
   name: string;
-  type: "PERCENTAGE" | "FIXED_AMOUNT";
+  type: PromotionType;
   value: number;
   start_date: string | null;
   end_date: string | null;
   is_active: boolean;
+  collections?: PromotionCollectionLink[];
+};
+
+type CollectionItem = {
+  id: number;
+  name: string;
+  slug: string;
+  is_active: boolean;
+};
+
+type ApiError = {
+  response?: {
+    data?: {
+      message?: string;
+    };
+  };
 };
 
 const emptyForm = {
   code: "",
   name: "",
-  type: "PERCENTAGE" as const,
+  type: "PERCENTAGE" as PromotionType,
   value: 0,
   start_date: "",
   end_date: "",
   is_active: true,
+  collection_ids: [] as number[],
 };
 
 function toDatetimeLocal(value?: string | null) {
@@ -42,26 +72,29 @@ function toDatetimeLocal(value?: string | null) {
 
 export default function PromotionPage() {
   const [promotions, setPromotions] = useState<PromotionItem[]>([]);
+  const [collections, setCollections] = useState<CollectionItem[]>([]);
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
-  async function loadPromotions() {
+  async function loadData() {
     try {
       setLoading(true);
-      const res = await getPromotion();
-      setPromotions(res?.data?.promotions || []);
-    } catch (err: any) {
-      setError(err?.response?.data?.message || "Không thể tải khuyến mãi");
+      const [promotionRes, collectionRes] = await Promise.all([getPromotion(), getCollection()]);
+      setPromotions(promotionRes?.data?.promotions || []);
+      setCollections(collectionRes?.data?.collections || []);
+    } catch (err: unknown) {
+      const messageText = (err as ApiError)?.response?.data?.message;
+      setError(messageText || "Không thể tải khuyến mãi");
     } finally {
       setLoading(false);
     }
   }
 
   useEffect(() => {
-    loadPromotions();
+    loadData();
   }, []);
 
   function resetForm() {
@@ -69,27 +102,41 @@ export default function PromotionPage() {
     setEditingId(null);
   }
 
+  function toggleCollection(collectionId: number) {
+    setForm((prev) => {
+      const existed = prev.collection_ids.includes(collectionId);
+      return {
+        ...prev,
+        collection_ids: existed
+          ? prev.collection_ids.filter((id) => id !== collectionId)
+          : [...prev.collection_ids, collectionId],
+      };
+    });
+  }
+
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setMessage("");
     setError("");
+
+    if (!form.code.trim() || !form.name.trim()) {
+      setError("Code và tên không được để trống");
+      return;
+    }
+
+    const payload = {
+      code: form.code.trim(),
+      name: form.name.trim(),
+      type: form.type,
+      value: Number(form.value),
+      start_date: form.start_date ? new Date(form.start_date).toISOString() : undefined,
+      end_date: form.end_date ? new Date(form.end_date).toISOString() : undefined,
+      is_active: form.is_active,
+      collection_ids: form.collection_ids,
+    };
+
     try {
       setLoading(true);
-      if (!form.code.trim() || !form.name.trim()) {
-        setError("Code và tên không được để trống");
-        return;
-      }
-
-      const payload = {
-        code: form.code.trim(),
-        name: form.name.trim(),
-        type: form.type,
-        value: Number(form.value),
-        start_date: form.start_date ? new Date(form.start_date).toISOString() : undefined,
-        end_date: form.end_date ? new Date(form.end_date).toISOString() : undefined,
-        is_active: form.is_active,
-      };
-
       if (editingId) {
         await updatePromotion(editingId, payload);
         setMessage("Cập nhật khuyến mãi thành công");
@@ -99,9 +146,10 @@ export default function PromotionPage() {
       }
 
       resetForm();
-      await loadPromotions();
-    } catch (err: any) {
-      setError(err?.response?.data?.message || "Thao tác thất bại");
+      await loadData();
+    } catch (err: unknown) {
+      const messageText = (err as ApiError)?.response?.data?.message;
+      setError(messageText || "Thao tác thất bại");
     } finally {
       setLoading(false);
     }
@@ -117,12 +165,14 @@ export default function PromotionPage() {
       start_date: toDatetimeLocal(item.start_date),
       end_date: toDatetimeLocal(item.end_date),
       is_active: item.is_active,
+      collection_ids: (item.collections || []).map((link) => link.collection_id),
     });
   }
 
   async function onDelete(id: number) {
     const confirmed = window.confirm("Bạn chắc chắn muốn xóa khuyến mãi này?");
     if (!confirmed) return;
+
     setMessage("");
     setError("");
     try {
@@ -130,9 +180,10 @@ export default function PromotionPage() {
       await deletePromotion(id);
       if (editingId === id) resetForm();
       setMessage("Xóa khuyến mãi thành công");
-      await loadPromotions();
-    } catch (err: any) {
-      setError(err?.response?.data?.message || "Xóa khuyến mãi thất bại");
+      await loadData();
+    } catch (err: unknown) {
+      const messageText = (err as ApiError)?.response?.data?.message;
+      setError(messageText || "Xóa khuyến mãi thất bại");
     } finally {
       setLoading(false);
     }
@@ -149,7 +200,7 @@ export default function PromotionPage() {
                 Quản lý Khuyến mãi
               </h1>
               <p className="text-text-gray-100 text-base">
-                Tạo/sửa/xóa mã giảm giá theo API backend
+                Tạo/sửa/xóa khuyến mãi và gắn cho nhiều bộ sưu tập
               </p>
             </div>
             <div className="text-sm text-text-gray-100">
@@ -179,7 +230,7 @@ export default function PromotionPage() {
                 onChange={(e) =>
                   setForm((prev) => ({
                     ...prev,
-                    type: e.target.value as "PERCENTAGE" | "FIXED_AMOUNT",
+                    type: e.target.value as PromotionType,
                   }))
                 }
               >
@@ -206,6 +257,29 @@ export default function PromotionPage() {
                 value={form.end_date}
                 onChange={(e) => setForm((prev) => ({ ...prev, end_date: e.target.value }))}
               />
+
+              <div className="md:col-span-2 rounded-lg border border-border-gray p-3">
+                <p className="text-sm font-semibold mb-2">Bộ sưu tập áp dụng</p>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2 max-h-40 overflow-y-auto pr-1">
+                  {collections.map((item) => {
+                    const checked = form.collection_ids.includes(item.id);
+                    return (
+                      <label key={item.id} className="flex items-center gap-2 text-sm">
+                        <input
+                          type="checkbox"
+                          checked={checked}
+                          onChange={() => toggleCollection(item.id)}
+                        />
+                        <span>{item.name}</span>
+                      </label>
+                    );
+                  })}
+                  {collections.length === 0 ? (
+                    <p className="text-xs text-text-gray-100">Không có bộ sưu tập</p>
+                  ) : null}
+                </div>
+              </div>
+
               <label className="flex items-center gap-2 text-sm">
                 <input
                   type="checkbox"
@@ -216,6 +290,7 @@ export default function PromotionPage() {
                 />
                 Đang hoạt động
               </label>
+
               <button
                 className="rounded-lg px-4 py-2 text-sm font-semibold border border-border-gray hover:ring-1 disabled:opacity-60"
                 type="submit"
@@ -244,41 +319,49 @@ export default function PromotionPage() {
                   <th className="px-4 py-3">Name</th>
                   <th className="px-4 py-3">Type</th>
                   <th className="px-4 py-3">Value</th>
+                  <th className="px-4 py-3">Collections</th>
                   <th className="px-4 py-3">Active</th>
                   <th className="px-4 py-3 text-right">Hành động</th>
                 </tr>
               </thead>
               <tbody>
-                {promotions.map((item) => (
-                  <tr key={item.id} className="border-b border-border-dark/70">
-                    <td className="px-4 py-3 font-semibold">{item.code}</td>
-                    <td className="px-4 py-3">{item.name}</td>
-                    <td className="px-4 py-3">{item.type}</td>
-                    <td className="px-4 py-3">{item.value}</td>
-                    <td className="px-4 py-3">{item.is_active ? "Yes" : "No"}</td>
-                    <td className="px-4 py-3">
-                      <div className="flex items-center justify-end gap-2">
-                        <button
-                          type="button"
-                          className="rounded border border-border-gray px-3 py-1 hover:ring-1"
-                          onClick={() => onEdit(item)}
-                        >
-                          Sửa
-                        </button>
-                        <button
-                          type="button"
-                          className="rounded border border-red-500/50 px-3 py-1 text-red-400 hover:bg-red-500/10"
-                          onClick={() => onDelete(item.id)}
-                        >
-                          Xóa
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                {promotions.map((item) => {
+                  const collectionNames = (item.collections || [])
+                    .map((link) => link.collection?.name || `#${link.collection_id}`)
+                    .join(", ");
+
+                  return (
+                    <tr key={item.id} className="border-b border-border-dark/70">
+                      <td className="px-4 py-3 font-semibold">{item.code}</td>
+                      <td className="px-4 py-3">{item.name}</td>
+                      <td className="px-4 py-3">{item.type}</td>
+                      <td className="px-4 py-3">{item.value}</td>
+                      <td className="px-4 py-3">{collectionNames || "-"}</td>
+                      <td className="px-4 py-3">{item.is_active ? "Yes" : "No"}</td>
+                      <td className="px-4 py-3">
+                        <div className="flex items-center justify-end gap-2">
+                          <button
+                            type="button"
+                            className="rounded border border-border-gray px-3 py-1 hover:ring-1"
+                            onClick={() => onEdit(item)}
+                          >
+                            Sửa
+                          </button>
+                          <button
+                            type="button"
+                            className="rounded border border-red-500/50 px-3 py-1 text-red-400 hover:bg-red-500/10"
+                            onClick={() => onDelete(item.id)}
+                          >
+                            Xóa
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
                 {!loading && promotions.length === 0 ? (
                   <tr>
-                    <td className="px-4 py-6 text-center text-text-gray-100" colSpan={6}>
+                    <td className="px-4 py-6 text-center text-text-gray-100" colSpan={7}>
                       Không có dữ liệu khuyến mãi
                     </td>
                   </tr>
