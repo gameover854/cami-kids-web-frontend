@@ -83,7 +83,7 @@ export default function ProductPage() {
         );
         setProducts(res.data.products);
       } catch (error) {
-        console.error("--->Error<---", error);
+        console.error("Error fetching products:", error);
       } finally {
         setIsLoading(false);
       }
@@ -112,7 +112,7 @@ export default function ProductPage() {
       await deleteProduct(id);
       setVersion(version + 1);
     } catch (error) {
-      console.log("--->Error Delete Product<---", error);
+      console.error("Error deleting product:", error);
     } finally {
       setIsLoading(false);
     }

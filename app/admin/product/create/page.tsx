@@ -35,14 +35,14 @@ export default function CreateProductPage() {
   const router = useRouter();
 
   const generateVariants = (dataAttribute: ProductAttribute) => {
-    let variants: ProductVariant = [];
+    const variants: ProductVariant = [];
     let combo: string[] = [];
     const attributeValues = dataAttribute
       .filter((item) => item.values.length > 0)
       .map((item) => item.values);
     if (attributeValues.length === 0) return variants;
     if (attributeValues.length === 1) {
-      for (let item of attributeValues[0]) {
+      for (const item of attributeValues[0]) {
         variants.push({
           id: uuidv4(),
           price: 0,
@@ -59,7 +59,7 @@ export default function CreateProductPage() {
       );
     });
 
-    for (let item of combo) {
+    for (const item of combo) {
       variants.push({
         id: uuidv4(),
         price: 0,
@@ -110,11 +110,14 @@ export default function CreateProductPage() {
     ]);
   };
 
-  const handleRemoveAttribute = (attributeId: string) => {
+  const handleRemoveAttribute = (attributeId: string | number) => {
     setDataAttribute(dataAttribute.filter((item) => item.id !== attributeId));
   };
 
-  const handleAttributeName = (attributeId: string, attributeName: string) => {
+  const handleAttributeName = (
+    attributeId: string | number,
+    attributeName: string,
+  ) => {
     if (!attributeId) return;
     setDataAttribute(
       dataAttribute.map((item) =>
@@ -125,7 +128,7 @@ export default function CreateProductPage() {
 
   const handleAddAttributeItem = (
     event: React.KeyboardEvent<HTMLInputElement>,
-    attributeItemId: string,
+    attributeItemId: string | number,
   ) => {
     if (event.key !== "Enter") return;
 
@@ -144,7 +147,7 @@ export default function CreateProductPage() {
   };
 
   const handleRemoveAttributeItem = (
-    attributeItemId: string,
+    attributeItemId: string | number,
     attributeItemValue: string,
   ) => {
     setDataAttribute(
@@ -163,7 +166,7 @@ export default function CreateProductPage() {
 
   const handleVariantItem = (
     value: number,
-    variantItemId: string,
+    variantItemId: string | number,
     type: string,
   ) => {
     setDataVariant(
@@ -205,7 +208,7 @@ export default function CreateProductPage() {
     }
   };
 
-  const handleUpdateImage = (imageId: string, action: string) => {
+  const handleUpdateImage = (imageId: string | number, action: string) => {
     switch (action) {
       case "PRIMARY":
         setDataImage((images) =>
@@ -228,15 +231,18 @@ export default function CreateProductPage() {
     }
   };
 
-  const handleCheckCollections = (checked: Boolean, collectionId: string) => {
+  const handleCheckCollections = (checked: boolean, collectionId: string) => {
     const id = Number(collectionId);
 
-    setDataProduct((prev) => ({
-      ...prev,
-      collection_id: checked
-        ? [...prev.collection_id, id]
-        : prev.collection_id.filter((item) => item !== id),
-    }));
+    setDataProduct((prev) => {
+      const collectionIds = prev.collection_id ?? [];
+      return {
+        ...prev,
+        collection_id: checked
+          ? [...collectionIds, id]
+          : collectionIds.filter((item) => item !== id),
+      };
+    });
   };
 
   const transformData = (
@@ -254,7 +260,7 @@ export default function CreateProductPage() {
         category_id: dataProduct.category_id,
         is_active: dataProduct.is_active,
         brand_id: dataProduct.brand_id,
-        collection_id: dataProduct.collection_id,
+        collection_id: dataProduct.collection_id ?? [],
       },
       attributes: dataAttribute.filter(
         (item) => item.values.length > 0 && item.name.length > 0,
@@ -276,7 +282,7 @@ export default function CreateProductPage() {
       await createProduct(payload);
       router.push("/admin/product");
     } catch (error) {
-      console.error("--->Error Create Product<---", error);
+      console.error("Error creating product:", error);
     } finally {
       setIsLoading(false);
     }
@@ -450,7 +456,7 @@ export default function CreateProductPage() {
                               </span>
                             ))}
                             <input
-                              id={item.id}
+                              id={item.id ? String(item.id) : undefined}
                               className="bg-transparent border-none p-0 text-sm focus:ring-0 placeholder-placeholder min-w-[80px] flex-1"
                               placeholder="Nhập giá trị biến thể"
                               type="text"
@@ -464,7 +470,7 @@ export default function CreateProductPage() {
                       <button
                         className="cursor-pointer absolute -top-2.5 -right-2.5 bg-background-dark border border-border-dark text-text-gray-100 hover:text-red-500 rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-all"
                         title="Xóa thuộc tính"
-                        id={item.id}
+                        id={item.id ? String(item.id) : undefined}
                         onClick={(e) => handleRemoveAttribute(item.id!)}
                       >
                         <span className="material-symbols-outlined text-[16px]">
@@ -649,7 +655,7 @@ export default function CreateProductPage() {
                         onChange={(e) =>
                           setDataProduct({
                             ...dataProduct,
-                            is_active: Boolean(e.target.checked),
+                            is_active: e.target.checked,
                           })
                         }
                       />
@@ -670,7 +676,7 @@ export default function CreateProductPage() {
                       }
                     >
                       {dataBrand.map((brand) => (
-                        <option key={brand.id} value={brand.id}>
+                        <option key={brand.id ?? "all-brand"} value={brand.id ?? ""}>
                           {brand.name}
                         </option>
                       ))}
@@ -691,9 +697,9 @@ export default function CreateProductPage() {
                     >
                       {dataCategories.map((parent) => (
                         <Fragment key={parent.id}>
-                          <option value={parent.id}>{parent.name}</option>
+                          <option value={parent.id ?? ""}>{parent.name}</option>
                           {parent.children?.map((child) => (
-                            <option key={child.id} value={child.id}>
+                            <option key={child.id} value={child.id ?? ""}>
                               └─ {child.name}
                             </option>
                           ))}

@@ -14,14 +14,13 @@ export default function EditProductPage({
   params: { id: string };
 }) {
   const { id } = params;
-  console.log("--->id<---", id);
+  void id;
   const [dataProduct, setDataProduct] = useState({
     name: "",
     selling_price: 0,
     compare_price: 0,
     description: "",
     category_id: undefined,
-    promotion_id: undefined,
     is_active: false,
   });
 
@@ -31,14 +30,14 @@ export default function EditProductPage({
   const router = useRouter();
 
   const generateVariants = (dataAttribute: ProductAttribute) => {
-    let variants: ProductVariant = [];
+    const variants: ProductVariant = [];
     let combo: string[] = [];
     const attributeValues = dataAttribute
       .filter((item) => item.values.length > 0)
       .map((item) => item.values);
     if (attributeValues.length === 0) return variants;
     if (attributeValues.length === 1) {
-      for (let item of attributeValues[0]) {
+      for (const item of attributeValues[0]) {
         variants.push({
           id: uuidv4(),
           price: 0,
@@ -55,7 +54,7 @@ export default function EditProductPage({
       );
     });
 
-    for (let item of combo) {
+    for (const item of combo) {
       variants.push({
         id: uuidv4(),
         price: 0,
@@ -82,11 +81,14 @@ export default function EditProductPage({
     ]);
   };
 
-  const handleRemoveAttribute = (attributeId: string) => {
+  const handleRemoveAttribute = (attributeId: string | number) => {
     setDataAttribute(dataAttribute.filter((item) => item.id !== attributeId));
   };
 
-  const handleAttributeName = (attributeId: string, attributeName: string) => {
+  const handleAttributeName = (
+    attributeId: string | number,
+    attributeName: string,
+  ) => {
     if (!attributeId) return;
     setDataAttribute(
       dataAttribute.map((item) =>
@@ -97,7 +99,7 @@ export default function EditProductPage({
 
   const handleAddAttributeItem = (
     event: React.KeyboardEvent<HTMLInputElement>,
-    attributeItemId: string,
+    attributeItemId: string | number,
   ) => {
     if (event.key !== "Enter") return;
 
@@ -116,7 +118,7 @@ export default function EditProductPage({
   };
 
   const handleRemoveAttributeItem = (
-    attributeItemId: string,
+    attributeItemId: string | number,
     attributeItemValue: string,
   ) => {
     setDataAttribute(
@@ -135,7 +137,7 @@ export default function EditProductPage({
 
   const handleVariantItem = (
     value: number,
-    variantItemId: string,
+    variantItemId: string | number,
     type: string,
   ) => {
     setDataVariant(
@@ -177,7 +179,7 @@ export default function EditProductPage({
     }
   };
 
-  const handleUpdateImage = (imageId: string, action: string) => {
+  const handleUpdateImage = (imageId: string | number, action: string) => {
     switch (action) {
       case "PRIMARY":
         setDataImage((images) =>
@@ -213,8 +215,7 @@ export default function EditProductPage({
         compare_price: Number(dataProduct.compare_price),
         description: String(dataProduct.description),
         category_id: Number(dataProduct.category_id),
-        promotion_id: dataProduct.promotion_id,
-        is_active: Boolean(dataProduct.is_active),
+        is_active: dataProduct.is_active,
       },
       attributes: dataAttribute.filter(
         (item) => item.values.length > 0 && item.name.length > 0,
@@ -231,12 +232,11 @@ export default function EditProductPage({
       dataVariant,
       dataImage,
     );
-    console.log("--->payload<---", payload);
     try {
       setIsLoading(true);
       await createProduct(payload);
     } catch (error) {
-      console.log("--->Error Create Product<---", error);
+      console.error("Error creating product:", error);
     } finally {
       setIsLoading(false);
     }
@@ -436,7 +436,7 @@ export default function EditProductPage({
                               </span>
                             ))}
                             <input
-                              id={item.id}
+                              id={item.id ? String(item.id) : undefined}
                               className="bg-transparent border-none p-0 text-sm focus:ring-0 placeholder-placeholder min-w-[80px] flex-1"
                               placeholder="Nhập giá trị biến thể"
                               type="text"
@@ -450,7 +450,7 @@ export default function EditProductPage({
                       <button
                         className="cursor-pointer absolute -top-2.5 -right-2.5 bg-background-dark border border-border-dark text-text-gray-100 hover:text-red-500 rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-all"
                         title="Xóa thuộc tính"
-                        id={item.id}
+                        id={item.id ? String(item.id) : undefined}
                         onClick={(e) => handleRemoveAttribute(item.id!)}
                       >
                         <span className="material-symbols-outlined text-[16px]">
@@ -630,7 +630,7 @@ export default function EditProductPage({
                         onChange={(e) =>
                           setDataProduct({
                             ...dataProduct,
-                            is_active: Boolean(e.target.checked),
+                            is_active: e.target.checked,
                           })
                         }
                       />

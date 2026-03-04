@@ -10,14 +10,17 @@ export function getProduct(page: number, limit: number, filters: Filters) {
   });
 }
 export function getProductById(id: number) {
-  return axios.get(`/products/${id}`);
+  return axios.get<GetProductByIdResponse>(`/products/${id}`);
 }
 export function createProduct(payload: PayloadProduct) {
-  return axios.post("/products", payload);
+  return axios.post<GetProductByIdResponse>("/products", payload);
 }
-export function updateProduct(id: number, payload: Product) {
-  return axios.put(`/products/${id}`, payload);
+export function updateProduct(
+  id: number,
+  payload: Partial<Product> | { product: Partial<Product> },
+) {
+  return axios.put<GetProductByIdResponse>(`/products/${id}`, payload);
 }
 export function deleteProduct(id: number) {
-  return axios.delete(`/products/${id}`);
+  return axios.delete<{ id: number }>(`/products/${id}`);
 }

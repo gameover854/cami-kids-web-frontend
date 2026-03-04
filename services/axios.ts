@@ -9,8 +9,6 @@ const axiosInstance = axios.create({
   },
 });
 
-console.log("NEXT_PUBLIC_API_URL", process.env.NEXT_PUBLIC_API_URL);
-
 axiosInstance.interceptors.request.use(
   (config) => {
     if (typeof window === "undefined") return config;
