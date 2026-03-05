@@ -1,15 +1,12 @@
 "use client";
 
 import { uploadMutiple } from "@/services/upload.services";
+import { mapProductFormToPayload } from "@/utils/product.mapper";
 import { convertToBase64, validateImage } from "@/utils/validateImage";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
-type UseProductFormParams = {
-  initialProduct?: Product;
-};
-
-const defaultProduct: Product = {
+const defaultProduct: UpsertProduct = {
   name: "",
   selling_price: 0,
   compare_price: 0,
@@ -23,7 +20,7 @@ const defaultProduct: Product = {
 export default function useProductForm(params?: UseProductFormParams) {
   const skipNextRegenerate = useRef(false);
 
-  const [dataProduct, setDataProduct] = useState<Product>(
+  const [dataProduct, setDataProduct] = useState<UpsertProduct>(
     params?.initialProduct ?? defaultProduct,
   );
   const [dataAttribute, setDataAttribute] = useState<ProductAttribute>([]);
@@ -67,17 +64,7 @@ export default function useProductForm(params?: UseProductFormParams) {
   }, [dataAttribute]);
 
   const setInitialFormData = useCallback(
-    ({
-      product,
-      attributes,
-      variants,
-      images,
-    }: {
-      product: Product;
-      attributes: ProductAttribute;
-      variants: ProductVariant;
-      images: ProductImage;
-    }) => {
+    ({ product, attributes, variants, images }: ProductFormInitialData) => {
       skipNextRegenerate.current = true;
       setDataProduct(product);
       setDataAttribute(attributes);
@@ -205,21 +192,8 @@ export default function useProductForm(params?: UseProductFormParams) {
     });
   };
 
-  const buildPayload = (): PayloadProduct => ({
-    product: {
-      name: dataProduct.name,
-      selling_price: Number(dataProduct.selling_price || 0),
-      compare_price: Number(dataProduct.compare_price || 0),
-      description: dataProduct.description,
-      category_id: dataProduct.category_id ?? null,
-      brand_id: dataProduct.brand_id ?? null,
-      collection_id: dataProduct.collection_id ?? [],
-      is_active: Boolean(dataProduct.is_active),
-    },
-    attributes: dataAttribute.filter((item) => item.name && item.values.length > 0),
-    variants: dataVariant,
-    images: dataImage,
-  });
+  const buildPayload = (): UpsertProductPayload =>
+    mapProductFormToPayload(dataProduct, dataAttribute, dataVariant, dataImage);
 
   return {
     dataProduct,

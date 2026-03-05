@@ -27,7 +27,7 @@ export default function ProductPage() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const [products, setProducts] = useState<Product[]>([]);
+  const [products, setProducts] = useState<ProductListItem[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
   const [selectedCategory, setSelectedCategory] = useState<Category | undefined>();
   const [selectedIsActive, setSelectedIsActive] = useState<IsActive>(ACTIVE_OPTIONS[0]);
@@ -75,7 +75,7 @@ export default function ProductPage() {
       keyword: keyword.trim() || undefined,
     };
   }, [keyword, selectedCategory, selectedIsActive]);
-  console.log('--->filters<---',filters );
+
   const syncQueryToUrl = useCallback(() => {
     const query = new URLSearchParams();
 

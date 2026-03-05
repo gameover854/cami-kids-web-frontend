@@ -8,7 +8,7 @@ import {
   getCustomer,
   updateCustomer,
 } from "@/services/customer.services";
-import { useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 
 const emptyForm = {
@@ -35,24 +35,27 @@ export default function CustomerPage() {
   const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
   const [sortBy, setSortBy] = useState<"newest" | "oldest">("newest");
 
-  async function loadCustomers(currentPage = page, currentKeyword = keyword) {
-    try {
-      setLoading(true);
-      const res = await getCustomer(currentPage, limit, currentKeyword);
-      setCustomers(res?.data?.customers || []);
-      setTotalCustomer(res?.data?.totalCustomer || 0);
-      setTotalPage(res?.data?.totalPage || 1);
-    } catch (err: unknown) {
-      const messageText = (err as ApiError)?.response?.data?.message;
-      setError(messageText || "Khong the tai danh sach khach hang");
-    } finally {
-      setLoading(false);
-    }
-  }
+  const loadCustomers = useCallback(
+    async (currentPage = page, currentKeyword = keyword) => {
+      try {
+        setLoading(true);
+        const res = await getCustomer(currentPage, limit, currentKeyword);
+        setCustomers(res?.data?.customers || []);
+        setTotalCustomer(res?.data?.totalCustomer || 0);
+        setTotalPage(res?.data?.totalPage || 1);
+      } catch (err: unknown) {
+        const messageText = (err as ApiError)?.response?.data?.message;
+        setError(messageText || "Khong the tai danh sach khach hang");
+      } finally {
+        setLoading(false);
+      }
+    },
+    [keyword, limit, page],
+  );
 
   useEffect(() => {
     loadCustomers();
-  }, [page, keyword]);
+  }, [loadCustomers]);
 
   function resetForm() {
     setForm(emptyForm);

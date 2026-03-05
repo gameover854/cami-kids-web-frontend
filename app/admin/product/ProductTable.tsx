@@ -2,16 +2,6 @@ import Image from "next/image";
 import Link from "next/link";
 import { formatVND } from "@/utils/formatCurrency";
 
-type ProductTableProps = {
-  products: Product[];
-  remove: (id: number) => void;
-  page: number;
-  limit: number;
-  totalProduct: number;
-  totalPage: number;
-  onChangePage: (page: number) => void;
-};
-
 export default function ProductTable({
   products,
   remove,
@@ -54,7 +44,7 @@ export default function ProductTable({
                         <Image
                           alt="Product thumbnail"
                           className="w-full h-full object-cover rounded"
-                          src={"/item_example.png"}
+                          src={item.images?.at(0)?.url ?? "/item_example.png"}
                           width={48}
                           height={48}
                         />

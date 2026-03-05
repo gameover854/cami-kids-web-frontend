@@ -1,38 +1,8 @@
 "use client";
 
 import { Checkbox, Field, Label } from "@headlessui/react";
-import type { ChangeEvent, Dispatch, KeyboardEvent, SetStateAction } from "react";
+import Image from "next/image";
 import { Fragment } from "react";
-
-type ProductFormProps = {
-  title: string;
-  submitLabel: string;
-  dataProduct: Product;
-  setDataProduct: Dispatch<SetStateAction<Product>>;
-  dataAttribute: ProductAttribute;
-  dataVariant: ProductVariant;
-  dataImage: ProductImage;
-  dataCategories: Categories;
-  dataCollections: Collections;
-  dataBrand: Brands;
-  onAddAttribute: () => void;
-  onRemoveAttribute: (attributeId: string | number) => void;
-  onAttributeName: (attributeId: string | number, attributeName: string) => void;
-  onAddAttributeItem: (
-    event: KeyboardEvent<HTMLInputElement>,
-    attributeItemId: string | number,
-  ) => void;
-  onRemoveAttributeItem: (attributeItemId: string | number, value: string) => void;
-  onVariantNumber: (
-    value: number,
-    variantItemId: string | number,
-    type: "price" | "stock_quantity",
-  ) => void;
-  onUploadImage: (e: ChangeEvent<HTMLInputElement>) => Promise<void>;
-  onUpdateImage: (imageId: string | number, action: ACTION_UPDATE_IMAGE) => void;
-  onCheckCollections: (checked: boolean, collectionId: string) => void;
-  onSubmit: () => Promise<void>;
-};
 
 export default function ProductForm({
   title,
@@ -205,7 +175,14 @@ export default function ProductForm({
         <div className="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-3">
           {dataImage.map((image) => (
             <div key={image.id} className="relative border border-border-dark rounded-lg p-2">
-              <img src={image.url} alt="Product" className="w-full h-24 object-cover rounded" />
+              <Image
+                src={image.url}
+                alt="Product"
+                className="w-full h-24 object-cover rounded"
+                width={320}
+                height={96}
+                unoptimized
+              />
               <div className="mt-2 flex gap-2 text-xs">
                 <button onClick={() => onUpdateImage(image.id, ACTION_UPDATE_IMAGE.PRIMARY)}>
                   Chon chinh

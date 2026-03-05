@@ -3,8 +3,9 @@
 import Header from "@/components/layout/header";
 import Loading from "@/components/notification/loading";
 import { getVariantById, updateVariant } from "@/services/variant.services";
-import { useEffect, useState } from "react";
+import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
+import { useCallback, useEffect, useState } from "react";
 
 export default function ProductVariantDetailPage() {
   const router = useRouter();
@@ -27,7 +28,7 @@ export default function ProductVariantDetailPage() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
 
-  async function loadVariant() {
+  const loadVariant = useCallback(async () => {
     try {
       setLoading(true);
       const res = await getVariantById(productId, variantId);
@@ -45,13 +46,13 @@ export default function ProductVariantDetailPage() {
     } finally {
       setLoading(false);
     }
-  }
+  }, [productId, variantId]);
 
   useEffect(() => {
     if (!rawProductId || !rawVariantId) return;
     if (Number.isNaN(productId) || Number.isNaN(variantId)) return;
     loadVariant();
-  }, [productId, rawProductId, rawVariantId, variantId]);
+  }, [loadVariant, productId, rawProductId, rawVariantId, variantId]);
 
   async function saveVariant() {
     setMessage("");
@@ -191,11 +192,14 @@ export default function ProductVariantDetailPage() {
               </p>
               <div className="mt-3 grid grid-cols-3 gap-2">
                 {(detail?.images || []).slice(0, 3).map((img) => (
-                  <img
+                  <Image
                     key={img.id}
                     src={img.url}
                     alt={`variant-${img.id}`}
                     className="w-full h-20 object-cover rounded border border-border-gray"
+                    width={240}
+                    height={80}
+                    unoptimized
                   />
                 ))}
               </div>

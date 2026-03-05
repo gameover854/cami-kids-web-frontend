@@ -12,12 +12,12 @@ export function getProduct(page: number, limit: number, filters: Filters) {
 export function getProductById(id: number) {
   return axios.get<GetProductByIdResponse>(`/products/${id}`);
 }
-export function createProduct(payload: PayloadProduct) {
+export function createProduct(payload: UpsertProductPayload) {
   return axios.post<GetProductByIdResponse>("/products", payload);
 }
 export function updateProduct(
   id: number,
-  payload: PayloadProduct,
+  payload: UpsertProductPayload,
 ) {
   return axios.put<GetProductByIdResponse>(`/products/${id}`, payload);
 }

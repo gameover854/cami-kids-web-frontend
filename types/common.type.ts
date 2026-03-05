@@ -1,29 +1,39 @@
-type Product = {
-  id?: number;
+type UpsertProduct = {
+  name: string;
+  selling_price: number;
+  compare_price?: number;
+  description: string;
   category_id?: number | null;
   collection_id?: number[];
   brand_id?: number | null;
+  is_active: boolean;
+};
+
+type ProductListItem = {
+  id: number;
   name: string;
   selling_price: number;
   compare_price?: number;
   is_active: boolean;
-  description: string;
+  description?: string;
   category?: Category | null;
-  attributes?: ProductAttribute;
-  variants?: ProductVariant;
-  images?: ProductImage;
   brand?: Brand | null;
-  collections?: CollectionProduct[];
+  attributes?: ProductAttribute;
+  images?: ProductImage;
 };
 
-type Products = Product[];
+type ProductDetail = ProductDetailResponse;
 
-type PayloadProduct = {
-  product: Product;
+type UpsertProductPayload = {
+  product: UpsertProduct;
   attributes?: ProductAttribute;
   variants?: ProductVariant;
   images?: ProductImage;
 };
+
+type Product = ProductDetail;
+type Products = ProductListItem[];
+type PayloadProduct = UpsertProductPayload;
 
 type ApiResponse<T> = {
   data: T;
@@ -38,7 +48,7 @@ type GetProductResponse = {
 };
 
 type GetProductByIdResponse = {
-  product: Product;
+  product: ProductDetail;
 };
 
 type AttributeItem = {
@@ -286,4 +296,105 @@ type AdminVariantDetail = {
       };
     };
   }>;
+};
+
+type ProductDetailCollectionItem = {
+  collection_id: number;
+};
+
+type ProductDetailAttributeValue = {
+  value: string;
+};
+
+type ProductDetailAttribute = {
+  id: number;
+  name: string;
+  values: ProductDetailAttributeValue[];
+};
+
+type ProductDetailVariantAttribute = {
+  value?: { value?: string };
+};
+
+type ProductDetailVariant = {
+  id: number;
+  price: number;
+  stock_quantity: number;
+  sku?: string;
+  barcode?: string;
+  attributes?: ProductDetailVariantAttribute[];
+};
+
+type ProductDetailImage = {
+  id: number;
+  url: string;
+  public_id?: string;
+  is_main?: boolean;
+  order?: number;
+};
+
+type ProductDetailResponse = {
+  id: number;
+  name: string;
+  selling_price: number;
+  compare_price?: number;
+  description?: string;
+  category_id?: number | null;
+  brand_id?: number | null;
+  is_active: boolean;
+  collections?: ProductDetailCollectionItem[];
+  attributes?: ProductDetailAttribute[];
+  variants?: ProductDetailVariant[];
+  images?: ProductDetailImage[];
+};
+
+type UseProductFormParams = {
+  initialProduct?: UpsertProduct;
+};
+
+type ProductFormInitialData = {
+  product: UpsertProduct;
+  attributes: ProductAttribute;
+  variants: ProductVariant;
+  images: ProductImage;
+};
+
+type ProductFormProps = {
+  title: string;
+  submitLabel: string;
+  dataProduct: UpsertProduct;
+  setDataProduct: React.Dispatch<React.SetStateAction<UpsertProduct>>;
+  dataAttribute: ProductAttribute;
+  dataVariant: ProductVariant;
+  dataImage: ProductImage;
+  dataCategories: Categories;
+  dataCollections: Collections;
+  dataBrand: Brands;
+  onAddAttribute: () => void;
+  onRemoveAttribute: (attributeId: string | number) => void;
+  onAttributeName: (attributeId: string | number, attributeName: string) => void;
+  onAddAttributeItem: (
+    event: React.KeyboardEvent<HTMLInputElement>,
+    attributeItemId: string | number,
+  ) => void;
+  onRemoveAttributeItem: (attributeItemId: string | number, value: string) => void;
+  onVariantNumber: (
+    value: number,
+    variantItemId: string | number,
+    type: "price" | "stock_quantity",
+  ) => void;
+  onUploadImage: (e: React.ChangeEvent<HTMLInputElement>) => Promise<void>;
+  onUpdateImage: (imageId: string | number, action: ACTION_UPDATE_IMAGE) => void;
+  onCheckCollections: (checked: boolean, collectionId: string) => void;
+  onSubmit: () => Promise<void>;
+};
+
+type ProductTableProps = {
+  products: ProductListItem[];
+  remove: (id: number) => void;
+  page: number;
+  limit: number;
+  totalProduct: number;
+  totalPage: number;
+  onChangePage: (page: number) => void;
 };
