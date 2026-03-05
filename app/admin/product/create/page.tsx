@@ -1,75 +1,40 @@
 "use client";
 
-import Loading from "@/components/notification/loading";
-import { getCategory } from "@/services/category.services";
-import { getBrand } from "@/services/brand.services";
-import { createProduct } from "@/services/product.services";
-import { uploadMutiple } from "@/services/upload.services";
-import { convertToBase64, validateImage } from "@/utils/validateImage";
-import { useRouter } from "next/navigation";
-import { Fragment, useEffect, useState } from "react";
-import { v4 as uuidv4 } from "uuid";
-import { Checkbox, Label, Field } from "@headlessui/react";
-import { getCollection } from "@/services/collections.services";
 import Header from "@/components/layout/header";
+import ProductForm from "@/components/product/ProductForm";
+import Loading from "@/components/notification/loading";
+import useProductForm from "@/hooks/useProductForm";
+import { getBrand } from "@/services/brand.services";
+import { getCategory } from "@/services/category.services";
+import { getCollection } from "@/services/collections.services";
+import { createProduct } from "@/services/product.services";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function CreateProductPage() {
-  const [dataProduct, setDataProduct] = useState<Product>({
-    name: "",
-    selling_price: 0,
-    compare_price: 0,
-    description: "",
-    category_id: undefined,
-    collection_id: [],
-    brand_id: undefined,
-    is_active: false,
-  });
-
-  const [dataAttribute, setDataAttribute] = useState<ProductAttribute>([]);
+  const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
-  const [dataImage, setDataImage] = useState<ProductImage>([]);
-  const [dataVariant, setDataVariant] = useState<ProductVariant>([]);
   const [dataCategories, setDataCategories] = useState<Categories>([]);
   const [dataCollections, setDataCollections] = useState<Collections>([]);
   const [dataBrand, setDataBrand] = useState<Brands>([]);
-  const router = useRouter();
 
-  const generateVariants = (dataAttribute: ProductAttribute) => {
-    const variants: ProductVariant = [];
-    let combo: string[] = [];
-    const attributeValues = dataAttribute
-      .filter((item) => item.values.length > 0)
-      .map((item) => item.values);
-    if (attributeValues.length === 0) return variants;
-    if (attributeValues.length === 1) {
-      for (const item of attributeValues[0]) {
-        variants.push({
-          id: uuidv4(),
-          price: 0,
-          stock_quantity: 0,
-          combo: item,
-        });
-      }
-      return variants;
-    }
-
-    combo = attributeValues.reduce((before, after) => {
-      return before.flatMap((val_1) =>
-        after.map((val_2) => (val_1 ? `${val_1} / ${val_2}` : val_2)),
-      );
-    });
-
-    for (const item of combo) {
-      variants.push({
-        id: uuidv4(),
-        price: 0,
-        stock_quantity: 0,
-        combo: item,
-      });
-    }
-
-    return variants;
-  };
+  const {
+    dataProduct,
+    setDataProduct,
+    dataAttribute,
+    dataVariant,
+    dataImage,
+    handleAddAttribute,
+    handleRemoveAttribute,
+    handleAttributeName,
+    handleAddAttributeItem,
+    handleRemoveAttributeItem,
+    handleVariantNumber,
+    handleUploadImage,
+    handleUpdateImage,
+    handleCheckCollections,
+    buildPayload,
+  } = useProductForm();
 
   useEffect(() => {
     const fetchData = async () => {
@@ -81,14 +46,9 @@ export default function CreateProductPage() {
           getBrand(),
         ]);
 
-        setDataCategories([
-          { id: null, name: "Tất cả" },
-          ...categoryRes.data.categories,
-        ]);
-
+        setDataCategories([{ id: null, name: "Tat ca" }, ...categoryRes.data.categories]);
         setDataCollections(collectionRes.data.collections);
-
-        setDataBrand([{ id: null, name: "Tất cả" }, ...brandRes.data.brands]);
+        setDataBrand([{ id: null, name: "Tat ca" }, ...brandRes.data.brands]);
       } catch (error) {
         console.error("Failed to fetch data:", error);
       } finally {
@@ -99,655 +59,45 @@ export default function CreateProductPage() {
     fetchData();
   }, []);
 
-  useEffect(() => {
-    setDataVariant(generateVariants(dataAttribute));
-  }, [dataAttribute]);
-
-  const handleAddAttribute = () => {
-    setDataAttribute([
-      ...dataAttribute,
-      { id: uuidv4(), name: "", values: [] },
-    ]);
-  };
-
-  const handleRemoveAttribute = (attributeId: string | number) => {
-    setDataAttribute(dataAttribute.filter((item) => item.id !== attributeId));
-  };
-
-  const handleAttributeName = (
-    attributeId: string | number,
-    attributeName: string,
-  ) => {
-    if (!attributeId) return;
-    setDataAttribute(
-      dataAttribute.map((item) =>
-        item.id === attributeId ? { ...item, name: attributeName } : item,
-      ),
-    );
-  };
-
-  const handleAddAttributeItem = (
-    event: React.KeyboardEvent<HTMLInputElement>,
-    attributeItemId: string | number,
-  ) => {
-    if (event.key !== "Enter") return;
-
-    const value = String(event.currentTarget.value).trim();
-    if (!value) return;
-
-    setDataAttribute((prev) =>
-      prev.map((item) =>
-        item.id === attributeItemId && !item.values.includes(value)
-          ? { ...item, values: [...item.values, value] }
-          : item,
-      ),
-    );
-
-    event.currentTarget.value = "";
-  };
-
-  const handleRemoveAttributeItem = (
-    attributeItemId: string | number,
-    attributeItemValue: string,
-  ) => {
-    setDataAttribute(
-      dataAttribute.map((item) =>
-        item.id === attributeItemId
-          ? {
-              ...item,
-              values: item.values.filter(
-                (value) => value !== attributeItemValue,
-              ),
-            }
-          : item,
-      ),
-    );
-  };
-
-  const handleVariantItem = (
-    value: number,
-    variantItemId: string | number,
-    type: string,
-  ) => {
-    setDataVariant(
-      dataVariant.map((item) =>
-        item.id === variantItemId ? { ...item, [type]: value } : item,
-      ),
-    );
-  };
-
-  const handleUploadImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const fileList = e.target.files;
-    if (!fileList || fileList.length === 0) return;
-
-    const validFiles = Array.from(fileList).filter((file) =>
-      validateImage(file.size, file.type),
-    );
-
-    if (validFiles.length === 0) return;
-
-    try {
-      const base64Files = await Promise.all(
-        validFiles.map((file) => convertToBase64(file)),
-      );
-
-      const { data } = await uploadMutiple(base64Files as string[]);
-
-      const newImages = data.map((image: Image) => ({
-        id: uuidv4(),
-        url: image.url,
-        public_id: image.public_id,
-        is_main: false,
-      }));
-
-      setDataImage((prev) => [...prev, ...newImages]);
-    } catch (error) {
-      console.error("Upload failed:", error);
-    } finally {
-      e.target.value = "";
-    }
-  };
-
-  const handleUpdateImage = (imageId: string | number, action: string) => {
-    switch (action) {
-      case "PRIMARY":
-        setDataImage((images) =>
-          images.map((image) =>
-            image.id === imageId
-              ? { ...image, is_main: true }
-              : { ...image, is_main: false },
-          ),
-        );
-        break;
-
-      case "DELETE":
-        setDataImage((images) =>
-          images.filter((image) => image.id !== imageId),
-        );
-        break;
-
-      default:
-        break;
-    }
-  };
-
-  const handleCheckCollections = (checked: boolean, collectionId: string) => {
-    const id = Number(collectionId);
-
-    setDataProduct((prev) => {
-      const collectionIds = prev.collection_id ?? [];
-      return {
-        ...prev,
-        collection_id: checked
-          ? [...collectionIds, id]
-          : collectionIds.filter((item) => item !== id),
-      };
-    });
-  };
-
-  const transformData = (
-    dataProduct: Product,
-    dataAttribute: ProductAttribute,
-    dataVariant: ProductVariant,
-    dataImage: ProductImage,
-  ) => {
-    return {
-      product: {
-        name: dataProduct.name.toString(),
-        selling_price: dataProduct.selling_price,
-        compare_price: dataProduct.compare_price,
-        description: dataProduct.description,
-        category_id: dataProduct.category_id,
-        is_active: dataProduct.is_active,
-        brand_id: dataProduct.brand_id,
-        collection_id: dataProduct.collection_id ?? [],
-      },
-      attributes: dataAttribute.filter(
-        (item) => item.values.length > 0 && item.name.length > 0,
-      ),
-      variants: dataVariant,
-      images: dataImage,
-    };
-  };
-
-  async function create() {
-    const payload = transformData(
-      dataProduct,
-      dataAttribute,
-      dataVariant,
-      dataImage,
-    );
+  const submitCreate = async () => {
     try {
       setIsLoading(true);
-      await createProduct(payload);
+      await createProduct(buildPayload());
       router.push("/admin/product");
     } catch (error) {
       console.error("Error creating product:", error);
     } finally {
       setIsLoading(false);
     }
-  }
+  };
 
   return (
     <div className="flex-1 flex flex-col h-full overflow-hidden relative">
       <Header />
       <main className="flex-1 overflow-y-auto p-4 md:p-8 scroll-smooth dark:bg-background-dark-2">
-        <div className="max-w-[1200px] mx-auto flex flex-col gap-6">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-            <div className="flex flex-col gap-1">
-              <h1 className="text-2xl md:text-3xl font-black tracking-tight dark:text-white text-text-gray-100">
-                Thêm sản phẩm mới
-              </h1>
-              <p className="text-text-gray-100 text-sm">
-                Điền thông tin chi tiết cho sản phẩm thời trang
-              </p>
-            </div>
-            <div className="flex gap-3">
-              <button className="cursor-pointer px-5 h-10 rounded-lg bg-background-dark text-text-gray-100 text-sm font-bold border border-border-dark hover:text-white hover:bg-[#283539] transition-all">
-                Hủy bỏ
-              </button>
-              <div className="cursor-pointer flex items-center justify-center gap-2 px-6 h-10 rounded-lg bg-background-primary text-background-dark text-sm font-bold hover:bg-[#3ec4f1] transition-all shadow-lg shadow-primary/20">
-                <span className="material-symbols-outlined text-[20px]">
-                  save
-                </span>
-                <span onClick={create}>Lưu sản phẩm</span>
-              </div>
-            </div>
-          </div>
-          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 items-start">
-            <div className="lg:col-span-2 flex flex-col gap-6">
-              <section className="bg-background-dark rounded-xl border border-border-dark p-5 shadow-sm">
-                <h2 className="text-lg font-bold mb-4 flex items-center gap-2 text-text-gray-100">
-                  <span className="material-symbols-outlined text-primary">
-                    info
-                  </span>
-                  Thông tin cơ bản
-                </h2>
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-sm font-medium text-text-gray-100 mb-1">
-                      Tên sản phẩm<span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      className="w-full rounded-lg text-sm px-3 py-2.5 focus:ring-1 focus:ring-primary placeholder-placeholder outline-none dark:bg-background-dark border-1  border-border-dark"
-                      placeholder="Ví dụ: Áo Thun Polo Bé Trai Cotton"
-                      type="text"
-                      onChange={(e) => {
-                        setDataProduct({
-                          ...dataProduct,
-                          name: e.target.value,
-                        });
-                      }}
-                    />
-                  </div>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-text-gray-100 mb-1">
-                        Giá bán (VNĐ)
-                      </label>
-                      <div className="relative">
-                        <input
-                          className="w-full rounded-lg text-sm border-1 border-border-dark pl-3 pr-10 py-2.5 text-right font-medium focus:ring-1 focus:ring-primary placeholder-placeholder outline-none dark:bg-background-dark"
-                          placeholder="Nhập giá bán"
-                          type="number"
-                          onChange={(e) => {
-                            setDataProduct({
-                              ...dataProduct,
-                              selling_price: Number(e.target.value),
-                            });
-                          }}
-                        />
-                        <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                          <span className="text-text-gray-100 text-xs">₫</span>
-                        </div>
-                      </div>
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-text-gray-100 mb-1">
-                        Giá so sánh (VNĐ)
-                      </label>
-                      <div className="relative">
-                        <input
-                          className="w-full rounded-lg  border-1 border-border-dark text-sm pl-3 pr-10 py-2.5 text-right font-medium focus:ring-1 focus:ring-primary placeholder-placeholder outline-none dark:bg-background-dark"
-                          placeholder="Nhập giá so sánh"
-                          type="number"
-                          onChange={(e) => {
-                            setDataProduct({
-                              ...dataProduct,
-                              compare_price: Number(e.target.value),
-                            });
-                          }}
-                        />
-                        <div className="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-                          <span className="text-text-gray-100 text-xs">₫</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-text-gray-100 mb-1">
-                      Mô tả sản phẩm
-                    </label>
-                    <div className="rounded-lg border border-border-dark overflow-hidden dark:bg-background-dark focus-within:ring-1 focus-within:ring-primary focus-within:border-primary ">
-                      <textarea
-                        className="w-full border-none p-3 text-sm focus:ring-0 resize-y bg-transparent outline-none dark:bg-background-dark"
-                        placeholder="Nhập mô tả chi tiết về chất liệu, kiểu dáng..."
-                        rows={4}
-                        onChange={(e) => {
-                          setDataProduct({
-                            ...dataProduct,
-                            description: e.target.value,
-                          });
-                        }}
-                      ></textarea>
-                    </div>
-                  </div>
-                </div>
-              </section>
-              <section className="bg-background-dark rounded-xl border border-border-dark p-5 shadow-sm">
-                <h2 className="text-lg font-bold text-white mb-6 flex items-center gap-2">
-                  <span className="material-symbols-outlined text-primary">
-                    style
-                  </span>
-                  Biến thể sản phẩm
-                </h2>
-                <div className="space-y-4 mb-8">
-                  {dataAttribute.map((item) => (
-                    <div
-                      key={item.id}
-                      className="bg-[#111618] border border-border-dark rounded-lg p-4 relative group hover:border-border-dark/80 transition-colors"
-                    >
-                      <div className="flex flex-col md:flex-row gap-4 items-start">
-                        <div className="w-full md:w-1/4">
-                          <label className="block text-xs font-medium text-text-gray-100 mb-1.5">
-                            Tên thuộc tính
-                          </label>
-                          <input
-                            className="w-full rounded text-sm px-3 py-2 bg-background-dark border border-border-dark focus:border-primary focus:ring-primary"
-                            type="text"
-                            placeholder="Nhập tên thuộc tính"
-                            value={item.name}
-                            onChange={(e) =>
-                              handleAttributeName(item.id!, e.target.value)
-                            }
-                          />
-                        </div>
-                        <div className="w-full md:w-3/4">
-                          <label className="block text-xs font-medium text-text-gray-100 mb-1.5">
-                            Giá trị của thuộc tính
-                          </label>
-                          <div className="w-full min-h-[38px] rounded px-2 py-1.5 bg-background-dark border border-border-dark focus-within:border-primary focus-within:ring-1 focus-within:ring-primary flex flex-wrap gap-2 items-center">
-                            {item.values.map((value, index) => (
-                              <span
-                                key={index}
-                                className="inline-flex items-center gap-1 px-2 py-0.5 rounded bg-primary/20 text-primary text-xs font-medium border border-primary/20"
-                              >
-                                {value}
-                                <button
-                                  className="cursor-pointer hover:text-white"
-                                  onClick={(e) =>
-                                    handleRemoveAttributeItem(item.id!, value)
-                                  }
-                                >
-                                  <span className="material-symbols-outlined text-[14px]">
-                                    close
-                                  </span>
-                                </button>
-                              </span>
-                            ))}
-                            <input
-                              id={item.id ? String(item.id) : undefined}
-                              className="bg-transparent border-none p-0 text-sm focus:ring-0 placeholder-placeholder min-w-[80px] flex-1"
-                              placeholder="Nhập giá trị biến thể"
-                              type="text"
-                              onKeyDown={(e) =>
-                                handleAddAttributeItem(e, item.id!)
-                              }
-                            />
-                          </div>
-                        </div>
-                      </div>
-                      <button
-                        className="cursor-pointer absolute -top-2.5 -right-2.5 bg-background-dark border border-border-dark text-text-gray-100 hover:text-red-500 rounded-full p-1 shadow-md opacity-0 group-hover:opacity-100 transition-all"
-                        title="Xóa thuộc tính"
-                        id={item.id ? String(item.id) : undefined}
-                        onClick={(e) => handleRemoveAttribute(item.id!)}
-                      >
-                        <span className="material-symbols-outlined text-[16px]">
-                          delete
-                        </span>
-                      </button>
-                    </div>
-                  ))}
-                  <button
-                    onClick={handleAddAttribute}
-                    className="cursor-pointer text-primary text-sm font-bold hover:text-[#3ec4f1] flex items-center gap-1.5 px-2 py-1 -ml-2 rounded hover:bg-primary/10 transition-colors"
-                  >
-                    <span className="material-symbols-outlined text-[20px]">
-                      add
-                    </span>
-                    Thêm thuộc tính mới
-                  </button>
-                </div>
-                <div className="border-t border-border-dark pt-6">
-                  <div className="flex items-center justify-between mb-3">
-                    <h3 className="text-sm font-bold text-white">
-                      Danh sách biến thể đã sinh ({dataVariant.length})
-                    </h3>
-                  </div>
-                  <div className="overflow-x-auto rounded-lg border border-border-dark">
-                    <table className="w-full text-left border-collapse min-w-[700px]">
-                      <thead>
-                        <tr className="bg-[#152025] text-xs uppercase tracking-wider text-text-gray-100 border-b border-border-dark">
-                          <th className="px-4 py-3 font-semibold">Biến thể</th>
-                          <th className="px-4 py-3 font-semibold text-right w-1/5">
-                            Giá bán <span className="text-red-500">*</span>
-                          </th>
-                          <th className="px-4 py-3 font-semibold text-right w-1/6">
-                            Tồn kho <span className="text-red-500">*</span>
-                          </th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-border-dark bg-[#111618]">
-                        {dataVariant.map((item) => (
-                          <tr
-                            className="hover:bg-background-dark/50 transition-colors"
-                            key={item.id}
-                          >
-                            <td className="px-4 py-3 align-middle">
-                              <div className="flex flex-col gap-0.5">
-                                <span className="text-text-gray-100">
-                                  {item.combo}
-                                </span>
-                              </div>
-                            </td>
-                            <td className="px-4 py-3 align-middle">
-                              <input
-                                className="w-full rounded border-1 border-border-dark px-2 py-1.5 text-sm text-right bg-background-dark border-border-dark focus:border-primary focus:ring-primary"
-                                type="number"
-                                value={item.price}
-                                onChange={(e) =>
-                                  handleVariantItem(
-                                    Number(e.target.value),
-                                    item.id!,
-                                    "price",
-                                  )
-                                }
-                              />
-                            </td>
-                            <td className="px-4 py-3 align-middle">
-                              <input
-                                className="w-full rounded px-2  border-1 border-border-dark py-1.5 text-sm text-right bg-background-dark border-border-dark focus:border-primary focus:ring-primary"
-                                min="0"
-                                type="number"
-                                value={item.stock_quantity}
-                                onChange={(e) =>
-                                  handleVariantItem(
-                                    Number(e.target.value),
-                                    item.id!,
-                                    "stock_quantity",
-                                  )
-                                }
-                              />
-                            </td>
-                          </tr>
-                        ))}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
-              </section>
-              <section className="bg-background-dark rounded-xl border border-border-dark p-5 shadow-sm">
-                <h2 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
-                  <span className="material-symbols-outlined text-primary">
-                    imagesmode
-                  </span>
-                  Hình ảnh sản phẩm
-                </h2>
-                <div className="border-2 border-dashed border-border-dark rounded-xl p-8 flex flex-col items-center justify-center text-center hover:border-primary/50 transition-colors bg-[#111618] cursor-pointer group">
-                  <div className="bg-background-dark p-3 rounded-full mb-3 group-hover:scale-110 transition-transform relative">
-                    <span className="material-symbols-outlined text-primary text-3xl">
-                      cloud_upload
-                    </span>
-                    <input
-                      type="file"
-                      name="uploadImage"
-                      id="uploadImage"
-                      accept="image/*"
-                      className="hidden"
-                      multiple
-                      onChange={(e) => handleUploadImage(e)}
-                    />
-                    <label
-                      htmlFor="uploadImage"
-                      className="cursor-pointer absolute left-0 h-full w-full"
-                    ></label>
-                  </div>
-                  <p className="text-white font-medium text-sm">
-                    Kéo thả hình ảnh vào đây hoặc click để chọn
-                  </p>
-                  <p className="text-text-gray-100 text-xs mt-1">
-                    Hỗ trợ JPG, PNG, WEBP. Tối đa 5MB/ảnh.
-                  </p>
-                </div>
-                <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-4">
-                  {dataImage.map((image) => (
-                    <div
-                      className="relative group aspect-square rounded-lg border-2 border-primary overflow-hidden bg-[#111618]"
-                      key={image.id}
-                    >
-                      <img
-                        alt="Product Image"
-                        className="w-full h-full object-cover"
-                        src={image.url}
-                      />
-                      {image.is_main && (
-                        <div className="absolute top-2 left-2 bg-primary text-background-dark text-[10px] font-bold px-2 py-0.5 rounded shadow-sm">
-                          Ảnh chính
-                        </div>
-                      )}
-
-                      <button
-                        className="absolute top-2 right-2 bg-black/60 hover:bg-red-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm"
-                        onClick={(e) => handleUpdateImage(image.id, "DELETE")}
-                      >
-                        <span className="material-symbols-outlined text-[16px]">
-                          close
-                        </span>
-                      </button>
-                      <div className="absolute inset-x-0 bottom-0 bg-black/60 p-2 opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm flex justify-center gap-2">
-                        <button
-                          className="text-xs text-white hover:text-primary underline"
-                          onClick={(e) =>
-                            handleUpdateImage(image.id, "PRIMARY")
-                          }
-                        >
-                          Đặt làm chính
-                        </button>
-                      </div>
-                      {/* <div className="absolute inset-x-0 bottom-0 bg-black/60 p-1 opacity-0 group-hover:opacity-100 transition-opacity backdrop-blur-sm flex justify-center cursor-move">
-                        <span className="material-symbols-outlined text-white text-[16px]">
-                          drag_handle
-                        </span>
-                      </div> */}
-                    </div>
-                  ))}
-                </div>
-              </section>
-            </div>
-            <div className="flex flex-col gap-6">
-              <section className="bg-background-dark rounded-xl border border-border-dark p-5 shadow-sm sticky top-24">
-                <h2 className="text-lg font-bold text-white mb-4">Tổ chức</h2>
-                <div className="space-y-5">
-                  <div className="flex items-center justify-between pb-4 border-b border-border-dark">
-                    <div className="flex flex-col">
-                      <span className="text-sm font-medium text-white">
-                        Trạng thái
-                      </span>
-                      <span className="text-xs text-text-gray-100">
-                        Cho phép bán
-                      </span>
-                    </div>
-                    <label className="relative inline-flex items-center cursor-pointer">
-                      <input
-                        className="sr-only peer"
-                        type="checkbox"
-                        onChange={(e) =>
-                          setDataProduct({
-                            ...dataProduct,
-                            is_active: e.target.checked,
-                          })
-                        }
-                      />
-                      <div className="w-11 h-6 bg-[#283539] peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full rtl:peer-checked:after:-translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-emerald-500"></div>
-                    </label>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-text-gray-100 mb-1">
-                      Thương Hiệu
-                    </label>
-                    <select
-                      className="w-full rounded-lg text-sm px-3 py-2.5 focus:ring-1 focus:ring-primary outline-none dark:bg-background-dark border-1 border-border-dark"
-                      onChange={(e) =>
-                        setDataProduct({
-                          ...dataProduct,
-                          brand_id: Number(e.target.value),
-                        })
-                      }
-                    >
-                      {dataBrand.map((brand) => (
-                        <option key={brand.id ?? "all-brand"} value={brand.id ?? ""}>
-                          {brand.name}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-text-gray-100 mb-1">
-                      Danh mục
-                    </label>
-                    <select
-                      className="w-full rounded-lg text-sm px-3 py-2.5 focus:ring-1 focus:ring-primary outline-none dark:bg-background-dark border-1 border-border-dark"
-                      onChange={(e) =>
-                        setDataProduct({
-                          ...dataProduct,
-                          category_id: Number(e.target.value),
-                        })
-                      }
-                    >
-                      {dataCategories.map((parent) => (
-                        <Fragment key={parent.id}>
-                          <option value={parent.id ?? ""}>{parent.name}</option>
-                          {parent.children?.map((child) => (
-                            <option key={child.id} value={child.id ?? ""}>
-                              └─ {child.name}
-                            </option>
-                          ))}
-                        </Fragment>
-                      ))}
-                    </select>
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-text-gray-100 mb-1">
-                      Bộ sưu tập
-                    </label>
-                    <div className="mt-2 overflow-y-scroll h-50">
-                      {dataCollections.map((collection) => (
-                        <Field key={collection.id} className="flex items-start">
-                          <Checkbox
-                            key={collection.id}
-                            value={collection.id}
-                            onChange={(e) =>
-                              handleCheckCollections(e, String(collection.id))
-                            }
-                            className="group block size-4 rounded border bg-white data-checked:bg-blue-500 mb-4"
-                          >
-                            <svg
-                              className="stroke-white opacity-0 group-data-checked:opacity-100"
-                              viewBox="0 0 14 14"
-                              fill="none"
-                            >
-                              <path
-                                d="M3 8L6 11L11 3.5"
-                                strokeWidth={2}
-                                strokeLinecap="round"
-                                strokeLinejoin="round"
-                              />
-                            </svg>
-                          </Checkbox>
-                          <Label className="ml-2 text-sm text-text-gray-100">
-                            {collection.name}
-                          </Label>
-                        </Field>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              </section>
-            </div>
-          </div>
-        </div>
-        {isLoading && <Loading />}
+        <ProductForm
+          title="Them san pham"
+          submitLabel="Luu san pham"
+          dataProduct={dataProduct}
+          setDataProduct={setDataProduct}
+          dataAttribute={dataAttribute}
+          dataVariant={dataVariant}
+          dataImage={dataImage}
+          dataCategories={dataCategories}
+          dataCollections={dataCollections}
+          dataBrand={dataBrand}
+          onAddAttribute={handleAddAttribute}
+          onRemoveAttribute={handleRemoveAttribute}
+          onAttributeName={handleAttributeName}
+          onAddAttributeItem={handleAddAttributeItem}
+          onRemoveAttributeItem={handleRemoveAttributeItem}
+          onVariantNumber={handleVariantNumber}
+          onUploadImage={handleUploadImage}
+          onUpdateImage={handleUpdateImage}
+          onCheckCollections={handleCheckCollections}
+          onSubmit={submitCreate}
+        />
+        {isLoading ? <Loading /> : null}
       </main>
     </div>
   );
