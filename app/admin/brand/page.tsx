@@ -10,23 +10,6 @@ import {
 } from "@/services/brand.services";
 import { useEffect, useState } from "react";
 
-type BrandItem = {
-  id: number;
-  name: string;
-  slug?: string | null;
-  logo?: string | null;
-  description?: string | null;
-  is_active?: boolean;
-};
-
-type ApiError = {
-  response?: {
-    data?: {
-      message?: string;
-    };
-  };
-};
-
 const emptyForm = {
   name: "",
   slug: "",
@@ -36,7 +19,7 @@ const emptyForm = {
 };
 
 export default function BrandPage() {
-  const [brands, setBrands] = useState<BrandItem[]>([]);
+  const [brands, setBrands] = useState<AdminBrandItem[]>([]);
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
@@ -102,7 +85,7 @@ export default function BrandPage() {
     }
   }
 
-  function onEdit(item: BrandItem) {
+  function onEdit(item: AdminBrandItem) {
     setEditingId(item.id);
     setForm({
       name: item.name || "",

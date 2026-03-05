@@ -11,49 +11,10 @@ import {
 } from "@/services/promotion.services";
 import { useEffect, useState } from "react";
 
-type PromotionType = "PERCENTAGE" | "FIXED_AMOUNT";
-
-type PromotionCollectionLink = {
-  collection_id: number;
-  promotion_id: number;
-  collection?: {
-    id: number;
-    name: string;
-    slug: string;
-  };
-};
-
-type PromotionItem = {
-  id: number;
-  code: string;
-  name: string;
-  type: PromotionType;
-  value: number;
-  start_date: string | null;
-  end_date: string | null;
-  is_active: boolean;
-  collections?: PromotionCollectionLink[];
-};
-
-type CollectionItem = {
-  id: number;
-  name: string;
-  slug: string;
-  is_active: boolean;
-};
-
-type ApiError = {
-  response?: {
-    data?: {
-      message?: string;
-    };
-  };
-};
-
 const emptyForm = {
   code: "",
   name: "",
-  type: "PERCENTAGE" as PromotionType,
+  type: "PERCENTAGE" as AdminPromotionType,
   value: 0,
   start_date: "",
   end_date: "",
@@ -71,8 +32,8 @@ function toDatetimeLocal(value?: string | null) {
 }
 
 export default function PromotionPage() {
-  const [promotions, setPromotions] = useState<PromotionItem[]>([]);
-  const [collections, setCollections] = useState<CollectionItem[]>([]);
+  const [promotions, setPromotions] = useState<AdminPromotionItem[]>([]);
+  const [collections, setCollections] = useState<AdminCollectionItem[]>([]);
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
@@ -155,7 +116,7 @@ export default function PromotionPage() {
     }
   }
 
-  function onEdit(item: PromotionItem) {
+  function onEdit(item: AdminPromotionItem) {
     setEditingId(item.id);
     setForm({
       code: item.code,
@@ -230,7 +191,7 @@ export default function PromotionPage() {
                 onChange={(e) =>
                   setForm((prev) => ({
                     ...prev,
-                    type: e.target.value as PromotionType,
+                    type: e.target.value as AdminPromotionType,
                   }))
                 }
               >

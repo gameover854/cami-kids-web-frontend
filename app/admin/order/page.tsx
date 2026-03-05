@@ -11,54 +11,12 @@ import {
 } from "@/services/order.services";
 import { useCallback, useEffect, useState } from "react";
 
-type OrderListItem = {
-  id: number;
-  total_amount: number;
-  shipping_address: string;
-  status: OrderStatus;
-  created_at: string;
-  user: {
-    id: number;
-    name: string | null;
-    email: string;
-    phone: string | null;
-  } | null;
-  payment?: {
-    id: number;
-    amount: number;
-    method: string;
-    status: string;
-    transaction_id: string | null;
-  } | null;
-};
-
-type OrderDetailItem = OrderListItem & {
-  items: Array<{
-    id: number;
-    quantity: number;
-    price_at_purchase: number;
-    variant?: {
-      id: number;
-      sku: string;
-      product?: { id: number; name: string };
-    };
-  }>;
-};
-
-type ApiError = {
-  response?: {
-    data?: {
-      message?: string;
-    };
-  };
-};
-
 const statuses: OrderStatus[] = ["PENDING", "PAID", "SHIPPED", "COMPLETED", "CANCELLED"];
 
 export default function OrderPage() {
-  const [orders, setOrders] = useState<OrderListItem[]>([]);
+  const [orders, setOrders] = useState<AdminOrderListItem[]>([]);
   const [selectedStatus, setSelectedStatus] = useState<OrderStatus | "ALL">("ALL");
-  const [selectedOrder, setSelectedOrder] = useState<OrderDetailItem | null>(null);
+  const [selectedOrder, setSelectedOrder] = useState<AdminOrderDetailItem | null>(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");

@@ -4,14 +4,6 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { clearAuthToken } from "@/utils/auth";
 
-type SidebarItem = {
-  id: number;
-  icon: string;
-  label: string;
-  href: string;
-  section: "main" | "manage" | "system";
-};
-
 const sidebarItems: SidebarItem[] = [
   { id: 1, icon: "home", label: "Tổng quan", href: "/admin", section: "main" },
   { id: 2, icon: "category", label: "Danh mục", href: "/admin/category", section: "manage" },

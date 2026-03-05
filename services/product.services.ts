@@ -17,7 +17,7 @@ export function createProduct(payload: PayloadProduct) {
 }
 export function updateProduct(
   id: number,
-  payload: Partial<Product> | { product: Partial<Product> },
+  payload: PayloadProduct,
 ) {
   return axios.put<GetProductByIdResponse>(`/products/${id}`, payload);
 }

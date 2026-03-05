@@ -11,31 +11,6 @@ import {
 import { getPromotion } from "@/services/promotion.services";
 import { useEffect, useMemo, useState } from "react";
 
-type CollectionItem = {
-  id: number;
-  name: string;
-  slug: string;
-  is_active: boolean;
-};
-
-type PromotionItem = {
-  id: number;
-  code: string;
-  name: string;
-  collections?: Array<{
-    collection_id: number;
-    promotion_id: number;
-  }>;
-};
-
-type ApiError = {
-  response?: {
-    data?: {
-      message?: string;
-    };
-  };
-};
-
 const emptyForm = {
   name: "",
   slug: "",
@@ -43,8 +18,8 @@ const emptyForm = {
 };
 
 export default function CollectionPage() {
-  const [collections, setCollections] = useState<CollectionItem[]>([]);
-  const [promotions, setPromotions] = useState<PromotionItem[]>([]);
+  const [collections, setCollections] = useState<AdminCollectionItem[]>([]);
+  const [promotions, setPromotions] = useState<AdminPromotionItem[]>([]);
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
@@ -129,7 +104,7 @@ export default function CollectionPage() {
     }
   }
 
-  function onEdit(item: CollectionItem) {
+  function onEdit(item: AdminCollectionItem) {
     setEditingId(item.id);
     setForm({
       name: item.name,

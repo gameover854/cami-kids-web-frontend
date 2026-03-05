@@ -11,27 +11,6 @@ import {
 } from "@/services/category.services";
 import { useEffect, useMemo, useState } from "react";
 
-type CategoryItem = {
-  id: number;
-  name: string;
-  parent_id: number | null;
-  brand_id: number | null;
-  children?: CategoryItem[];
-};
-
-type BrandItem = {
-  id: number;
-  name: string;
-};
-
-type ApiError = {
-  response?: {
-    data?: {
-      message?: string;
-    };
-  };
-};
-
 const emptyForm = {
   name: "",
   parent_id: "",
@@ -39,8 +18,8 @@ const emptyForm = {
 };
 
 export default function CategoryPage() {
-  const [categories, setCategories] = useState<CategoryItem[]>([]);
-  const [brands, setBrands] = useState<BrandItem[]>([]);
+  const [categories, setCategories] = useState<AdminCategoryItem[]>([]);
+  const [brands, setBrands] = useState<AdminSimpleBrandItem[]>([]);
   const [form, setForm] = useState(emptyForm);
   const [editingId, setEditingId] = useState<number | null>(null);
   const [loading, setLoading] = useState(false);
@@ -48,7 +27,7 @@ export default function CategoryPage() {
   const [error, setError] = useState("");
 
   const flattened = useMemo(() => {
-    const rows: CategoryItem[] = [];
+    const rows: AdminCategoryItem[] = [];
     categories.forEach((parent) => {
       rows.push({ ...parent, children: [] });
       (parent.children || []).forEach((child) => {
@@ -123,7 +102,7 @@ export default function CategoryPage() {
     }
   }
 
-  function onEdit(item: CategoryItem) {
+  function onEdit(item: AdminCategoryItem) {
     setEditingId(item.id);
     setForm({
       name: item.name,
