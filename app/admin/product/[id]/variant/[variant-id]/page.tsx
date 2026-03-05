@@ -4,16 +4,17 @@ import Header from "@/components/layout/header";
 import Loading from "@/components/notification/loading";
 import { getVariantById, updateVariant } from "@/services/variant.services";
 import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 
-export default function ProductVariantDetailPage({
-  params,
-}: {
-  params: { id: string; "variant-id": string };
-}) {
+export default function ProductVariantDetailPage() {
   const router = useRouter();
-  const productId = Number(params.id);
-  const variantId = Number(params["variant-id"]);
+  const params = useParams<{ id: string; "variant-id": string }>();
+  const rawProductId = Array.isArray(params?.id) ? params.id[0] : params?.id;
+  const rawVariantId = Array.isArray(params?.["variant-id"])
+    ? params["variant-id"][0]
+    : params?.["variant-id"];
+  const productId = rawProductId ? Number(rawProductId) : Number.NaN;
+  const variantId = rawVariantId ? Number(rawVariantId) : Number.NaN;
 
   const [detail, setDetail] = useState<AdminVariantDetail | null>(null);
   const [form, setForm] = useState({
@@ -47,9 +48,10 @@ export default function ProductVariantDetailPage({
   }
 
   useEffect(() => {
+    if (!rawProductId || !rawVariantId) return;
     if (Number.isNaN(productId) || Number.isNaN(variantId)) return;
     loadVariant();
-  }, [productId, variantId]);
+  }, [productId, rawProductId, rawVariantId, variantId]);
 
   async function saveVariant() {
     setMessage("");

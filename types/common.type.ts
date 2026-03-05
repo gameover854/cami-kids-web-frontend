@@ -88,6 +88,7 @@ type Filters = {
   category_id?: number | null;
   is_active?: number | null;
   sort?: "asc" | "desc";
+  keyword?: string;
 };
 
 type IsActive = {

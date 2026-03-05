@@ -9,7 +9,7 @@ import { getProductById, updateProduct } from "@/services/product.services";
 import { uploadMutiple } from "@/services/upload.services";
 import { convertToBase64, validateImage } from "@/utils/validateImage";
 import { Checkbox, Field, Label } from "@headlessui/react";
-import { useRouter } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { Fragment, useEffect, useRef, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 
@@ -63,8 +63,10 @@ type ProductDetailResponse = {
   images?: ProductDetailImage[];
 };
 
-export default function EditProductPage({ params }: { params: { id: string } }) {
-  const productId = Number(params.id);
+export default function EditProductPage() {
+  const params = useParams<{ id: string }>();
+  const rawProductId = Array.isArray(params?.id) ? params.id[0] : params?.id;
+  const productId = rawProductId ? Number(rawProductId) : Number.NaN;
   const router = useRouter();
   const skipNextRegenerate = useRef(false);
 
@@ -117,7 +119,8 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
 
   useEffect(() => {
     const fetchData = async () => {
-      if (!Number.isInteger(productId)) {
+      if (!rawProductId) return;
+      if (!Number.isInteger(productId) || productId <= 0) {
         router.push("/admin/product");
         return;
       }
@@ -202,7 +205,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
     };
 
     fetchData();
-  }, [productId, router]);
+  }, [productId, rawProductId, router]);
 
   useEffect(() => {
     if (skipNextRegenerate.current) {
@@ -346,7 +349,7 @@ export default function EditProductPage({ params }: { params: { id: string } }) 
   });
 
   const submitUpdate = async () => {
-    if (!Number.isInteger(productId)) return;
+    if (!Number.isInteger(productId) || productId <= 0) return;
     setIsLoading(true);
     try {
       await updateProduct(productId, parseData());
