@@ -1,11 +1,11 @@
 import axios from "./axios";
+import { ORDER_STATUSES, PAYMENT_METHODS, PAYMENT_STATUSES } from "@/constants/order";
 
-export type OrderStatus =
-  | "PENDING"
-  | "PAID"
-  | "SHIPPED"
-  | "COMPLETED"
-  | "CANCELLED";
+export type OrderStatus = (typeof ORDER_STATUSES)[number];
+
+export type PaymentMethod = (typeof PAYMENT_METHODS)[number];
+
+export type PaymentStatus = (typeof PAYMENT_STATUSES)[number];
 
 export function getOrders(params?: {
   page?: number;
@@ -43,8 +43,8 @@ export function updateOrderPayment(
   id: number,
   payload: {
     amount?: number;
-    method?: string;
-    status?: string;
+    method?: PaymentMethod;
+    status?: PaymentStatus;
     transaction_id?: string | null;
   },
 ) {

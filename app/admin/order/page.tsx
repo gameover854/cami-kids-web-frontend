@@ -3,7 +3,15 @@
 import Header from "@/components/layout/header";
 import Loading from "@/components/notification/loading";
 import {
+  ORDER_STATUSES,
+  ORDER_STATUS_TRANSITIONS,
+  PAYMENT_METHODS,
+  PAYMENT_STATUSES,
+} from "@/constants/order";
+import {
   OrderStatus,
+  PaymentMethod,
+  PaymentStatus,
   getOrderById,
   getOrders,
   updateOrderPayment,
@@ -12,7 +20,10 @@ import {
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useMemo, useState } from "react";
 
-const statuses: OrderStatus[] = ["PENDING", "PAID", "SHIPPED", "COMPLETED", "CANCELLED"];
+const statuses: OrderStatus[] = [...ORDER_STATUSES];
+const statusTransitions: Record<OrderStatus, OrderStatus[]> = ORDER_STATUS_TRANSITIONS;
+const paymentMethods: PaymentMethod[] = [...PAYMENT_METHODS];
+const paymentStatuses: PaymentStatus[] = [...PAYMENT_STATUSES];
 
 const parsePositiveNumber = (value: string | null) => {
   if (!value) return null;
@@ -42,8 +53,8 @@ export default function OrderPage() {
   const [totalOrder, setTotalOrder] = useState(0);
   const [paymentForm, setPaymentForm] = useState({
     amount: "",
-    method: "",
-    status: "",
+    method: "" as PaymentMethod | "",
+    status: "" as PaymentStatus | "",
     transaction_id: "",
   });
 
@@ -109,6 +120,9 @@ export default function OrderPage() {
   }, []);
 
   async function onUpdateStatus(id: number, status: OrderStatus) {
+    const current = orders.find((order) => order.id === id)?.status as OrderStatus | undefined;
+    if (!current || current === status) return;
+
     try {
       setLoading(true);
       await updateOrderStatus(id, status);
@@ -131,14 +145,14 @@ export default function OrderPage() {
 
     const payload: {
       amount?: number;
-      method?: string;
-      status?: string;
+      method?: PaymentMethod;
+      status?: PaymentStatus;
       transaction_id?: string | null;
     } = {};
 
     if (paymentForm.amount !== "") payload.amount = Number(paymentForm.amount);
-    if (paymentForm.method.trim()) payload.method = paymentForm.method.trim();
-    if (paymentForm.status.trim()) payload.status = paymentForm.status.trim();
+    if (paymentForm.method) payload.method = paymentForm.method;
+    if (paymentForm.status) payload.status = paymentForm.status;
     if (paymentForm.transaction_id !== "") payload.transaction_id = paymentForm.transaction_id;
 
     try {
@@ -224,7 +238,14 @@ export default function OrderPage() {
                         disabled={loading}
                       >
                         {statuses.map((status) => (
-                          <option key={status} value={status}>
+                          <option
+                            key={status}
+                            value={status}
+                            disabled={
+                              status !== order.status &&
+                              !statusTransitions[order.status as OrderStatus]?.includes(status)
+                            }
+                          >
                             {status}
                           </option>
                         ))}
@@ -310,22 +331,40 @@ export default function OrderPage() {
                       setPaymentForm((prev) => ({ ...prev, amount: e.target.value }))
                     }
                   />
-                  <input
+                  <select
                     className="w-full rounded border border-border-gray bg-transparent px-3 py-2 text-sm"
-                    placeholder="Method (COD, BANK_TRANSFER...)"
                     value={paymentForm.method}
                     onChange={(e) =>
-                      setPaymentForm((prev) => ({ ...prev, method: e.target.value }))
+                      setPaymentForm((prev) => ({
+                        ...prev,
+                        method: e.target.value as PaymentMethod | "",
+                      }))
                     }
-                  />
-                  <input
+                  >
+                    <option value="">Chon phuong thuc thanh toan</option>
+                    {paymentMethods.map((method) => (
+                      <option key={method} value={method}>
+                        {method}
+                      </option>
+                    ))}
+                  </select>
+                  <select
                     className="w-full rounded border border-border-gray bg-transparent px-3 py-2 text-sm"
-                    placeholder="Payment status"
                     value={paymentForm.status}
                     onChange={(e) =>
-                      setPaymentForm((prev) => ({ ...prev, status: e.target.value }))
+                      setPaymentForm((prev) => ({
+                        ...prev,
+                        status: e.target.value as PaymentStatus | "",
+                      }))
                     }
-                  />
+                  >
+                    <option value="">Chon trang thai thanh toan</option>
+                    {paymentStatuses.map((status) => (
+                      <option key={status} value={status}>
+                        {status}
+                      </option>
+                    ))}
+                  </select>
                   <input
                     className="w-full rounded border border-border-gray bg-transparent px-3 py-2 text-sm"
                     placeholder="Transaction id"

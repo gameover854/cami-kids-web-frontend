@@ -64,7 +64,7 @@ export default function AdminPage() {
               </p>
               <p className="mt-2 text-2xl font-bold tracking-tight">{formatVND(summary.total_revenue)}</p>
               <p className="mt-2 text-xs text-text-gray-200 dark:text-text-gray-100">
-                Duoc tinh tu payment status = PAID
+                Duoc tinh tu payment status = SUCCESS
               </p>
             </div>
             <div className="bg-background-light dark:bg-background-dark p-6 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm">

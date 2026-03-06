@@ -233,11 +233,15 @@ type AdminOrderListItem = {
   payment?: {
     id: number;
     amount: number;
-    method: string;
-    status: string;
+    method: PaymentMethod;
+    status: PaymentStatus;
     transaction_id: string | null;
   } | null;
 };
+
+type PaymentMethod = "COD" | "BANK_TRANSFER" | "MOMO" | "VNPAY" | "CREDIT_CARD";
+
+type PaymentStatus = "PENDING" | "SUCCESS" | "FAILED" | "REFUNDED";
 
 type AdminOrderDetailItem = AdminOrderListItem & {
   items: Array<{
