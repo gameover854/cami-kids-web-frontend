@@ -11,6 +11,7 @@ export function getOrders(params?: {
   page?: number;
   limit?: number;
   status?: OrderStatus;
+  user_id?: number;
   sort?: "asc" | "desc";
 }) {
   const page = params?.page ?? 1;
@@ -18,6 +19,7 @@ export function getOrders(params?: {
   const filters: Record<string, string> = {};
 
   if (params?.status) filters.status = params.status;
+  if (params?.user_id) filters.user_id = String(params.user_id);
   if (params?.sort) filters.sort = params.sort;
 
   return axios.get("/orders", {

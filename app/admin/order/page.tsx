@@ -1,4 +1,4 @@
-﻿"use client";
+"use client";
 
 import Header from "@/components/layout/header";
 import Loading from "@/components/notification/loading";
@@ -9,17 +9,37 @@ import {
   updateOrderPayment,
   updateOrderStatus,
 } from "@/services/order.services";
-import { useCallback, useEffect, useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useMemo, useState } from "react";
 
 const statuses: OrderStatus[] = ["PENDING", "PAID", "SHIPPED", "COMPLETED", "CANCELLED"];
 
+const parsePositiveNumber = (value: string | null) => {
+  if (!value) return null;
+  const num = Number(value);
+  return Number.isInteger(num) && num > 0 ? num : null;
+};
+
 export default function OrderPage() {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
+  const customerId = useMemo(
+    () => parsePositiveNumber(searchParams.get("customer_id")),
+    [searchParams],
+  );
+
   const [orders, setOrders] = useState<AdminOrderListItem[]>([]);
   const [selectedStatus, setSelectedStatus] = useState<OrderStatus | "ALL">("ALL");
   const [selectedOrder, setSelectedOrder] = useState<AdminOrderDetailItem | null>(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [page, setPage] = useState(1);
+  const [limit] = useState(10);
+  const [totalPage, setTotalPage] = useState(1);
+  const [totalOrder, setTotalOrder] = useState(0);
   const [paymentForm, setPaymentForm] = useState({
     amount: "",
     method: "",
@@ -27,29 +47,46 @@ export default function OrderPage() {
     transaction_id: "",
   });
 
+  const syncQuery = useCallback(() => {
+    const query = new URLSearchParams();
+    query.set("page", String(page));
+    query.set("limit", String(limit));
+    if (selectedStatus !== "ALL") query.set("status", selectedStatus);
+    if (customerId) query.set("customer_id", String(customerId));
+    router.replace(`${pathname}?${query.toString()}`);
+  }, [customerId, limit, page, pathname, router, selectedStatus]);
+
   const loadOrders = useCallback(async () => {
     try {
       setLoading(true);
       const res = await getOrders({
-        page: 1,
-        limit: 20,
+        page,
+        limit,
         status: selectedStatus === "ALL" ? undefined : selectedStatus,
+        user_id: customerId ?? undefined,
         sort: "desc",
       });
       setOrders(res?.data?.orders || []);
+      setTotalOrder(res?.data?.totalOrder || 0);
+      setTotalPage(res?.data?.totalPage || 1);
     } catch (err: unknown) {
       const messageText = (err as ApiError)?.response?.data?.message;
-      setError(messageText || "Không thể tải đơn hàng");
+      setError(messageText || "Khong the tai don hang");
     } finally {
       setLoading(false);
     }
-  }, [selectedStatus]);
+  }, [customerId, limit, page, selectedStatus]);
 
   useEffect(() => {
+    syncQuery();
     loadOrders();
-  }, [loadOrders]);
+  }, [loadOrders, syncQuery]);
 
-  async function openDetail(id: number) {
+  useEffect(() => {
+    setPage(1);
+  }, [selectedStatus, customerId]);
+
+  const openDetail = useCallback(async (id: number) => {
     try {
       setLoading(true);
       const res = await getOrderById(id);
@@ -65,24 +102,24 @@ export default function OrderPage() {
       setError("");
     } catch (err: unknown) {
       const messageText = (err as ApiError)?.response?.data?.message;
-      setError(messageText || "Không thể lấy chi tiết đơn hàng");
+      setError(messageText || "Khong the lay chi tiet don hang");
     } finally {
       setLoading(false);
     }
-  }
+  }, []);
 
   async function onUpdateStatus(id: number, status: OrderStatus) {
     try {
       setLoading(true);
       await updateOrderStatus(id, status);
-      setMessage("Cập nhật trạng thái đơn hàng thành công");
+      setMessage("Cap nhat trang thai don hang thanh cong");
       await loadOrders();
       if (selectedOrder?.id === id) {
         await openDetail(id);
       }
     } catch (err: unknown) {
       const messageText = (err as ApiError)?.response?.data?.message;
-      setError(messageText || "Cập nhật trạng thái thất bại");
+      setError(messageText || "Cap nhat trang thai that bai");
     } finally {
       setLoading(false);
     }
@@ -107,12 +144,12 @@ export default function OrderPage() {
     try {
       setLoading(true);
       await updateOrderPayment(selectedOrder.id, payload);
-      setMessage("Cập nhật thanh toán thành công");
+      setMessage("Cap nhat thanh toan thanh cong");
       await openDetail(selectedOrder.id);
       await loadOrders();
     } catch (err: unknown) {
       const messageText = (err as ApiError)?.response?.data?.message;
-      setError(messageText || "Cập nhật thanh toán thất bại");
+      setError(messageText || "Cap nhat thanh toan that bai");
     } finally {
       setLoading(false);
     }
@@ -126,19 +163,24 @@ export default function OrderPage() {
           <div className="flex items-end justify-between gap-4">
             <div>
               <h1 className="text-3xl md:text-4xl font-black tracking-tight dark:text-text-light text-text-gray-200">
-                Quản lý Đơn hàng
+                Quan ly Don hang
               </h1>
               <p className="text-text-gray-100 text-base">
-                Danh sách, chi tiết, cập nhật trạng thái và thanh toán
+                Luong status/payment that, co filter theo khach hang va phan trang
               </p>
             </div>
-            <div className="text-sm">
+            <div className="flex items-center gap-2">
+              {customerId ? (
+                <span className="text-xs px-2 py-1 rounded border border-border-gray">
+                  customer_id={customerId}
+                </span>
+              ) : null}
               <select
                 value={selectedStatus}
                 onChange={(e) => setSelectedStatus(e.target.value as OrderStatus | "ALL")}
                 className="rounded border border-border-gray bg-transparent px-3 py-2"
               >
-                <option value="ALL">Tất cả trạng thái</option>
+                <option value="ALL">Tat ca trang thai</option>
                 {statuses.map((status) => (
                   <option key={status} value={status}>
                     {status}
@@ -156,11 +198,11 @@ export default function OrderPage() {
               <thead className="border-b border-border-dark text-xs uppercase tracking-wide text-text-gray-100">
                 <tr>
                   <th className="px-4 py-3">ID</th>
-                  <th className="px-4 py-3">Khách hàng</th>
-                  <th className="px-4 py-3">Tổng tiền</th>
-                  <th className="px-4 py-3">Trạng thái</th>
-                  <th className="px-4 py-3">Ngày tạo</th>
-                  <th className="px-4 py-3 text-right">Hành động</th>
+                  <th className="px-4 py-3">Khach hang</th>
+                  <th className="px-4 py-3">Tong tien</th>
+                  <th className="px-4 py-3">Trang thai</th>
+                  <th className="px-4 py-3">Ngay tao</th>
+                  <th className="px-4 py-3 text-right">Hanh dong</th>
                 </tr>
               </thead>
               <tbody>
@@ -196,7 +238,7 @@ export default function OrderPage() {
                           className="rounded border border-border-gray px-3 py-1 hover:ring-1"
                           onClick={() => openDetail(order.id)}
                         >
-                          Chi tiết
+                          Chi tiet
                         </button>
                       </div>
                     </td>
@@ -205,23 +247,47 @@ export default function OrderPage() {
                 {!loading && orders.length === 0 ? (
                   <tr>
                     <td className="px-4 py-6 text-center text-text-gray-100" colSpan={6}>
-                      Không có đơn hàng
+                      Khong co don hang
                     </td>
                   </tr>
                 ) : null}
               </tbody>
             </table>
+            <div className="flex items-center justify-between gap-2 p-3 border-t border-border-dark">
+              <span className="text-sm text-text-gray-100">Tong don: {totalOrder}</span>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  className="rounded border border-border-gray px-3 py-1 disabled:opacity-50"
+                  disabled={page <= 1 || loading}
+                  onClick={() => setPage((prev) => prev - 1)}
+                >
+                  Truoc
+                </button>
+                <span className="text-sm text-text-gray-100">
+                  {page} / {Math.max(totalPage, 1)}
+                </span>
+                <button
+                  type="button"
+                  className="rounded border border-border-gray px-3 py-1 disabled:opacity-50"
+                  disabled={page >= totalPage || loading}
+                  onClick={() => setPage((prev) => prev + 1)}
+                >
+                  Sau
+                </button>
+              </div>
+            </div>
           </section>
 
           {selectedOrder ? (
             <section className="rounded-xl border border-border-gray dark:bg-background-dark bg-background-light p-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <h2 className="text-lg font-bold">Order #{selectedOrder.id}</h2>
-                <p>Địa chỉ giao: {selectedOrder.shipping_address}</p>
-                <p>Trạng thái: {selectedOrder.status}</p>
-                <p>Tổng tiền: {selectedOrder.total_amount}</p>
+                <p>Dia chi giao: {selectedOrder.shipping_address}</p>
+                <p>Trang thai: {selectedOrder.status}</p>
+                <p>Tong tien: {selectedOrder.total_amount}</p>
                 <div className="pt-2">
-                  <h3 className="font-semibold mb-2">Sản phẩm trong đơn</h3>
+                  <h3 className="font-semibold mb-2">San pham trong don</h3>
                   <ul className="space-y-1 text-sm">
                     {selectedOrder.items?.map((item) => (
                       <li key={item.id} className="border border-border-gray rounded px-3 py-2">
@@ -233,7 +299,7 @@ export default function OrderPage() {
               </div>
 
               <div>
-                <h3 className="font-semibold mb-3">Cập nhật thanh toán</h3>
+                <h3 className="font-semibold mb-3">Cap nhat thanh toan</h3>
                 <form onSubmit={onUpdatePayment} className="space-y-3">
                   <input
                     className="w-full rounded border border-border-gray bg-transparent px-3 py-2 text-sm"
@@ -276,7 +342,7 @@ export default function OrderPage() {
                     className="rounded border border-border-gray px-4 py-2 text-sm font-semibold hover:ring-1 disabled:opacity-60"
                     disabled={loading}
                   >
-                    Lưu thanh toán
+                    Luu thanh toan
                   </button>
                 </form>
               </div>
@@ -284,8 +350,7 @@ export default function OrderPage() {
           ) : null}
         </div>
       </main>
-      {loading && <Loading />}
+      {loading ? <Loading /> : null}
     </div>
   );
 }
-
