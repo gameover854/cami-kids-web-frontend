@@ -91,7 +91,7 @@ export default function AdminPage() {
               </p>
               <p className="mt-2 text-2xl font-bold tracking-tight">{formatVND(summary.average_order_value)}</p>
               <p className="mt-2 text-xs text-text-gray-200 dark:text-text-gray-100">
-                Trung binh tren toan bo don hang
+                Trung binh tren don co payment status = SUCCESS
               </p>
             </div>
           </div>
