@@ -398,3 +398,21 @@ type ProductTableProps = {
   totalPage: number;
   onChangePage: (page: number) => void;
 };
+
+type AdminDashboardTopProduct = {
+  product_id: number;
+  product_name: string;
+  total_quantity: number;
+  total_revenue: number;
+};
+
+type AdminDashboardSummary = {
+  total_revenue: number;
+  total_orders: number;
+  pending_orders: number;
+  completed_orders: number;
+  new_customers: number;
+  average_order_value: number;
+  low_stock_variants: number;
+  top_products: AdminDashboardTopProduct[];
+};
