@@ -1,10 +1,12 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 
 type SelectOption = {
   id: number;
   name: string;
+  displayName?: string;
+  depth?: number;
 };
 
 type MultiSelectBoxProps = {
@@ -24,6 +26,22 @@ function MultiSelectBox({
 }: MultiSelectBoxProps) {
   const [open, setOpen] = useState(false);
   const [search, setSearch] = useState("");
+  const containerRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    if (!open) return;
+
+    const handleClickOutside = (event: MouseEvent) => {
+      if (!containerRef.current) return;
+      if (containerRef.current.contains(event.target as Node)) return;
+      setOpen(false);
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, [open]);
 
   const filteredOptions = useMemo(() => {
     if (!search.trim()) return options;
@@ -40,7 +58,7 @@ function MultiSelectBox({
   }, [options, selectedIds]);
 
   return (
-    <div className="relative w-full lg:w-auto">
+    <div ref={containerRef} className="relative w-full lg:w-auto">
       <button
         type="button"
         className="flex h-10 items-center gap-2 border-1 border-border-gray rounded-lg dark:bg-background-dark bg-background-light pl-4 pr-10 text-sm font-medium dark:text-text-gray-200 text-text-gray-200 hover:ring-1 transition-all w-full"
@@ -68,6 +86,11 @@ function MultiSelectBox({
                 <label
                   key={item.id}
                   className="flex items-center gap-2 rounded px-2 py-1 text-sm text-text-gray-200 hover:bg-background-gray/60 dark:hover:bg-surface-dark"
+                  style={
+                    item.depth
+                      ? { paddingLeft: `${8 + item.depth * 12}px` }
+                      : undefined
+                  }
                 >
                   <input
                     type="checkbox"
@@ -80,7 +103,7 @@ function MultiSelectBox({
                       }
                     }}
                   />
-                  <span>{item.name}</span>
+                  <span>{item.displayName ?? item.name}</span>
                 </label>
               );
             })}
@@ -127,13 +150,27 @@ export default function ProductFilter({
   keyword: string;
   setKeyword: (value: string) => void;
 }) {
-  const categoryOptions = useMemo(
-    () =>
-      categories
-        .filter((item) => typeof item.id === "number")
-        .map((item) => ({ id: item.id as number, name: item.name })),
-    [categories],
-  );
+  const categoryOptions = useMemo(() => {
+    const buildOptions = (items: Category[], depth: number): SelectOption[] => {
+      return items.flatMap((item) => {
+        const options: SelectOption[] = [];
+        if (typeof item.id === "number") {
+          options.push({
+            id: item.id,
+            name: item.name,
+            displayName: item.name,
+            depth,
+          });
+        }
+        if (Array.isArray(item.children) && item.children.length > 0) {
+          options.push(...buildOptions(item.children, depth + 1));
+        }
+        return options;
+      });
+    };
+
+    return buildOptions(categories, 0);
+  }, [categories]);
   const statusOptions = useMemo(
     () =>
       isActive
@@ -151,20 +188,14 @@ export default function ProductFilter({
 
   return (
     <div className="dark:bg-background-dark bg-background-light rounded-xl border-1 border-border-gray p-4 flex flex-col lg:flex-row gap-4 justify-between items-start lg:items-center">
-      <div className="relative w-full lg:w-96">
-        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-          <span className="material-symbols-outlined text-text-gray-100">search</span>
-        </div>
-        <input
-          className="block w-full pl-10 pr-3 py-2.5 border-1 border-border-gray rounded-lg leading-5 dark:bg-background-dark bg-background-light dark:text-text-light text-text-gray-200 placeholder-placeholder focus:outline-none focus:ring-1 hover:ring-1 text-sm"
-          placeholder="Tìm kiếm tên sản phẩm"
-          type="text"
-          value={keyword}
-          onChange={(event) => setKeyword(event.target.value)}
-        />
-      </div>
-
       <div className="flex flex-wrap gap-3 w-full lg:w-auto">
+        <MultiSelectBox
+          label="Thương hiệu"
+          options={brandOptions}
+          selectedIds={selectedBrandIds}
+          onChange={setSelectedBrandIds}
+          placeholder="Tìm thương hiệu"
+        />
         <MultiSelectBox
           label="Danh mục"
           options={categoryOptions}
@@ -179,12 +210,18 @@ export default function ProductFilter({
           onChange={setSelectedStatusIds}
           placeholder="Tìm trạng thái"
         />
-        <MultiSelectBox
-          label="Thương hiệu"
-          options={brandOptions}
-          selectedIds={selectedBrandIds}
-          onChange={setSelectedBrandIds}
-          placeholder="Tìm thương hiệu"
+      </div>
+
+      <div className="relative w-full lg:w-96">
+        <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+          <span className="material-symbols-outlined text-text-gray-100">search</span>
+        </div>
+        <input
+          className="block w-full pl-10 pr-3 py-2.5 border-1 border-border-gray rounded-lg leading-5 dark:bg-background-dark bg-background-light dark:text-text-light text-text-gray-200 placeholder-placeholder focus:outline-none focus:ring-1 hover:ring-1 text-sm"
+          placeholder="Tìm kiếm tên sản phẩm"
+          type="text"
+          value={keyword}
+          onChange={(event) => setKeyword(event.target.value)}
         />
       </div>
     </div>
