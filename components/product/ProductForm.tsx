@@ -2,11 +2,13 @@
 
 import { Checkbox, Field, Label } from "@headlessui/react";
 import Image from "next/image";
+import Link from "next/link";
 import { Fragment } from "react";
 
 export default function ProductForm({
   title,
   submitLabel,
+  productId,
   dataProduct,
   setDataProduct,
   dataAttribute,
@@ -21,11 +23,15 @@ export default function ProductForm({
   onAddAttributeItem,
   onRemoveAttributeItem,
   onVariantNumber,
+  onVariantText,
   onUploadImage,
   onUpdateImage,
   onCheckCollections,
   onSubmit,
 }: ProductFormProps) {
+  const canLinkVariant = (variantId?: number | string) =>
+    Number.isInteger(productId) && Number.isInteger(variantId);
+
   return (
     <div className="max-w-[1200px] mx-auto flex flex-col gap-6">
       <div className="flex items-center justify-between">
@@ -130,6 +136,7 @@ export default function ProductForm({
             <thead>
               <tr className="text-left border-b border-border-dark">
                 <th className="py-2">To hop</th>
+                <th className="py-2">SKU</th>
                 <th className="py-2">Gia</th>
                 <th className="py-2">Kho</th>
               </tr>
@@ -137,7 +144,27 @@ export default function ProductForm({
             <tbody>
               {dataVariant.map((variant) => (
                 <tr key={variant.id} className="border-b border-border-dark/50">
-                  <td className="py-2">{variant.combo}</td>
+                  <td className="py-2">
+                    {canLinkVariant(variant.id) ? (
+                      <Link
+                        className="text-primary hover:underline"
+                        href={`/admin/product/${productId}/variant/${variant.id}`}
+                      >
+                        {variant.combo}
+                      </Link>
+                    ) : (
+                      variant.combo
+                    )}
+                  </td>
+                  <td className="py-2">
+                    <input
+                      className="rounded px-2 py-1 border border-border-dark bg-background-dark"
+                      value={variant.sku || ""}
+                      onChange={(e) =>
+                        onVariantText(e.target.value, variant.id!, "sku")
+                      }
+                    />
+                  </td>
                   <td className="py-2">
                     <input
                       className="rounded px-2 py-1 border border-border-dark bg-background-dark"

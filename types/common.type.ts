@@ -366,6 +366,7 @@ type ProductFormInitialData = {
 type ProductFormProps = {
   title: string;
   submitLabel: string;
+  productId?: number;
   dataProduct: UpsertProduct;
   setDataProduct: React.Dispatch<React.SetStateAction<UpsertProduct>>;
   dataAttribute: ProductAttribute;
@@ -386,6 +387,11 @@ type ProductFormProps = {
     value: number,
     variantItemId: string | number,
     type: "price" | "stock_quantity",
+  ) => void;
+  onVariantText: (
+    value: string,
+    variantItemId: string | number,
+    type: "sku" | "barcode",
   ) => void;
   onUploadImage: (e: React.ChangeEvent<HTMLInputElement>) => Promise<void>;
   onUpdateImage: (imageId: string | number, action: ACTION_UPDATE_IMAGE) => void;

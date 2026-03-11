@@ -49,6 +49,7 @@ export default function useProductForm(params?: UseProductFormParams) {
         price: 0,
         stock_quantity: 0,
         combo: item,
+        sku: "",
       });
     }
 
@@ -137,6 +138,18 @@ export default function useProductForm(params?: UseProductFormParams) {
     );
   };
 
+  const handleVariantText = (
+    value: string,
+    variantItemId: string | number,
+    type: "sku" | "barcode",
+  ) => {
+    setDataVariant((prev) =>
+      prev.map((item) =>
+        item.id === variantItemId ? { ...item, [type]: value } : item,
+      ),
+    );
+  };
+
   const handleUploadImage = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const fileList = e.target.files;
     if (!fileList || fileList.length === 0) return;
@@ -208,6 +221,7 @@ export default function useProductForm(params?: UseProductFormParams) {
     handleAddAttributeItem,
     handleRemoveAttributeItem,
     handleVariantNumber,
+    handleVariantText,
     handleUploadImage,
     handleUpdateImage,
     handleCheckCollections,

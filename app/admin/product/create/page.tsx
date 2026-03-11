@@ -30,6 +30,7 @@ export default function CreateProductPage() {
     handleAddAttributeItem,
     handleRemoveAttributeItem,
     handleVariantNumber,
+    handleVariantText,
     handleUploadImage,
     handleUpdateImage,
     handleCheckCollections,
@@ -92,6 +93,7 @@ export default function CreateProductPage() {
           onAddAttributeItem={handleAddAttributeItem}
           onRemoveAttributeItem={handleRemoveAttributeItem}
           onVariantNumber={handleVariantNumber}
+          onVariantText={handleVariantText}
           onUploadImage={handleUploadImage}
           onUpdateImage={handleUpdateImage}
           onCheckCollections={handleCheckCollections}

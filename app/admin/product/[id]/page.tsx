@@ -36,6 +36,7 @@ export default function EditProductPage() {
     handleAddAttributeItem,
     handleRemoveAttributeItem,
     handleVariantNumber,
+    handleVariantText,
     handleUploadImage,
     handleUpdateImage,
     handleCheckCollections,
@@ -96,6 +97,7 @@ export default function EditProductPage() {
         <ProductForm
           title="Chinh sua san pham"
           submitLabel="Luu thay doi"
+          productId={Number.isInteger(productId) ? productId : undefined}
           dataProduct={dataProduct}
           setDataProduct={setDataProduct}
           dataAttribute={dataAttribute}
@@ -110,6 +112,7 @@ export default function EditProductPage() {
           onAddAttributeItem={handleAddAttributeItem}
           onRemoveAttributeItem={handleRemoveAttributeItem}
           onVariantNumber={handleVariantNumber}
+          onVariantText={handleVariantText}
           onUploadImage={handleUploadImage}
           onUpdateImage={handleUpdateImage}
           onCheckCollections={handleCheckCollections}
