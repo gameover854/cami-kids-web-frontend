@@ -36,7 +36,7 @@ export default function ProductFilter({
         </div>
         <input
           className="block w-full pl-10 pr-3 py-2.5 border-1 border-border-gray rounded-lg leading-5 dark:bg-background-dark bg-background-light dark:text-text-light text-text-gray-200 placeholder-placeholder focus:outline-none focus:ring-1 hover:ring-1 text-sm"
-          placeholder="Tim kiem ten san pham"
+          placeholder="Tìm kiếm tên sản phẩm"
           type="text"
           value={keyword}
           onChange={(event) => setKeyword(event.target.value)}
@@ -48,7 +48,7 @@ export default function ProductFilter({
           <div className="flex h-10 items-center gap-2 border-1 border-border-gray rounded-lg dark:bg-background-dark bg-background-light pl-4 pr-8 text-sm font-medium dark:text-text-gray-200 text-text-gray-200 hover:ring-1 transition-all">
             {selectedCategory ? (
               <Listbox value={selectedCategory} onChange={setSelectedCategory}>
-                <p>Danh muc:</p>
+                <p>Danh mục:</p>
                 <ListboxButton className="cursor-pointer">
                   {selectedCategory.name}
                   <ChevronDownIcon
@@ -71,14 +71,14 @@ export default function ProductFilter({
                 </ListboxOptions>
               </Listbox>
             ) : (
-              "Chua co du lieu"
+              "Chưa có dữ liệu"
             )}
           </div>
         </div>
 
         <div className="relative group">
           <div className="flex h-10 items-center gap-2 border-1 border-border-gray rounded-lg dark:bg-background-dark bg-background-light pl-4 pr-8 text-sm font-medium dark:text-text-gray-200 text-text-gray-200 hover:ring-1 transition-all">
-            <p>Trang thai:</p>
+            <p>Trạng thái:</p>
             {selectedIsActive ? (
               <Listbox value={selectedIsActive} onChange={setSelectedIsActive}>
                 <ListboxButton className="cursor-pointer">
@@ -103,7 +103,7 @@ export default function ProductFilter({
                 </ListboxOptions>
               </Listbox>
             ) : (
-              "Chua co du lieu"
+              "Chưa có dữ liệu"
             )}
           </div>
         </div>

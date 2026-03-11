@@ -27,7 +27,7 @@ export default function SettingPage() {
       setForm({ ...defaultForm, ...(res?.data?.settings || {}) });
     } catch (err: unknown) {
       const messageText = (err as ApiError)?.response?.data?.message;
-      setError(messageText || "Khong the tai cau hinh");
+      setError(messageText || "Không thể tải cấu hình");
     } finally {
       setLoading(false);
     }
@@ -49,11 +49,11 @@ export default function SettingPage() {
         auto_cancel_hours: Number(form.auto_cancel_hours),
         low_stock_threshold: Number(form.low_stock_threshold),
       });
-      setMessage("Luu cau hinh thanh cong");
+      setMessage("Lưu cấu hình thành công");
       await loadSettings();
     } catch (err: unknown) {
       const messageText = (err as ApiError)?.response?.data?.message;
-      setError(messageText || "Luu cau hinh that bai");
+      setError(messageText || "Lưu cấu hình thất bại");
     } finally {
       setLoading(false);
     }
@@ -66,28 +66,28 @@ export default function SettingPage() {
         <div className="max-w-[1000px] mx-auto flex flex-col gap-6">
           <div>
             <h1 className="text-3xl md:text-4xl font-black tracking-tight dark:text-text-light text-text-gray-200">
-              Cau hinh He thong
+              Cấu hình Hệ thống
             </h1>
             <p className="text-text-gray-100 text-base mt-1">
-              Quan ly setting thuc te voi API /settings
+              Quản lý setting thực tế với API /settings
             </p>
           </div>
 
           <form onSubmit={onSubmit} className="flex flex-col gap-4">
             <section className="rounded-xl border border-border-gray dark:bg-background-dark bg-background-light p-4">
               <h2 className="font-bold text-lg mb-3 dark:text-text-light text-text-gray-200">
-                Store Profile
+                Hồ sơ cửa hàng
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <input
                   className="rounded-lg border border-border-gray bg-transparent px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-primary"
-                  placeholder="Store name"
+                  placeholder="Tên cửa hàng"
                   value={form.store_name}
                   onChange={(e) => setForm((prev) => ({ ...prev, store_name: e.target.value }))}
                 />
                 <input
                   className="rounded-lg border border-border-gray bg-transparent px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-primary"
-                  placeholder="Support email"
+                  placeholder="Email hỗ trợ"
                   type="email"
                   value={form.support_email}
                   onChange={(e) =>
@@ -96,7 +96,7 @@ export default function SettingPage() {
                 />
                 <input
                   className="rounded-lg border border-border-gray bg-transparent px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-primary"
-                  placeholder="Support phone"
+                  placeholder="SĐT hỗ trợ"
                   value={form.support_phone}
                   onChange={(e) =>
                     setForm((prev) => ({ ...prev, support_phone: e.target.value }))
@@ -104,7 +104,7 @@ export default function SettingPage() {
                 />
                 <input
                   className="rounded-lg border border-border-gray bg-transparent px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-primary"
-                  placeholder="Timezone"
+                  placeholder="Múi giờ"
                   value={form.timezone}
                   onChange={(e) => setForm((prev) => ({ ...prev, timezone: e.target.value }))}
                 />
@@ -113,12 +113,12 @@ export default function SettingPage() {
 
             <section className="rounded-xl border border-border-gray dark:bg-background-dark bg-background-light p-4">
               <h2 className="font-bold text-lg mb-3 dark:text-text-light text-text-gray-200">
-                Order Rules
+                Quy tắc đơn hàng
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <input
                   className="rounded-lg border border-border-gray bg-transparent px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-primary"
-                  placeholder="Auto cancel hours"
+                  placeholder="Giờ tự hủy"
                   type="number"
                   min={0}
                   value={form.auto_cancel_hours}
@@ -131,7 +131,7 @@ export default function SettingPage() {
                 />
                 <input
                   className="rounded-lg border border-border-gray bg-transparent px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-primary"
-                  placeholder="Low stock threshold"
+                  placeholder="Ngưỡng tồn kho thấp"
                   type="number"
                   min={0}
                   value={form.low_stock_threshold}
@@ -154,7 +154,7 @@ export default function SettingPage() {
                     }))
                   }
                 />
-                Cho phep khach vang lai checkout
+                Cho phép khách vãng lai thanh toán
               </label>
             </section>
 
@@ -169,14 +169,14 @@ export default function SettingPage() {
                 }}
                 disabled={loading}
               >
-                Cancel
+                Hủy
               </button>
               <button
                 type="submit"
                 className="rounded-lg px-4 py-2 text-sm font-semibold bg-primary text-background-dark hover:opacity-90"
                 disabled={loading}
               >
-                Save Settings
+                Lưu cài đặt
               </button>
             </div>
             {message ? <p className="text-sm text-emerald-400">{message}</p> : null}

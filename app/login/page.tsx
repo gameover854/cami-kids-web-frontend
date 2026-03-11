@@ -72,7 +72,7 @@ export default function LoginPage() {
                 <span className="material-symbols-outlined">checkroom</span>
               </div>
               <p className="text-[22px] font-bold leading-tight tracking-tight text-white">
-                Admin Dashboard
+                Bảng điều khiển Admin
               </p>
             </div>
           </div>

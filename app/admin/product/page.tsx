@@ -11,9 +11,9 @@ import ProductFilter from "./ProductFilter";
 import ProductTable from "./ProductTable";
 
 const ACTIVE_OPTIONS: IsActive[] = [
-  { id: null, name: "Tat ca" },
-  { id: 0, name: "Khong hoat dong" },
-  { id: 1, name: "Hoat dong" },
+  { id: null, name: "Tất cả" },
+  { id: 0, name: "Không hoạt động" },
+  { id: 1, name: "Hoạt động" },
 ];
 
 const parseNullableNumber = (value: string | null) => {
@@ -45,7 +45,7 @@ export default function ProductPage() {
     const fetchCategories = async () => {
       try {
         const res = await getCategory();
-        const list: Category[] = [{ id: null, name: "Tat ca" }, ...res.data.categories];
+        const list: Category[] = [{ id: null, name: "Tất cả" }, ...res.data.categories];
         setCategories(list);
 
         const categoryQuery = searchParams.get("category_id");
@@ -143,15 +143,15 @@ export default function ProductPage() {
           <div className="flex flex-col md:flex-row md:items-end justify-between gap-4">
             <div className="flex flex-col gap-1">
               <h1 className="text-3xl md:text-4xl font-black tracking-tight dark:text-text-light text-text-gray-200">
-                Quan ly San pham
+                Quản lý Sản phẩm
               </h1>
-              <p className="text-text-gray-100 text-base">Danh sach va quan ly kho hang</p>
+              <p className="text-text-gray-100 text-base">Danh sách và quản lý kho hàng</p>
             </div>
             <div className="flex gap-3">
               <Link href="/admin/product/create">
                 <button className="flex items-center justify-center gap-2 px-5 h-10 rounded-lg border-1 border-border-gray text-text-gray-200 text-sm font-bold cursor-pointer hover:ring-1">
                   <span className="material-symbols-outlined">add</span>
-                  <span>Them san pham</span>
+                  <span>Thêm sản phẩm</span>
                 </button>
               </Link>
             </div>

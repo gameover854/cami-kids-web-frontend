@@ -47,9 +47,9 @@ export default function CreateProductPage() {
           getBrand(),
         ]);
 
-        setDataCategories([{ id: null, name: "Tat ca" }, ...categoryRes.data.categories]);
+        setDataCategories([{ id: null, name: "Tất cả" }, ...categoryRes.data.categories]);
         setDataCollections(collectionRes.data.collections);
-        setDataBrand([{ id: null, name: "Tat ca" }, ...brandRes.data.brands]);
+        setDataBrand([{ id: null, name: "Tất cả" }, ...brandRes.data.brands]);
       } catch (error) {
         console.error("Failed to fetch data:", error);
       } finally {
@@ -77,8 +77,8 @@ export default function CreateProductPage() {
       <Header />
       <main className="flex-1 overflow-y-auto p-4 md:p-8 scroll-smooth dark:bg-background-dark-2">
         <ProductForm
-          title="Them san pham"
-          submitLabel="Luu san pham"
+          title="Thêm sản phẩm"
+          submitLabel="Lưu sản phẩm"
           dataProduct={dataProduct}
           setDataProduct={setDataProduct}
           dataAttribute={dataAttribute}

@@ -82,7 +82,7 @@ export default function OrderPage() {
       setTotalPage(res?.data?.totalPage || 1);
     } catch (err: unknown) {
       const messageText = (err as ApiError)?.response?.data?.message;
-      setError(messageText || "Khong the tai don hang");
+      setError(messageText || "Không thể tải đơn hàng");
     } finally {
       setLoading(false);
     }
@@ -113,7 +113,7 @@ export default function OrderPage() {
       setError("");
     } catch (err: unknown) {
       const messageText = (err as ApiError)?.response?.data?.message;
-      setError(messageText || "Khong the lay chi tiet don hang");
+      setError(messageText || "Không thể lấy chi tiết đơn hàng");
     } finally {
       setLoading(false);
     }
@@ -126,14 +126,14 @@ export default function OrderPage() {
     try {
       setLoading(true);
       await updateOrderStatus(id, status);
-      setMessage("Cap nhat trang thai don hang thanh cong");
+      setMessage("Cập nhật trạng thái đơn hàng thành công");
       await loadOrders();
       if (selectedOrder?.id === id) {
         await openDetail(id);
       }
     } catch (err: unknown) {
       const messageText = (err as ApiError)?.response?.data?.message;
-      setError(messageText || "Cap nhat trang thai that bai");
+      setError(messageText || "Cập nhật trạng thái thất bại");
     } finally {
       setLoading(false);
     }
@@ -158,12 +158,12 @@ export default function OrderPage() {
     try {
       setLoading(true);
       await updateOrderPayment(selectedOrder.id, payload);
-      setMessage("Cap nhat thanh toan thanh cong");
+      setMessage("Cập nhật thanh toán thành công");
       await openDetail(selectedOrder.id);
       await loadOrders();
     } catch (err: unknown) {
       const messageText = (err as ApiError)?.response?.data?.message;
-      setError(messageText || "Cap nhat thanh toan that bai");
+      setError(messageText || "Cập nhật thanh toán thất bại");
     } finally {
       setLoading(false);
     }
@@ -177,10 +177,10 @@ export default function OrderPage() {
           <div className="flex items-end justify-between gap-4">
             <div>
               <h1 className="text-3xl md:text-4xl font-black tracking-tight dark:text-text-light text-text-gray-200">
-                Quan ly Don hang
+                Quản lý Đơn hàng
               </h1>
               <p className="text-text-gray-100 text-base">
-                Luong status/payment that, co filter theo khach hang va phan trang
+                Luồng status/payment thật, có filter theo khách hàng và phân trang
               </p>
             </div>
             <div className="flex items-center gap-2">
@@ -194,7 +194,7 @@ export default function OrderPage() {
                 onChange={(e) => setSelectedStatus(e.target.value as OrderStatus | "ALL")}
                 className="rounded border border-border-gray bg-transparent px-3 py-2"
               >
-                <option value="ALL">Tat ca trang thai</option>
+                <option value="ALL">Tất cả trạng thái</option>
                 {statuses.map((status) => (
                   <option key={status} value={status}>
                     {status}
@@ -212,11 +212,11 @@ export default function OrderPage() {
               <thead className="border-b border-border-dark text-xs uppercase tracking-wide text-text-gray-100">
                 <tr>
                   <th className="px-4 py-3">ID</th>
-                  <th className="px-4 py-3">Khach hang</th>
-                  <th className="px-4 py-3">Tong tien</th>
-                  <th className="px-4 py-3">Trang thai</th>
-                  <th className="px-4 py-3">Ngay tao</th>
-                  <th className="px-4 py-3 text-right">Hanh dong</th>
+                  <th className="px-4 py-3">Khách hàng</th>
+                  <th className="px-4 py-3">Tổng tiền</th>
+                  <th className="px-4 py-3">Trạng thái</th>
+                  <th className="px-4 py-3">Ngày tạo</th>
+                  <th className="px-4 py-3 text-right">Hành động</th>
                 </tr>
               </thead>
               <tbody>
@@ -259,7 +259,7 @@ export default function OrderPage() {
                           className="rounded border border-border-gray px-3 py-1 hover:ring-1"
                           onClick={() => openDetail(order.id)}
                         >
-                          Chi tiet
+                          Chi tiết
                         </button>
                       </div>
                     </td>
@@ -268,14 +268,14 @@ export default function OrderPage() {
                 {!loading && orders.length === 0 ? (
                   <tr>
                     <td className="px-4 py-6 text-center text-text-gray-100" colSpan={6}>
-                      Khong co don hang
+                      Không có đơn hàng
                     </td>
                   </tr>
                 ) : null}
               </tbody>
             </table>
             <div className="flex items-center justify-between gap-2 p-3 border-t border-border-dark">
-              <span className="text-sm text-text-gray-100">Tong don: {totalOrder}</span>
+              <span className="text-sm text-text-gray-100">Tổng đơn: {totalOrder}</span>
               <div className="flex items-center gap-2">
                 <button
                   type="button"
@@ -283,7 +283,7 @@ export default function OrderPage() {
                   disabled={page <= 1 || loading}
                   onClick={() => setPage((prev) => prev - 1)}
                 >
-                  Truoc
+                  Trước
                 </button>
                 <span className="text-sm text-text-gray-100">
                   {page} / {Math.max(totalPage, 1)}
@@ -303,16 +303,16 @@ export default function OrderPage() {
           {selectedOrder ? (
             <section className="rounded-xl border border-border-gray dark:bg-background-dark bg-background-light p-4 grid grid-cols-1 lg:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <h2 className="text-lg font-bold">Order #{selectedOrder.id}</h2>
-                <p>Dia chi giao: {selectedOrder.shipping_address}</p>
-                <p>Trang thai: {selectedOrder.status}</p>
-                <p>Tong tien: {selectedOrder.total_amount}</p>
+                <h2 className="text-lg font-bold">Đơn hàng #{selectedOrder.id}</h2>
+                <p>Địa chỉ giao: {selectedOrder.shipping_address}</p>
+                <p>Trạng thái: {selectedOrder.status}</p>
+                <p>Tổng tiền: {selectedOrder.total_amount}</p>
                 <div className="pt-2">
-                  <h3 className="font-semibold mb-2">San pham trong don</h3>
+                  <h3 className="font-semibold mb-2">Sản phẩm trong đơn</h3>
                   <ul className="space-y-1 text-sm">
                     {selectedOrder.items?.map((item) => (
                       <li key={item.id} className="border border-border-gray rounded px-3 py-2">
-                        {item.variant?.product?.name || "Unknown product"} | SKU: {item.variant?.sku || "-"} | Qty: {item.quantity} | Price: {item.price_at_purchase}
+                        {item.variant?.product?.name || "Sản phẩm không xác định"} | SKU: {item.variant?.sku || "-"} | SL: {item.quantity} | Giá: {item.price_at_purchase}
                       </li>
                     ))}
                   </ul>
@@ -320,11 +320,11 @@ export default function OrderPage() {
               </div>
 
               <div>
-                <h3 className="font-semibold mb-3">Cap nhat thanh toan</h3>
+                <h3 className="font-semibold mb-3">Cập nhật thanh toán</h3>
                 <form onSubmit={onUpdatePayment} className="space-y-3">
                   <input
                     className="w-full rounded border border-border-gray bg-transparent px-3 py-2 text-sm"
-                    placeholder="Amount"
+                    placeholder="Số tiền"
                     type="number"
                     value={paymentForm.amount}
                     onChange={(e) =>
@@ -341,7 +341,7 @@ export default function OrderPage() {
                       }))
                     }
                   >
-                    <option value="">Chon phuong thuc thanh toan</option>
+                    <option value="">Chọn phương thức thanh toán</option>
                     {paymentMethods.map((method) => (
                       <option key={method} value={method}>
                         {method}
@@ -358,7 +358,7 @@ export default function OrderPage() {
                       }))
                     }
                   >
-                    <option value="">Chon trang thai thanh toan</option>
+                    <option value="">Chọn trạng thái thanh toán</option>
                     {paymentStatuses.map((status) => (
                       <option key={status} value={status}>
                         {status}
@@ -367,7 +367,7 @@ export default function OrderPage() {
                   </select>
                   <input
                     className="w-full rounded border border-border-gray bg-transparent px-3 py-2 text-sm"
-                    placeholder="Transaction id"
+                    placeholder="Mã giao dịch"
                     value={paymentForm.transaction_id}
                     onChange={(e) =>
                       setPaymentForm((prev) => ({
@@ -378,13 +378,13 @@ export default function OrderPage() {
                   />
                   <button
                     type="submit"
-                    className="rounded border border-border-gray px-4 py-2 text-sm font-semibold hover:ring-1 disabled:opacity-60"
-                    disabled={loading}
-                  >
-                    Luu thanh toan
-                  </button>
-                </form>
-              </div>
+                  className="rounded border border-border-gray px-4 py-2 text-sm font-semibold hover:ring-1 disabled:opacity-60"
+                  disabled={loading}
+                >
+                  Lưu thanh toán
+                </button>
+              </form>
+            </div>
             </section>
           ) : null}
         </div>

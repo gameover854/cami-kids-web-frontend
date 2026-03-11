@@ -219,7 +219,9 @@ export default function CollectionPage() {
                       <td className="px-4 py-3">{item.id}</td>
                       <td className="px-4 py-3 font-semibold">{item.name}</td>
                       <td className="px-4 py-3">{item.slug}</td>
-                      <td className="px-4 py-3">{item.is_active ? "Active" : "Inactive"}</td>
+                      <td className="px-4 py-3">
+                        {item.is_active ? "Hoạt động" : "Không hoạt động"}
+                      </td>
                       <td className="px-4 py-3">
                         {promotionNames.length > 0 ? (
                           <div className="flex flex-wrap gap-1.5">

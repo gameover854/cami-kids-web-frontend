@@ -47,7 +47,7 @@ export default function ProductForm({
       <section className="bg-background-dark rounded-xl border border-border-dark p-5 space-y-4">
         <input
           className="w-full rounded-lg text-sm px-3 py-2.5 border border-border-dark outline-none dark:bg-background-dark"
-          placeholder="Ten san pham"
+          placeholder="Tên sản phẩm"
           value={dataProduct.name}
           onChange={(e) => setDataProduct((prev) => ({ ...prev, name: e.target.value }))}
         />
@@ -55,7 +55,7 @@ export default function ProductForm({
           <input
             className="w-full rounded-lg text-sm px-3 py-2.5 border border-border-dark outline-none dark:bg-background-dark"
             type="number"
-            placeholder="Gia ban"
+            placeholder="Giá bán"
             value={dataProduct.selling_price}
             onChange={(e) =>
               setDataProduct((prev) => ({
@@ -67,7 +67,7 @@ export default function ProductForm({
           <input
             className="w-full rounded-lg text-sm px-3 py-2.5 border border-border-dark outline-none dark:bg-background-dark"
             type="number"
-            placeholder="Gia so sanh"
+            placeholder="Giá so sánh"
             value={dataProduct.compare_price || 0}
             onChange={(e) =>
               setDataProduct((prev) => ({
@@ -80,7 +80,7 @@ export default function ProductForm({
         <textarea
           className="w-full rounded-lg text-sm px-3 py-2.5 border border-border-dark outline-none dark:bg-background-dark"
           rows={4}
-          placeholder="Mo ta san pham"
+          placeholder="Mô tả sản phẩm"
           value={dataProduct.description}
           onChange={(e) =>
             setDataProduct((prev) => ({ ...prev, description: e.target.value }))
@@ -90,9 +90,9 @@ export default function ProductForm({
 
       <section className="bg-background-dark rounded-xl border border-border-dark p-5">
         <div className="flex items-center justify-between mb-4">
-          <h2 className="font-bold text-text-gray-100">Thuoc tinh va Bien the</h2>
+          <h2 className="font-bold text-text-gray-100">Thuộc tính và Biến thể</h2>
           <button className="text-sm text-primary" onClick={onAddAttribute}>
-            + Them thuoc tinh
+            + Thêm thuộc tính
           </button>
         </div>
         <div className="space-y-3">
@@ -101,7 +101,7 @@ export default function ProductForm({
               <div className="flex gap-2">
                 <input
                   className="flex-1 rounded text-sm px-3 py-2 border border-border-dark bg-background-dark"
-                  placeholder="Ten thuoc tinh"
+                  placeholder="Tên thuộc tính"
                   value={attribute.name}
                   onChange={(e) => onAttributeName(attribute.id!, e.target.value)}
                 />
@@ -109,7 +109,7 @@ export default function ProductForm({
                   className="text-sm text-red-400"
                   onClick={() => onRemoveAttribute(attribute.id!)}
                 >
-                  Xoa
+                  Xóa
                 </button>
               </div>
               <div className="mt-2 flex flex-wrap gap-2">
@@ -124,7 +124,7 @@ export default function ProductForm({
                 ))}
                 <input
                   className="rounded text-sm px-2 py-1 border border-border-dark bg-background-dark"
-                  placeholder="Nhap roi Enter"
+                  placeholder="Nhập rồi Enter"
                   onKeyDown={(e) => onAddAttributeItem(e, attribute.id!)}
                 />
               </div>
@@ -135,9 +135,9 @@ export default function ProductForm({
           <table className="w-full text-sm">
             <thead>
               <tr className="text-left border-b border-border-dark">
-                <th className="py-2">To hop</th>
+                <th className="py-2">Tổ hợp</th>
                 <th className="py-2">SKU</th>
-                <th className="py-2">Gia</th>
+                <th className="py-2">Giá</th>
                 <th className="py-2">Kho</th>
               </tr>
             </thead>
@@ -197,7 +197,7 @@ export default function ProductForm({
       </section>
 
       <section className="bg-background-dark rounded-xl border border-border-dark p-5">
-        <h2 className="font-bold text-text-gray-100 mb-3">Hinh anh</h2>
+        <h2 className="font-bold text-text-gray-100 mb-3">Hình ảnh</h2>
         <input type="file" accept="image/*" multiple onChange={onUploadImage} />
         <div className="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-3">
           {dataImage.map((image) => (
@@ -212,13 +212,13 @@ export default function ProductForm({
               />
               <div className="mt-2 flex gap-2 text-xs">
                 <button onClick={() => onUpdateImage(image.id, ACTION_UPDATE_IMAGE.PRIMARY)}>
-                  Chon chinh
+                  Chọn chính
                 </button>
                 <button
                   className="text-red-400"
                   onClick={() => onUpdateImage(image.id, ACTION_UPDATE_IMAGE.DELETE)}
                 >
-                  Xoa
+                  Xóa
                 </button>
               </div>
             </div>
@@ -227,10 +227,10 @@ export default function ProductForm({
       </section>
 
       <section className="bg-background-dark rounded-xl border border-border-dark p-5">
-        <h2 className="font-bold text-text-gray-100 mb-3">To chuc</h2>
+        <h2 className="font-bold text-text-gray-100 mb-3">Tổ chức</h2>
         <div className="space-y-4">
           <div className="flex items-center justify-between">
-            <span className="text-sm text-text-gray-100">Cho phep ban</span>
+            <span className="text-sm text-text-gray-100">Cho phép bán</span>
             <input
               type="checkbox"
               checked={dataProduct.is_active}

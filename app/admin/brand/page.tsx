@@ -144,19 +144,19 @@ export default function BrandPage() {
               />
               <input
                 className="rounded-lg border border-border-gray bg-transparent px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-primary"
-                placeholder="Slug (optional)"
+                placeholder="Slug (tùy chọn)"
                 value={form.slug}
                 onChange={(e) => setForm((prev) => ({ ...prev, slug: e.target.value }))}
               />
               <input
                 className="rounded-lg border border-border-gray bg-transparent px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-primary"
-                placeholder="Logo URL (optional)"
+                placeholder="Logo URL (tùy chọn)"
                 value={form.logo}
                 onChange={(e) => setForm((prev) => ({ ...prev, logo: e.target.value }))}
               />
               <input
                 className="rounded-lg border border-border-gray bg-transparent px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-primary md:col-span-2"
-                placeholder="Description (optional)"
+                placeholder="Mô tả (tùy chọn)"
                 value={form.description}
                 onChange={(e) =>
                   setForm((prev) => ({ ...prev, description: e.target.value }))
@@ -209,7 +209,9 @@ export default function BrandPage() {
                     <td className="px-4 py-3">{item.id}</td>
                     <td className="px-4 py-3 font-semibold">{item.name}</td>
                     <td className="px-4 py-3">{item.slug || "-"}</td>
-                    <td className="px-4 py-3">{item.is_active === false ? "Inactive" : "Active"}</td>
+                    <td className="px-4 py-3">
+                      {item.is_active === false ? "Không hoạt động" : "Hoạt động"}
+                    </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-end gap-2">
                         <button

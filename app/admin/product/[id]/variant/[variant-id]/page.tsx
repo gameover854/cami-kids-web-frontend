@@ -42,7 +42,7 @@ export default function ProductVariantDetailPage() {
       });
     } catch (err: unknown) {
       const messageText = (err as ApiError)?.response?.data?.message;
-      setError(messageText || "Khong the tai chi tiet bien the");
+      setError(messageText || "Không thể tải chi tiết biến thể");
     } finally {
       setLoading(false);
     }
@@ -65,11 +65,11 @@ export default function ProductVariantDetailPage() {
         price: Number(form.price),
         stock_quantity: Number(form.stock_quantity),
       });
-      setMessage("Cap nhat bien the thanh cong");
+      setMessage("Cập nhật biến thể thành công");
       await loadVariant();
     } catch (err: unknown) {
       const messageText = (err as ApiError)?.response?.data?.message;
-      setError(messageText || "Cap nhat bien the that bai");
+      setError(messageText || "Cập nhật biến thể thất bại");
     } finally {
       setLoading(false);
     }
@@ -95,7 +95,7 @@ export default function ProductVariantDetailPage() {
         <div className="max-w-[1100px] mx-auto flex flex-col gap-6">
           <div>
             <h1 className="text-3xl md:text-4xl font-black tracking-tight dark:text-text-light text-text-gray-200">
-              Chi tiet Bien the
+              Chi tiết Biến thể
             </h1>
             <p className="text-text-gray-100 text-base mt-1">
               Product #{productId} / Variant #{variantId}
@@ -105,7 +105,7 @@ export default function ProductVariantDetailPage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
             <section className="lg:col-span-2 rounded-xl border border-border-gray dark:bg-background-dark bg-background-light p-4">
               <h2 className="font-bold text-lg mb-3 dark:text-text-light text-text-gray-200">
-                Inventory + Pricing
+                Tồn kho + Giá
               </h2>
               <form onSubmit={onSave} className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 <input
@@ -149,7 +149,7 @@ export default function ProductVariantDetailPage() {
                     className="rounded-lg px-4 py-2 text-sm font-semibold border border-border-gray hover:ring-1"
                     disabled={loading}
                   >
-                    Luu bien the
+                    Lưu biến thể
                   </button>
                 </div>
               </form>
@@ -158,21 +158,21 @@ export default function ProductVariantDetailPage() {
             </section>
 
             <aside className="rounded-xl border border-border-gray dark:bg-background-dark bg-background-light p-4">
-              <h2 className="font-bold text-lg mb-3 dark:text-text-light text-text-gray-200">Actions</h2>
+              <h2 className="font-bold text-lg mb-3 dark:text-text-light text-text-gray-200">Hành động</h2>
               <div className="flex gap-2 flex-wrap mb-4">
                 <button
                   type="button"
                   className="rounded border border-border-gray px-3 py-1 hover:ring-1"
                   onClick={() => router.back()}
                 >
-                  Back
+                  Quay lại
                 </button>
                 <button
                   type="button"
                   className="rounded border border-border-gray px-3 py-1 hover:ring-1"
-                  onClick={() => setMessage("Archive flow se duoc bo sung o phase sau")}
+                  onClick={() => setMessage("Luồng lưu trữ sẽ được bổ sung ở giai đoạn sau")}
                 >
-                  Archive
+                  Lưu trữ
                 </button>
                 <button
                   type="button"
@@ -180,15 +180,15 @@ export default function ProductVariantDetailPage() {
                   onClick={saveVariant}
                   disabled={loading}
                 >
-                  Save
+                  Lưu
                 </button>
               </div>
-              <h2 className="font-bold text-lg mb-3 dark:text-text-light text-text-gray-200">Meta</h2>
+              <h2 className="font-bold text-lg mb-3 dark:text-text-light text-text-gray-200">Thông tin</h2>
               <p className="text-sm text-text-gray-100">
-                Product: <strong>{detail?.product?.name || "-"}</strong>
+                Sản phẩm: <strong>{detail?.product?.name || "-"}</strong>
               </p>
               <p className="text-sm text-text-gray-100 mt-1">
-                Attributes: {attributeText || "-"}
+                Thuộc tính: {attributeText || "-"}
               </p>
               <div className="mt-3 grid grid-cols-3 gap-2">
                 {(detail?.images || []).slice(0, 3).map((img) => (

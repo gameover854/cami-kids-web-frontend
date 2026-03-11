@@ -34,6 +34,15 @@ export default function CustomerPage() {
   const [error, setError] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
   const [sortBy, setSortBy] = useState<"newest" | "oldest">("newest");
+  const statusLabelMap = {
+    all: "Tất cả",
+    active: "Hoạt động",
+    inactive: "Không hoạt động",
+  };
+  const sortLabelMap = {
+    newest: "Mới nhất",
+    oldest: "Cũ nhất",
+  };
 
   const loadCustomers = useCallback(
     async (currentPage = page, currentKeyword = keyword) => {
@@ -45,7 +54,7 @@ export default function CustomerPage() {
         setTotalPage(res?.data?.totalPage || 1);
       } catch (err: unknown) {
         const messageText = (err as ApiError)?.response?.data?.message;
-        setError(messageText || "Khong the tai danh sach khach hang");
+        setError(messageText || "Không thể tải danh sách khách hàng");
       } finally {
         setLoading(false);
       }
@@ -74,10 +83,10 @@ export default function CustomerPage() {
           name: form.name.trim(),
           phone: form.phone.trim() || null,
         });
-        setMessage("Cap nhat khach hang thanh cong");
+        setMessage("Cập nhật khách hàng thành công");
       } else {
         if (!form.email.trim() || !form.password.trim()) {
-          setError("Email va mat khau la bat buoc");
+          setError("Email và mật khẩu là bắt buộc");
           return;
         }
         await createCustomer({
@@ -86,14 +95,14 @@ export default function CustomerPage() {
           phone: form.phone.trim() || undefined,
           password: form.password,
         });
-        setMessage("Tao khach hang thanh cong");
+        setMessage("Tạo khách hàng thành công");
       }
       resetForm();
       await loadCustomers(1, keyword);
       setPage(1);
     } catch (err: unknown) {
       const messageText = (err as ApiError)?.response?.data?.message;
-      setError(messageText || "Thao tac that bai");
+      setError(messageText || "Thao tác thất bại");
     } finally {
       setLoading(false);
     }
@@ -110,7 +119,7 @@ export default function CustomerPage() {
   }
 
   async function onDelete(id: number) {
-    const confirmed = window.confirm("Ban chac chan muon xoa khach hang nay?");
+    const confirmed = window.confirm("Bạn chắc chắn muốn xóa khách hàng này?");
     if (!confirmed) return;
 
     setMessage("");
@@ -118,11 +127,11 @@ export default function CustomerPage() {
     try {
       setLoading(true);
       await deleteCustomer(id);
-      setMessage("Xoa khach hang thanh cong");
+      setMessage("Xóa khách hàng thành công");
       await loadCustomers(page, keyword);
     } catch (err: unknown) {
       const messageText = (err as ApiError)?.response?.data?.message;
-      setError(messageText || "Xoa khach hang that bai");
+      setError(messageText || "Xóa khách hàng thất bại");
     } finally {
       setLoading(false);
     }
@@ -151,14 +160,14 @@ export default function CustomerPage() {
           <div className="flex items-end justify-between gap-4">
             <div>
               <h1 className="text-3xl md:text-4xl font-black tracking-tight dark:text-text-light text-text-gray-200">
-                Quan ly Khach hang
+                Quản lý Khách hàng
               </h1>
               <p className="text-text-gray-100 text-base">
-                Danh sach va thong tin khach hang thuc te tu API
+                Danh sách và thông tin khách hàng thực tế từ API
               </p>
             </div>
             <div className="text-sm text-text-gray-100">
-              Tong: <strong>{totalCustomer}</strong>
+              Tổng: <strong>{totalCustomer}</strong>
             </div>
           </div>
 
@@ -173,13 +182,13 @@ export default function CustomerPage() {
                   setError("");
                 }}
               >
-                Add Customer
+                Thêm khách hàng
               </button>
             </div>
             <form onSubmit={onSubmit} className="grid grid-cols-1 md:grid-cols-5 gap-3">
               <input
                 className="rounded-lg border border-border-gray bg-transparent px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-primary"
-                placeholder="Ten khach hang"
+                placeholder="Tên khách hàng"
                 value={form.name}
                 onChange={(e) => setForm((prev) => ({ ...prev, name: e.target.value }))}
               />
@@ -194,13 +203,13 @@ export default function CustomerPage() {
               />
               <input
                 className="rounded-lg border border-border-gray bg-transparent px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-primary"
-                placeholder="So dien thoai"
+                placeholder="Số điện thoại"
                 value={form.phone}
                 onChange={(e) => setForm((prev) => ({ ...prev, phone: e.target.value }))}
               />
               <input
                 className="rounded-lg border border-border-gray bg-transparent px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-primary"
-                placeholder={editingId ? "Mat khau khong doi o che do sua" : "Mat khau"}
+                placeholder={editingId ? "Mật khẩu không đổi ở chế độ sửa" : "Mật khẩu"}
                 type="password"
                 value={form.password}
                 onChange={(e) => setForm((prev) => ({ ...prev, password: e.target.value }))}
@@ -213,7 +222,7 @@ export default function CustomerPage() {
                   type="submit"
                   disabled={loading}
                 >
-                  {editingId ? "Cap nhat" : "Tao moi"}
+                  {editingId ? "Cập nhật" : "Tạo mới"}
                 </button>
                 <button
                   className="rounded-lg px-4 py-2 text-sm font-semibold border border-border-gray hover:ring-1 disabled:opacity-60"
@@ -221,7 +230,7 @@ export default function CustomerPage() {
                   onClick={resetForm}
                   disabled={loading}
                 >
-                  Lam moi
+                  Làm mới
                 </button>
               </div>
             </form>
@@ -229,7 +238,7 @@ export default function CustomerPage() {
             <div className="mt-3 flex gap-2">
               <input
                 className="rounded-lg border border-border-gray bg-transparent px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-primary w-full md:w-96"
-                placeholder="Tim theo ten, email, so dien thoai..."
+                placeholder="Tìm theo tên, email, số điện thoại..."
                 value={searchInput}
                 onChange={(e) => setSearchInput(e.target.value)}
               />
@@ -241,7 +250,7 @@ export default function CustomerPage() {
                   setKeyword(searchInput.trim());
                 }}
               >
-                Tim
+                Tìm
               </button>
               <button
                 type="button"
@@ -252,7 +261,7 @@ export default function CustomerPage() {
                   )
                 }
               >
-                Status: {statusFilter}
+                Trạng thái: {statusLabelMap[statusFilter]}
               </button>
               <button
                 type="button"
@@ -261,7 +270,7 @@ export default function CustomerPage() {
                   setSortBy((prev) => (prev === "newest" ? "oldest" : "newest"))
                 }
               >
-                Sort: {sortBy}
+                Sắp xếp: {sortLabelMap[sortBy]}
               </button>
             </div>
 
@@ -273,12 +282,12 @@ export default function CustomerPage() {
             <table className="w-full text-left text-sm">
               <thead className="border-b border-border-dark text-xs uppercase tracking-wide text-text-gray-100">
                 <tr>
-                  <th className="px-4 py-3">Name</th>
+                  <th className="px-4 py-3">Tên</th>
                   <th className="px-4 py-3">Email</th>
-                  <th className="px-4 py-3">Phone</th>
-                  <th className="px-4 py-3">Total Orders</th>
-                  <th className="px-4 py-3">Status</th>
-                  <th className="px-4 py-3 text-right">Hanh dong</th>
+                  <th className="px-4 py-3">Điện thoại</th>
+                  <th className="px-4 py-3">Tổng đơn</th>
+                  <th className="px-4 py-3">Trạng thái</th>
+                  <th className="px-4 py-3 text-right">Hành động</th>
                 </tr>
               </thead>
               <tbody>
@@ -289,7 +298,7 @@ export default function CustomerPage() {
                     <td className="px-4 py-3">{item.phone || "-"}</td>
                     <td className="px-4 py-3">{item._count?.orders || 0}</td>
                     <td className="px-4 py-3">
-                      {(item._count?.orders || 0) > 0 ? "Active" : "Inactive"}
+                      {(item._count?.orders || 0) > 0 ? "Hoạt động" : "Không hoạt động"}
                     </td>
                     <td className="px-4 py-3">
                       <div className="flex items-center justify-end gap-2">
@@ -298,21 +307,21 @@ export default function CustomerPage() {
                           className="rounded border border-border-gray px-3 py-1 hover:ring-1"
                           onClick={() => onEdit(item)}
                         >
-                          Sua
+                          Sửa
                         </button>
                         <button
                           type="button"
                           className="rounded border border-red-500/50 px-3 py-1 text-red-400 hover:bg-red-500/10"
                           onClick={() => onDelete(item.id)}
                         >
-                          Xoa
+                          Xóa
                         </button>
                         <button
                           type="button"
                           className="rounded border border-border-gray px-3 py-1 hover:ring-1"
                           onClick={() => router.push(`/admin/order?customer_id=${item.id}`)}
                         >
-                          Orders
+                          Đơn hàng
                         </button>
                       </div>
                     </td>
@@ -321,7 +330,7 @@ export default function CustomerPage() {
                 {!loading && visibleCustomers.length === 0 ? (
                   <tr>
                     <td className="px-4 py-6 text-center text-text-gray-100" colSpan={6}>
-                      Khong co du lieu khach hang
+                      Không có dữ liệu khách hàng
                     </td>
                   </tr>
                 ) : null}
@@ -334,7 +343,7 @@ export default function CustomerPage() {
                 disabled={page <= 1 || loading}
                 onClick={() => setPage((prev) => prev - 1)}
               >
-                Truoc
+                Trước
               </button>
               <span className="text-sm text-text-gray-100">
                 {page} / {Math.max(totalPage, 1)}

@@ -25,13 +25,13 @@ export default function ProductTable({
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="border-b border-border-dark text-xs uppercase tracking-wider text-text-gray-100">
-              <th className="px-6 py-4 font-semibold">San pham</th>
-              <th className="px-6 py-4 font-semibold">Thuong hieu</th>
-              <th className="px-6 py-4 font-semibold">Danh muc</th>
-              <th className="px-6 py-4 font-semibold text-right">Gia ban</th>
-              <th className="px-6 py-4 font-semibold text-center">Bien the</th>
-              <th className="px-6 py-4 font-semibold">Trang thai</th>
-              <th className="px-6 py-4 font-semibold text-right">Thao tac</th>
+              <th className="px-6 py-4 font-semibold">Sản phẩm</th>
+              <th className="px-6 py-4 font-semibold">Thương hiệu</th>
+              <th className="px-6 py-4 font-semibold">Danh mục</th>
+              <th className="px-6 py-4 font-semibold text-right">Giá bán</th>
+              <th className="px-6 py-4 font-semibold text-center">Biến thể</th>
+              <th className="px-6 py-4 font-semibold">Trạng thái</th>
+              <th className="px-6 py-4 font-semibold text-right">Thao tác</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border-dark">
@@ -57,12 +57,12 @@ export default function ProductTable({
                   </Link>
                 </td>
                 <td className="px-6 py-4 text-center text-xs text-text-gray-100">
-                  {item.brand ? item.brand.name : "Khong co"}
+                  {item.brand ? item.brand.name : "Không có"}
                 </td>
                 <td className="px-6 py-4">
                   <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-background-gray text-text-light border border-border-gray">
                     {item.category?.parent ? `${item.category.parent.name} / ` : ""}
-                    {item.category?.name ?? "Khong co"}
+                    {item.category?.name ?? "Không có"}
                   </span>
                 </td>
                 <td className="px-6 py-4 text-right text-text-gray-200 font-medium text-sm">
@@ -77,18 +77,18 @@ export default function ProductTable({
                         </p>
                       ))
                     ) : (
-                      <p className="text-xs text-text-gray-100 italic">Khong co bien the</p>
+                      <p className="text-xs text-text-gray-100 italic">Không có biến thể</p>
                     )}
                   </div>
                 </td>
                 <td className="px-6 py-4">
                   {item.is_active ? (
                     <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                      Hoat dong
+                      Hoạt động
                     </span>
                   ) : (
                     <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-gray-500/10 text-gray-400 border border-gray-500/20">
-                      Khong hoat dong
+                      Không hoạt động
                     </span>
                   )}
                 </td>
@@ -96,14 +96,14 @@ export default function ProductTable({
                   <div className="flex items-center justify-end gap-2 opacity-60 group-hover:opacity-100 transition-opacity">
                     <Link
                       className="p-1.5 text-text-gray-100 hover:text-white hover:bg-[#283539] rounded-lg transition-colors cursor-pointer"
-                      title="Chinh sua"
+                      title="Chỉnh sửa"
                       href={`/admin/product/${item.id}`}
                     >
                       <span className="material-symbols-outlined text-[20px]">edit</span>
                     </Link>
                     <button
                       className="p-1.5 text-text-gray-100 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-colors cursor-pointer"
-                      title="Xoa"
+                      title="Xóa"
                       onClick={() => remove(Number(item.id))}
                     >
                       <span className="material-symbols-outlined text-[20px]">delete</span>
@@ -115,7 +115,7 @@ export default function ProductTable({
             {products.length === 0 ? (
               <tr>
                 <td className="px-6 py-8 text-sm text-text-gray-100" colSpan={7}>
-                  Khong co san pham phu hop bo loc.
+                  Không có sản phẩm phù hợp bộ lọc.
                 </td>
               </tr>
             ) : null}
@@ -125,7 +125,7 @@ export default function ProductTable({
 
       <div className="dark:bg-background-dark px-6 py-4 border-t border-border-dark flex items-center justify-between">
         <div className="text-sm text-text-gray-100">
-          Hien thi <span className="font-medium">{start}</span> den <span className="font-medium">{end}</span> trong <span className="font-medium">{totalProduct}</span> ket qua
+          Hiển thị <span className="font-medium">{start}</span> đến <span className="font-medium">{end}</span> trong <span className="font-medium">{totalProduct}</span> kết quả
         </div>
         <div className="flex items-center gap-2">
           <button
@@ -133,7 +133,7 @@ export default function ProductTable({
             disabled={page <= 1}
             onClick={() => onChangePage(page - 1)}
           >
-            Truoc
+            Trước
           </button>
 
           {pages.map((pageNumber) => (

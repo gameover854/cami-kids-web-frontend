@@ -62,9 +62,9 @@ export default function EditProductPage() {
 
         const product = productRes.data.product as ProductDetail;
 
-        setDataCategories([{ id: null, name: "Tat ca" }, ...categoryRes.data.categories]);
+        setDataCategories([{ id: null, name: "Tất cả" }, ...categoryRes.data.categories]);
         setDataCollections(collectionRes.data.collections);
-        setDataBrand([{ id: null, name: "Tat ca" }, ...brandRes.data.brands]);
+        setDataBrand([{ id: null, name: "Tất cả" }, ...brandRes.data.brands]);
 
         setInitialFormData(mapProductDetailToFormData(product));
       } catch (error) {
@@ -95,8 +95,8 @@ export default function EditProductPage() {
       <Header />
       <main className="flex-1 overflow-y-auto p-4 md:p-8 scroll-smooth dark:bg-background-dark-2">
         <ProductForm
-          title="Chinh sua san pham"
-          submitLabel="Luu thay doi"
+          title="Chỉnh sửa sản phẩm"
+          submitLabel="Lưu thay đổi"
           productId={Number.isInteger(productId) ? productId : undefined}
           dataProduct={dataProduct}
           setDataProduct={setDataProduct}

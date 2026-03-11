@@ -173,7 +173,7 @@ export default function PromotionPage() {
             <form onSubmit={onSubmit} className="grid grid-cols-1 md:grid-cols-3 gap-3">
               <input
                 className="rounded-lg border border-border-gray bg-transparent px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-primary"
-                placeholder="Code"
+                placeholder="Mã"
                 value={form.code}
                 onChange={(e) => setForm((prev) => ({ ...prev, code: e.target.value }))}
                 required
@@ -276,12 +276,12 @@ export default function PromotionPage() {
             <table className="w-full text-left text-sm">
               <thead className="border-b border-border-dark text-xs uppercase tracking-wide text-text-gray-100">
                 <tr>
-                  <th className="px-4 py-3">Code</th>
-                  <th className="px-4 py-3">Name</th>
-                  <th className="px-4 py-3">Type</th>
-                  <th className="px-4 py-3">Value</th>
-                  <th className="px-4 py-3">Collections</th>
-                  <th className="px-4 py-3">Active</th>
+                  <th className="px-4 py-3">Mã</th>
+                  <th className="px-4 py-3">Tên</th>
+                  <th className="px-4 py-3">Loại</th>
+                  <th className="px-4 py-3">Giá trị</th>
+                  <th className="px-4 py-3">Bộ sưu tập</th>
+                  <th className="px-4 py-3">Trạng thái</th>
                   <th className="px-4 py-3 text-right">Hành động</th>
                 </tr>
               </thead>
@@ -298,7 +298,7 @@ export default function PromotionPage() {
                       <td className="px-4 py-3">{item.type}</td>
                       <td className="px-4 py-3">{item.value}</td>
                       <td className="px-4 py-3">{collectionNames || "-"}</td>
-                      <td className="px-4 py-3">{item.is_active ? "Yes" : "No"}</td>
+                      <td className="px-4 py-3">{item.is_active ? "Có" : "Không"}</td>
                       <td className="px-4 py-3">
                         <div className="flex items-center justify-end gap-2">
                           <button
