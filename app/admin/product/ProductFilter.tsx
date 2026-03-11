@@ -1,33 +1,154 @@
 "use client";
 
-import {
-  Listbox,
-  ListboxButton,
-  ListboxOption,
-  ListboxOptions,
-} from "@headlessui/react";
-import { CheckIcon, ChevronDownIcon } from "@heroicons/react/20/solid";
-import type { Dispatch, SetStateAction } from "react";
+import { useMemo, useState } from "react";
+
+type SelectOption = {
+  id: number;
+  name: string;
+};
+
+type MultiSelectBoxProps = {
+  label: string;
+  options: SelectOption[];
+  selectedIds: number[];
+  onChange: (next: number[]) => void;
+  placeholder?: string;
+};
+
+function MultiSelectBox({
+  label,
+  options,
+  selectedIds,
+  onChange,
+  placeholder,
+}: MultiSelectBoxProps) {
+  const [open, setOpen] = useState(false);
+  const [search, setSearch] = useState("");
+
+  const filteredOptions = useMemo(() => {
+    if (!search.trim()) return options;
+    const keyword = search.trim().toLowerCase();
+    return options.filter((item) => item.name.toLowerCase().includes(keyword));
+  }, [options, search]);
+
+  const selectedNames = useMemo(() => {
+    if (selectedIds.length === 0) return "Tất cả";
+    const map = new Map(options.map((item) => [item.id, item.name]));
+    const names = selectedIds.map((id) => map.get(id)).filter(Boolean) as string[];
+    if (names.length <= 2) return names.join(", ");
+    return `${names.slice(0, 2).join(", ")} +${names.length - 2}`;
+  }, [options, selectedIds]);
+
+  return (
+    <div className="relative w-full lg:w-auto">
+      <button
+        type="button"
+        className="flex h-10 items-center gap-2 border-1 border-border-gray rounded-lg dark:bg-background-dark bg-background-light pl-4 pr-10 text-sm font-medium dark:text-text-gray-200 text-text-gray-200 hover:ring-1 transition-all w-full"
+        onClick={() => setOpen((prev) => !prev)}
+      >
+        <span>{label}:</span>
+        <span className="truncate">{selectedNames}</span>
+        <span className="material-symbols-outlined absolute right-3 text-[18px] text-text-gray-100">
+          expand_more
+        </span>
+      </button>
+
+      {open ? (
+        <div className="absolute z-20 mt-2 w-full min-w-[220px] rounded-lg border border-border-gray dark:border-border-dark bg-background-light dark:bg-background-dark p-2 shadow-lg">
+          <input
+            className="w-full rounded border border-border-gray dark:border-border-dark bg-background-light dark:bg-background-dark px-3 py-2 text-sm outline-none focus:ring-1"
+            placeholder={placeholder || "Tìm kiếm"}
+            value={search}
+            onChange={(event) => setSearch(event.target.value)}
+          />
+          <div className="mt-2 max-h-52 overflow-y-auto space-y-1">
+            {filteredOptions.map((item) => {
+              const checked = selectedIds.includes(item.id);
+              return (
+                <label
+                  key={item.id}
+                  className="flex items-center gap-2 rounded px-2 py-1 text-sm text-text-gray-200 hover:bg-background-gray/60 dark:hover:bg-surface-dark"
+                >
+                  <input
+                    type="checkbox"
+                    checked={checked}
+                    onChange={() => {
+                      if (checked) {
+                        onChange(selectedIds.filter((id) => id !== item.id));
+                      } else {
+                        onChange([...selectedIds, item.id]);
+                      }
+                    }}
+                  />
+                  <span>{item.name}</span>
+                </label>
+              );
+            })}
+            {filteredOptions.length === 0 ? (
+              <p className="text-xs text-text-gray-100 px-2 py-1">Không có dữ liệu</p>
+            ) : null}
+          </div>
+          <div className="mt-2 flex items-center justify-between text-xs text-text-gray-100">
+            <button type="button" className="hover:text-text-gray-200" onClick={() => onChange([])}>
+              Xóa lọc
+            </button>
+            <button type="button" className="hover:text-text-gray-200" onClick={() => setOpen(false)}>
+              Đóng
+            </button>
+          </div>
+        </div>
+      ) : null}
+    </div>
+  );
+}
 
 export default function ProductFilter({
   categories,
   isActive,
-  selectedCategory,
-  setSelectedCategory,
-  selectedIsActive,
-  setSelectedIsActive,
+  brands,
+  selectedCategoryIds,
+  setSelectedCategoryIds,
+  selectedStatusIds,
+  setSelectedStatusIds,
+  selectedBrandIds,
+  setSelectedBrandIds,
   keyword,
   setKeyword,
 }: {
   categories: Category[];
   isActive: IsActive[];
-  selectedCategory: Category | undefined;
-  setSelectedCategory: Dispatch<SetStateAction<Category | undefined>>;
-  selectedIsActive: IsActive | undefined;
-  setSelectedIsActive: Dispatch<SetStateAction<IsActive>>;
+  brands: Brands;
+  selectedCategoryIds: number[];
+  setSelectedCategoryIds: (next: number[]) => void;
+  selectedStatusIds: number[];
+  setSelectedStatusIds: (next: number[]) => void;
+  selectedBrandIds: number[];
+  setSelectedBrandIds: (next: number[]) => void;
   keyword: string;
-  setKeyword: Dispatch<SetStateAction<string>>;
+  setKeyword: (value: string) => void;
 }) {
+  const categoryOptions = useMemo(
+    () =>
+      categories
+        .filter((item) => typeof item.id === "number")
+        .map((item) => ({ id: item.id as number, name: item.name })),
+    [categories],
+  );
+  const statusOptions = useMemo(
+    () =>
+      isActive
+        .filter((item) => typeof item.id === "number")
+        .map((item) => ({ id: item.id as number, name: item.name })),
+    [isActive],
+  );
+  const brandOptions = useMemo(
+    () =>
+      brands
+        .filter((item) => typeof item.id === "number")
+        .map((item) => ({ id: item.id as number, name: item.name })),
+    [brands],
+  );
+
   return (
     <div className="dark:bg-background-dark bg-background-light rounded-xl border-1 border-border-gray p-4 flex flex-col lg:flex-row gap-4 justify-between items-start lg:items-center">
       <div className="relative w-full lg:w-96">
@@ -44,69 +165,27 @@ export default function ProductFilter({
       </div>
 
       <div className="flex flex-wrap gap-3 w-full lg:w-auto">
-        <div className="relative group">
-          <div className="flex h-10 items-center gap-2 border-1 border-border-gray rounded-lg dark:bg-background-dark bg-background-light pl-4 pr-8 text-sm font-medium dark:text-text-gray-200 text-text-gray-200 hover:ring-1 transition-all">
-            {selectedCategory ? (
-              <Listbox value={selectedCategory} onChange={setSelectedCategory}>
-                <p>Danh mục:</p>
-                <ListboxButton className="cursor-pointer">
-                  {selectedCategory.name}
-                  <ChevronDownIcon
-                    className="group pointer-events-none absolute top-2.5 right-2.5 size-4 dark:fill-text-light fill-text-gray-200/60"
-                    aria-hidden="true"
-                  />
-                </ListboxButton>
-
-                <ListboxOptions anchor="bottom" className="focus:outline-none">
-                  {categories.map((category) => (
-                    <ListboxOption
-                      key={category.id}
-                      value={category}
-                      className="group flex cursor-pointer border-1 border-boder-gray items-center gap-2 px-3 py-1.5 select-none dark:bg-background-dark bg-background-gray data-focus:bg-hover text-gray-200"
-                    >
-                      <CheckIcon className="invisible size-4 fill-white group-data-selected:visible" />
-                      <div className="text-sm/6 text-white">{category.name}</div>
-                    </ListboxOption>
-                  ))}
-                </ListboxOptions>
-              </Listbox>
-            ) : (
-              "Chưa có dữ liệu"
-            )}
-          </div>
-        </div>
-
-        <div className="relative group">
-          <div className="flex h-10 items-center gap-2 border-1 border-border-gray rounded-lg dark:bg-background-dark bg-background-light pl-4 pr-8 text-sm font-medium dark:text-text-gray-200 text-text-gray-200 hover:ring-1 transition-all">
-            <p>Trạng thái:</p>
-            {selectedIsActive ? (
-              <Listbox value={selectedIsActive} onChange={setSelectedIsActive}>
-                <ListboxButton className="cursor-pointer">
-                  {selectedIsActive.name}
-                  <ChevronDownIcon
-                    className="group pointer-events-none absolute top-2.5 right-2.5 size-4 dark:fill-text-light fill-text-gray-200/60"
-                    aria-hidden="true"
-                  />
-                </ListboxButton>
-
-                <ListboxOptions anchor="bottom" className="focus:outline-none">
-                  {isActive.map((status) => (
-                    <ListboxOption
-                      key={status.id}
-                      value={status}
-                      className="group flex cursor-pointer border-1 border-boder-gray items-center gap-2 px-3 py-1.5 select-none dark:bg-background-dark bg-background-gray data-focus:bg-hover text-gray-200"
-                    >
-                      <CheckIcon className="invisible size-4 fill-white group-data-selected:visible" />
-                      <div className="text-sm/6 text-white">{status.name}</div>
-                    </ListboxOption>
-                  ))}
-                </ListboxOptions>
-              </Listbox>
-            ) : (
-              "Chưa có dữ liệu"
-            )}
-          </div>
-        </div>
+        <MultiSelectBox
+          label="Danh mục"
+          options={categoryOptions}
+          selectedIds={selectedCategoryIds}
+          onChange={setSelectedCategoryIds}
+          placeholder="Tìm danh mục"
+        />
+        <MultiSelectBox
+          label="Trạng thái"
+          options={statusOptions}
+          selectedIds={selectedStatusIds}
+          onChange={setSelectedStatusIds}
+          placeholder="Tìm trạng thái"
+        />
+        <MultiSelectBox
+          label="Thương hiệu"
+          options={brandOptions}
+          selectedIds={selectedBrandIds}
+          onChange={setSelectedBrandIds}
+          placeholder="Tìm thương hiệu"
+        />
       </div>
     </div>
   );

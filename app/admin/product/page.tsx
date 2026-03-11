@@ -2,6 +2,7 @@
 
 import Header from "@/components/layout/header";
 import Loading from "@/components/notification/loading";
+import { getBrand } from "@/services/brand.services";
 import { getCategory } from "@/services/category.services";
 import { deleteProduct, getProduct } from "@/services/product.services";
 import Link from "next/link";
@@ -16,10 +17,12 @@ const ACTIVE_OPTIONS: IsActive[] = [
   { id: 1, name: "Hoạt động" },
 ];
 
-const parseNullableNumber = (value: string | null) => {
-  if (value === null || value.trim() === "") return null;
-  const parsed = Number(value);
-  return Number.isNaN(parsed) ? null : parsed;
+const parseIds = (value: string | null) => {
+  if (!value) return [];
+  return value
+    .split(",")
+    .map((item) => Number(item))
+    .filter((item) => Number.isInteger(item));
 };
 
 export default function ProductPage() {
@@ -29,8 +32,11 @@ export default function ProductPage() {
 
   const [products, setProducts] = useState<ProductListItem[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<Category | undefined>();
-  const [selectedIsActive, setSelectedIsActive] = useState<IsActive>(ACTIVE_OPTIONS[0]);
+  const [brands, setBrands] = useState<Brands>([]);
+
+  const [selectedCategoryIds, setSelectedCategoryIds] = useState<number[]>([]);
+  const [selectedStatusIds, setSelectedStatusIds] = useState<number[]>([]);
+  const [selectedBrandIds, setSelectedBrandIds] = useState<number[]>([]);
 
   const [page, setPage] = useState(() => Math.max(1, Number(searchParams.get("page") || 1)));
   const [limit] = useState(() => Math.max(1, Number(searchParams.get("limit") || 5)));
@@ -42,39 +48,32 @@ export default function ProductPage() {
   const [version, setVersion] = useState(0);
 
   useEffect(() => {
-    const fetchCategories = async () => {
+    const fetchFilters = async () => {
       try {
-        const res = await getCategory();
-        const list: Category[] = [{ id: null, name: "Tất cả" }, ...res.data.categories];
-        setCategories(list);
+        const [categoryRes, brandRes] = await Promise.all([getCategory(), getBrand()]);
+        setCategories([{ id: null, name: "Tất cả" }, ...categoryRes.data.categories]);
+        setBrands([{ id: null, name: "Tất cả" }, ...brandRes.data.brands]);
 
-        const categoryQuery = searchParams.get("category_id");
-        const isActiveQuery = searchParams.get("is_active");
-        const parsedCategory = parseNullableNumber(categoryQuery);
-        const parsedIsActive = parseNullableNumber(isActiveQuery);
-
-        const matchedCategory = list.find((item) => item.id === parsedCategory) ?? list[0];
-        const matchedIsActive =
-          ACTIVE_OPTIONS.find((item) => item.id === parsedIsActive) ?? ACTIVE_OPTIONS[0];
-
-        setSelectedCategory(matchedCategory);
-        setSelectedIsActive(matchedIsActive);
+        setSelectedCategoryIds(parseIds(searchParams.get("category_id")));
+        setSelectedStatusIds(parseIds(searchParams.get("is_active")));
+        setSelectedBrandIds(parseIds(searchParams.get("brand_id")));
       } catch (error) {
         console.error("Error fetching categories:", error);
       }
     };
 
-    fetchCategories();
+    fetchFilters();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const filters = useMemo<Filters>(() => {
     return {
-      category_id: selectedCategory?.id ?? null,
-      is_active: selectedIsActive?.id ?? null,
+      category_id: selectedCategoryIds.length ? selectedCategoryIds : null,
+      is_active: selectedStatusIds.length ? selectedStatusIds : null,
+      brand_id: selectedBrandIds.length ? selectedBrandIds : null,
       keyword: keyword.trim() || undefined,
     };
-  }, [keyword, selectedCategory, selectedIsActive]);
+  }, [keyword, selectedBrandIds, selectedCategoryIds, selectedStatusIds]);
 
   const syncQueryToUrl = useCallback(() => {
     const query = new URLSearchParams();
@@ -82,11 +81,14 @@ export default function ProductPage() {
     query.set("page", String(page));
     query.set("limit", String(limit));
 
-    if (filters.category_id !== null && filters.category_id !== undefined) {
-      query.set("category_id", String(filters.category_id));
+    if (filters.category_id && filters.category_id.length > 0) {
+      query.set("category_id", filters.category_id.join(","));
     }
-    if (filters.is_active !== null && filters.is_active !== undefined) {
-      query.set("is_active", String(filters.is_active));
+    if (filters.is_active && filters.is_active.length > 0) {
+      query.set("is_active", filters.is_active.join(","));
+    }
+    if (filters.brand_id && filters.brand_id.length > 0) {
+      query.set("brand_id", filters.brand_id.join(","));
     }
     if (filters.keyword) {
       query.set("keyword", filters.keyword);
@@ -110,10 +112,10 @@ export default function ProductPage() {
   }, [filters, limit, page]);
 
   useEffect(() => {
-    if (!categories.length || !selectedCategory) return;
+    if (!categories.length) return;
     syncQueryToUrl();
     fetchProducts();
-  }, [categories.length, fetchProducts, selectedCategory, syncQueryToUrl, version]);
+  }, [categories.length, fetchProducts, syncQueryToUrl, version]);
 
   useEffect(() => {
     const handler = setTimeout(() => {
@@ -161,14 +163,20 @@ export default function ProductPage() {
             <ProductFilter
               categories={categories}
               isActive={ACTIVE_OPTIONS}
-              selectedCategory={selectedCategory}
-              setSelectedCategory={(value) => {
-                setSelectedCategory(value);
+              brands={brands}
+              selectedCategoryIds={selectedCategoryIds}
+              setSelectedCategoryIds={(value) => {
+                setSelectedCategoryIds(value);
                 setPage(1);
               }}
-              selectedIsActive={selectedIsActive}
-              setSelectedIsActive={(value) => {
-                setSelectedIsActive(value);
+              selectedStatusIds={selectedStatusIds}
+              setSelectedStatusIds={(value) => {
+                setSelectedStatusIds(value);
+                setPage(1);
+              }}
+              selectedBrandIds={selectedBrandIds}
+              setSelectedBrandIds={(value) => {
+                setSelectedBrandIds(value);
                 setPage(1);
               }}
               keyword={keyword}

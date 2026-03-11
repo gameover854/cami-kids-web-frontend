@@ -95,8 +95,9 @@ type Brand = {
 type Categories = Category[];
 
 type Filters = {
-  category_id?: number | null;
-  is_active?: number | null;
+  category_id?: number[] | null;
+  is_active?: number[] | null;
+  brand_id?: number[] | null;
   sort?: "asc" | "desc";
   keyword?: string;
 };
