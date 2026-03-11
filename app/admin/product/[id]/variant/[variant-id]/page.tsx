@@ -98,7 +98,7 @@ export default function ProductVariantDetailPage() {
               Chi tiết Biến thể
             </h1>
             <p className="text-text-gray-100 text-base mt-1">
-              Product #{productId} / Variant #{variantId}
+              Sản phẩm #{productId} / Biến thể #{variantId}
             </p>
           </div>
 
@@ -108,41 +108,53 @@ export default function ProductVariantDetailPage() {
                 Tồn kho + Giá
               </h2>
               <form onSubmit={onSave} className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                <input
-                  className="rounded-lg border border-border-gray bg-transparent px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-primary"
-                  placeholder="SKU"
-                  value={form.sku}
-                  onChange={(e) => setForm((prev) => ({ ...prev, sku: e.target.value }))}
-                />
-                <input
-                  className="rounded-lg border border-border-gray bg-transparent px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-primary"
-                  placeholder="Barcode"
-                  value={form.barcode}
-                  onChange={(e) => setForm((prev) => ({ ...prev, barcode: e.target.value }))}
-                />
-                <input
-                  className="rounded-lg border border-border-gray bg-transparent px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-primary"
-                  placeholder="Price"
-                  type="number"
-                  min={0}
-                  value={form.price}
-                  onChange={(e) =>
-                    setForm((prev) => ({ ...prev, price: Number(e.target.value) }))
-                  }
-                />
-                <input
-                  className="rounded-lg border border-border-gray bg-transparent px-3 py-2 text-sm outline-none focus:ring-1 focus:ring-primary"
-                  placeholder="Stock quantity"
-                  type="number"
-                  min={0}
-                  value={form.stock_quantity}
-                  onChange={(e) =>
-                    setForm((prev) => ({
-                      ...prev,
-                      stock_quantity: Number(e.target.value),
-                    }))
-                  }
-                />
+                <label className="flex flex-col gap-1 text-sm text-text-gray-100">
+                  SKU
+                  <input
+                    className="rounded-lg border border-border-gray bg-transparent px-3 py-2 text-sm text-text-gray-200 outline-none focus:ring-1 focus:ring-primary"
+                    placeholder="Nhập SKU"
+                    value={form.sku}
+                    onChange={(e) => setForm((prev) => ({ ...prev, sku: e.target.value }))}
+                  />
+                </label>
+                <label className="flex flex-col gap-1 text-sm text-text-gray-100">
+                  Barcode
+                  <input
+                    className="rounded-lg border border-border-gray bg-transparent px-3 py-2 text-sm text-text-gray-200 outline-none focus:ring-1 focus:ring-primary"
+                    placeholder="Nhập barcode"
+                    value={form.barcode}
+                    onChange={(e) => setForm((prev) => ({ ...prev, barcode: e.target.value }))}
+                  />
+                </label>
+                <label className="flex flex-col gap-1 text-sm text-text-gray-100">
+                  Giá bán
+                  <input
+                    className="rounded-lg border border-border-gray bg-transparent px-3 py-2 text-sm text-text-gray-200 outline-none focus:ring-1 focus:ring-primary"
+                    placeholder="Nhập giá"
+                    type="number"
+                    min={0}
+                    value={form.price}
+                    onChange={(e) =>
+                      setForm((prev) => ({ ...prev, price: Number(e.target.value) }))
+                    }
+                  />
+                </label>
+                <label className="flex flex-col gap-1 text-sm text-text-gray-100">
+                  Tồn kho
+                  <input
+                    className="rounded-lg border border-border-gray bg-transparent px-3 py-2 text-sm text-text-gray-200 outline-none focus:ring-1 focus:ring-primary"
+                    placeholder="Nhập tồn kho"
+                    type="number"
+                    min={0}
+                    value={form.stock_quantity}
+                    onChange={(e) =>
+                      setForm((prev) => ({
+                        ...prev,
+                        stock_quantity: Number(e.target.value),
+                      }))
+                    }
+                  />
+                </label>
                 <div className="md:col-span-2 flex justify-end">
                   <button
                     type="submit"
@@ -158,7 +170,9 @@ export default function ProductVariantDetailPage() {
             </section>
 
             <aside className="rounded-xl border border-border-gray dark:bg-background-dark bg-background-light p-4">
-              <h2 className="font-bold text-lg mb-3 dark:text-text-light text-text-gray-200">Hành động</h2>
+              <h2 className="font-bold text-lg mb-3 dark:text-text-light text-text-gray-200">
+                Hành động
+              </h2>
               <div className="flex gap-2 flex-wrap mb-4">
                 <button
                   type="button"
@@ -183,7 +197,9 @@ export default function ProductVariantDetailPage() {
                   Lưu
                 </button>
               </div>
-              <h2 className="font-bold text-lg mb-3 dark:text-text-light text-text-gray-200">Thông tin</h2>
+              <h2 className="font-bold text-lg mb-3 dark:text-text-light text-text-gray-200">
+                Thông tin
+              </h2>
               <p className="text-sm text-text-gray-100">
                 Sản phẩm: <strong>{detail?.product?.name || "-"}</strong>
               </p>
