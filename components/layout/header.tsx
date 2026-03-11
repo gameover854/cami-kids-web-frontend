@@ -1,6 +1,7 @@
 ﻿"use client";
 
 import Switch from "../button/switch";
+import Breadcrumb from "../breadcrumb";
 
 export default function Header() {
   return (
@@ -10,11 +11,7 @@ export default function Header() {
           <span className="material-symbols-outlined">menu</span>
         </button>
       </div>
-      <div className="hidden lg:flex items-center gap-2 text-text-gray-100 dark:text-text-light text-sm">
-        <span>Trang chủ</span>
-        <span className="material-symbols-outlined text-[16px]">chevron_right</span>
-        <span>Sản phẩm</span>
-      </div>
+      <Breadcrumb />
       <div className="flex items-center gap-4 ml-auto">
         <div className="flex items-center gap-3 px-3 py-2.5 rounded-lg bg-primary/10">
           <span className="text-sm text-text-gray-100 dark:text-text-light semibold">

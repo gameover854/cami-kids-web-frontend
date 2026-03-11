@@ -23,9 +23,9 @@ function isActivePath(pathName: string, href: string) {
 function getItemClass(pathName: string, href: string) {
   const active = isActivePath(pathName, href);
   if (active) {
-    return "bg-surface-dark text-text-primary transition-colors border-l-2 border-border-primary";
+    return "bg-background-gray text-white transition-colors border-l-2 border-border-primary dark:bg-surface-dark dark:text-white";
   }
-  return "text-text-secondary hover:bg-surface-dark hover:text-white transition-colors group";
+  return "text-text-gray-200 hover:bg-background-gray hover:text-white transition-colors group dark:text-text-secondary dark:hover:bg-surface-dark dark:hover:text-white";
 }
 
 export default function Sidebar() {
@@ -42,11 +42,15 @@ export default function Sidebar() {
   const systemItems = sidebarItems.filter((item) => item.section === "system");
 
   return (
-    <aside className="w-64 flex-shrink-0 border-r border-border-dark bg-background-dark flex-col justify-between p-4 hidden lg:flex">
+    <aside className="w-64 flex-shrink-0 border-r border-border-gray bg-background-light flex-col justify-between p-4 hidden lg:flex dark:border-border-dark dark:bg-background-dark">
       <div className="flex flex-col gap-6">
         <div className="flex flex-col px-2">
-          <h1 className="text-white text-xl font-bold leading-normal tracking-tight">Admin Fashion</h1>
-          <p className="text-text-secondary text-xs font-normal">Quản trị viên</p>
+          <h1 className="text-text-gray-200 text-xl font-bold leading-normal tracking-tight dark:text-white">
+            Admin Fashion
+          </h1>
+          <p className="text-text-gray-100 text-xs font-normal dark:text-text-secondary">
+            Quản trị viên
+          </p>
         </div>
 
         <nav className="flex flex-col gap-2">
@@ -64,7 +68,7 @@ export default function Sidebar() {
           ))}
 
           <div className="flex flex-col gap-1">
-            <div className="px-3 py-1 text-xs font-semibold text-text-secondary uppercase tracking-wider">
+            <div className="px-3 py-1 text-xs font-semibold text-text-gray-100 uppercase tracking-wider dark:text-text-secondary">
               Quản lý
             </div>
             {manageItems.map((item) => {
@@ -88,7 +92,7 @@ export default function Sidebar() {
           </div>
 
           <div className="flex flex-col gap-1 mt-2">
-            <div className="px-3 py-1 text-xs font-semibold text-text-secondary uppercase tracking-wider">
+            <div className="px-3 py-1 text-xs font-semibold text-text-gray-100 uppercase tracking-wider dark:text-text-secondary">
               Hệ thống
             </div>
             {systemItems.map((item) => (
@@ -107,7 +111,7 @@ export default function Sidebar() {
         </nav>
       </div>
 
-      <div className="flex items-center gap-3 px-3 py-3 border-t border-border-dark mt-auto">
+      <div className="flex items-center gap-3 px-3 py-3 border-t border-border-gray mt-auto dark:border-border-dark">
         <div
           className="bg-center bg-no-repeat bg-cover rounded-full size-8 shrink-0 bg-gray-600"
           style={{
@@ -116,11 +120,15 @@ export default function Sidebar() {
           }}
         />
         <div className="flex flex-col overflow-hidden">
-          <p className="text-white text-sm font-medium truncate">Admin User</p>
-          <p className="text-text-secondary text-xs truncate">admin@fashion.com</p>
+          <p className="text-text-gray-200 text-sm font-medium truncate dark:text-white">
+            Admin User
+          </p>
+          <p className="text-text-gray-100 text-xs truncate dark:text-text-secondary">
+            admin@fashion.com
+          </p>
         </div>
         <button
-          className="ml-auto text-text-secondary hover:text-white"
+          className="ml-auto text-text-gray-100 hover:text-text-gray-200 dark:text-text-secondary dark:hover:text-white"
           onClick={handleLogout}
           type="button"
         >

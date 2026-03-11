@@ -4,6 +4,7 @@ import { Checkbox, Field, Label } from "@headlessui/react";
 import Image from "next/image";
 import Link from "next/link";
 import { Fragment } from "react";
+import { formatVND } from "@/utils/formatCurrency";
 
 export default function ProductForm({
   title,
@@ -44,51 +45,71 @@ export default function ProductForm({
         </button>
       </div>
 
-      <section className="bg-background-dark rounded-xl border border-border-dark p-5 space-y-4">
-        <input
-          className="w-full rounded-lg text-sm px-3 py-2.5 border border-border-dark outline-none dark:bg-background-dark"
-          placeholder="Tên sản phẩm"
-          value={dataProduct.name}
-          onChange={(e) => setDataProduct((prev) => ({ ...prev, name: e.target.value }))}
-        />
+      <section className="bg-background-light dark:bg-background-dark rounded-xl border border-border-gray dark:border-border-dark p-5 space-y-4">
+        <label className="flex flex-col gap-1 text-sm text-text-gray-100">
+          <span className="text-xs font-semibold">Tên sản phẩm</span>
+          <input
+            className="w-full rounded-lg text-sm px-3 py-2.5 border border-border-gray dark:border-border-dark outline-none bg-background-light dark:bg-background-dark"
+            placeholder="Nhập tên sản phẩm"
+            value={dataProduct.name}
+            onChange={(e) => setDataProduct((prev) => ({ ...prev, name: e.target.value }))}
+          />
+        </label>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <input
-            className="w-full rounded-lg text-sm px-3 py-2.5 border border-border-dark outline-none dark:bg-background-dark"
-            type="number"
-            placeholder="Giá bán"
-            value={dataProduct.selling_price}
-            onChange={(e) =>
-              setDataProduct((prev) => ({
-                ...prev,
-                selling_price: Number(e.target.value),
-              }))
-            }
-          />
-          <input
-            className="w-full rounded-lg text-sm px-3 py-2.5 border border-border-dark outline-none dark:bg-background-dark"
-            type="number"
-            placeholder="Giá so sánh"
-            value={dataProduct.compare_price || 0}
-            onChange={(e) =>
-              setDataProduct((prev) => ({
-                ...prev,
-                compare_price: Number(e.target.value),
-              }))
-            }
-          />
+          <label className="flex flex-col gap-1 text-sm text-text-gray-100">
+            <span className="text-xs font-semibold">Giá bán</span>
+            <input
+              className="w-full rounded-lg text-sm px-3 py-2.5 border border-border-gray dark:border-border-dark outline-none bg-background-light dark:bg-background-dark"
+              type="number"
+              placeholder="Nhập giá bán"
+              value={dataProduct.selling_price}
+              onChange={(e) =>
+                setDataProduct((prev) => ({
+                  ...prev,
+                  selling_price: Number(e.target.value),
+                }))
+              }
+            />
+            <span className="text-xs text-text-gray-100">
+              {formatVND(dataProduct.selling_price)} VNĐ
+            </span>
+            <span className="text-xs text-text-gray-100">Định dạng: 1.000.000 VNĐ</span>
+          </label>
+          <label className="flex flex-col gap-1 text-sm text-text-gray-100">
+            <span className="text-xs font-semibold">Giá so sánh</span>
+            <input
+              className="w-full rounded-lg text-sm px-3 py-2.5 border border-border-gray dark:border-border-dark outline-none bg-background-light dark:bg-background-dark"
+              type="number"
+              placeholder="Nhập giá so sánh"
+              value={dataProduct.compare_price || 0}
+              onChange={(e) =>
+                setDataProduct((prev) => ({
+                  ...prev,
+                  compare_price: Number(e.target.value),
+                }))
+              }
+            />
+            <span className="text-xs text-text-gray-100">
+              {formatVND(dataProduct.compare_price || 0)} VNĐ
+            </span>
+            <span className="text-xs text-text-gray-100">Định dạng: 1.000.000 VNĐ</span>
+          </label>
         </div>
-        <textarea
-          className="w-full rounded-lg text-sm px-3 py-2.5 border border-border-dark outline-none dark:bg-background-dark"
-          rows={4}
-          placeholder="Mô tả sản phẩm"
-          value={dataProduct.description}
-          onChange={(e) =>
-            setDataProduct((prev) => ({ ...prev, description: e.target.value }))
-          }
-        />
+        <label className="flex flex-col gap-1 text-sm text-text-gray-100">
+          <span className="text-xs font-semibold">Mô tả sản phẩm</span>
+          <textarea
+            className="w-full rounded-lg text-sm px-3 py-2.5 border border-border-gray dark:border-border-dark outline-none bg-background-light dark:bg-background-dark"
+            rows={4}
+            placeholder="Nhập mô tả sản phẩm"
+            value={dataProduct.description}
+            onChange={(e) =>
+              setDataProduct((prev) => ({ ...prev, description: e.target.value }))
+            }
+          />
+        </label>
       </section>
 
-      <section className="bg-background-dark rounded-xl border border-border-dark p-5">
+      <section className="bg-background-light dark:bg-background-dark rounded-xl border border-border-gray dark:border-border-dark p-5">
         <div className="flex items-center justify-between mb-4">
           <h2 className="font-bold text-text-gray-100">Thuộc tính và Biến thể</h2>
           <button className="text-sm text-primary" onClick={onAddAttribute}>
@@ -97,14 +118,17 @@ export default function ProductForm({
         </div>
         <div className="space-y-3">
           {dataAttribute.map((attribute) => (
-            <div key={attribute.id} className="border border-border-dark rounded-lg p-3">
+            <div key={attribute.id} className="border border-border-gray dark:border-border-dark rounded-lg p-3">
               <div className="flex gap-2">
-                <input
-                  className="flex-1 rounded text-sm px-3 py-2 border border-border-dark bg-background-dark"
-                  placeholder="Tên thuộc tính"
-                  value={attribute.name}
-                  onChange={(e) => onAttributeName(attribute.id!, e.target.value)}
-                />
+                <label className="flex-1 flex flex-col gap-1 text-sm text-text-gray-100">
+                  <span className="text-xs font-semibold">Tên thuộc tính</span>
+                  <input
+                    className="rounded text-sm px-3 py-2 border border-border-gray dark:border-border-dark bg-background-light dark:bg-background-dark"
+                    placeholder="Nhập tên thuộc tính"
+                    value={attribute.name}
+                    onChange={(e) => onAttributeName(attribute.id!, e.target.value)}
+                  />
+                </label>
                 <button
                   className="text-sm text-red-400"
                   onClick={() => onRemoveAttribute(attribute.id!)}
@@ -122,11 +146,14 @@ export default function ProductForm({
                     {value} x
                   </button>
                 ))}
-                <input
-                  className="rounded text-sm px-2 py-1 border border-border-dark bg-background-dark"
-                  placeholder="Nhập rồi Enter"
-                  onKeyDown={(e) => onAddAttributeItem(e, attribute.id!)}
-                />
+                <label className="flex flex-col gap-1 text-sm text-text-gray-100">
+                  <span className="text-xs font-semibold">Giá trị thuộc tính</span>
+                  <input
+                    className="rounded text-sm px-2 py-1 border border-border-gray dark:border-border-dark bg-background-light dark:bg-background-dark"
+                    placeholder="Nhập rồi Enter"
+                    onKeyDown={(e) => onAddAttributeItem(e, attribute.id!)}
+                  />
+                </label>
               </div>
             </div>
           ))}
@@ -134,7 +161,7 @@ export default function ProductForm({
         <div className="mt-4 overflow-x-auto">
           <table className="w-full text-sm">
             <thead>
-              <tr className="text-left border-b border-border-dark">
+              <tr className="text-left border-b border-border-gray dark:border-border-dark">
                 <th className="py-2">Tổ hợp</th>
                 <th className="py-2">SKU</th>
                 <th className="py-2">Giá</th>
@@ -143,7 +170,7 @@ export default function ProductForm({
             </thead>
             <tbody>
               {dataVariant.map((variant) => (
-                <tr key={variant.id} className="border-b border-border-dark/50">
+                <tr key={variant.id} className="border-b border-border-gray/60 dark:border-border-dark/50">
                   <td className="py-2">
                     {canLinkVariant(variant.id) ? (
                       <Link
@@ -158,7 +185,7 @@ export default function ProductForm({
                   </td>
                   <td className="py-2">
                     <input
-                      className="rounded px-2 py-1 border border-border-dark bg-background-dark"
+                      className="rounded px-2 py-1 border border-border-gray dark:border-border-dark bg-background-light dark:bg-background-dark"
                       value={variant.sku || ""}
                       onChange={(e) =>
                         onVariantText(e.target.value, variant.id!, "sku")
@@ -166,18 +193,24 @@ export default function ProductForm({
                     />
                   </td>
                   <td className="py-2">
-                    <input
-                      className="rounded px-2 py-1 border border-border-dark bg-background-dark"
-                      type="number"
-                      value={variant.price}
-                      onChange={(e) =>
-                        onVariantNumber(Number(e.target.value), variant.id!, "price")
-                      }
-                    />
+                    <div className="flex flex-col gap-1">
+                      <input
+                        className="rounded px-2 py-1 border border-border-gray dark:border-border-dark bg-background-light dark:bg-background-dark"
+                        type="number"
+                        value={variant.price}
+                        onChange={(e) =>
+                          onVariantNumber(Number(e.target.value), variant.id!, "price")
+                        }
+                      />
+                      <span className="text-xs text-text-gray-100">
+                        {formatVND(variant.price)} VNĐ
+                      </span>
+                      <span className="text-xs text-text-gray-100">Định dạng: 1.000.000 VNĐ</span>
+                    </div>
                   </td>
                   <td className="py-2">
                     <input
-                      className="rounded px-2 py-1 border border-border-dark bg-background-dark"
+                      className="rounded px-2 py-1 border border-border-gray dark:border-border-dark bg-background-light dark:bg-background-dark"
                       type="number"
                       value={variant.stock_quantity}
                       onChange={(e) =>
@@ -196,12 +229,18 @@ export default function ProductForm({
         </div>
       </section>
 
-      <section className="bg-background-dark rounded-xl border border-border-dark p-5">
+      <section className="bg-background-light dark:bg-background-dark rounded-xl border border-border-gray dark:border-border-dark p-5">
         <h2 className="font-bold text-text-gray-100 mb-3">Hình ảnh</h2>
-        <input type="file" accept="image/*" multiple onChange={onUploadImage} />
+        <label className="flex flex-col gap-1 text-sm text-text-gray-100">
+          <span className="text-xs font-semibold">Tải ảnh sản phẩm</span>
+          <input type="file" accept="image/*" multiple onChange={onUploadImage} />
+        </label>
         <div className="mt-3 grid grid-cols-2 sm:grid-cols-4 gap-3">
           {dataImage.map((image) => (
-            <div key={image.id} className="relative border border-border-dark rounded-lg p-2">
+            <div
+              key={image.id}
+              className="relative border border-border-gray dark:border-border-dark rounded-lg p-2"
+            >
               <Image
                 src={image.url}
                 alt="Product"
@@ -226,7 +265,7 @@ export default function ProductForm({
         </div>
       </section>
 
-      <section className="bg-background-dark rounded-xl border border-border-dark p-5">
+      <section className="bg-background-light dark:bg-background-dark rounded-xl border border-border-gray dark:border-border-dark p-5">
         <h2 className="font-bold text-text-gray-100 mb-3">Tổ chức</h2>
         <div className="space-y-4">
           <div className="flex items-center justify-between">
@@ -240,46 +279,53 @@ export default function ProductForm({
             />
           </div>
 
-          <select
-            className="w-full rounded-lg text-sm px-3 py-2.5 border border-border-dark bg-background-dark"
-            value={dataProduct.brand_id ?? ""}
-            onChange={(e) =>
-              setDataProduct((prev) => ({
-                ...prev,
-                brand_id: e.target.value ? Number(e.target.value) : null,
-              }))
-            }
-          >
-            {dataBrand.map((brand) => (
-              <option key={brand.id ?? "all-brand"} value={brand.id ?? ""}>
-                {brand.name}
-              </option>
-            ))}
-          </select>
+          <label className="flex flex-col gap-1 text-sm text-text-gray-100">
+            <span className="text-xs font-semibold">Thương hiệu</span>
+            <select
+              className="w-full rounded-lg text-sm px-3 py-2.5 border border-border-gray dark:border-border-dark bg-background-light dark:bg-background-dark"
+              value={dataProduct.brand_id ?? ""}
+              onChange={(e) =>
+                setDataProduct((prev) => ({
+                  ...prev,
+                  brand_id: e.target.value ? Number(e.target.value) : null,
+                }))
+              }
+            >
+              {dataBrand.map((brand) => (
+                <option key={brand.id ?? "all-brand"} value={brand.id ?? ""}>
+                  {brand.name}
+                </option>
+              ))}
+            </select>
+          </label>
 
-          <select
-            className="w-full rounded-lg text-sm px-3 py-2.5 border border-border-dark bg-background-dark"
-            value={dataProduct.category_id ?? ""}
-            onChange={(e) =>
-              setDataProduct((prev) => ({
-                ...prev,
-                category_id: e.target.value ? Number(e.target.value) : null,
-              }))
-            }
-          >
-            {dataCategories.map((parent) => (
-              <Fragment key={parent.id}>
-                <option value={parent.id ?? ""}>{parent.name}</option>
-                {parent.children?.map((child) => (
-                  <option key={child.id} value={child.id ?? ""}>
-                    └─ {child.name}
-                  </option>
-                ))}
-              </Fragment>
-            ))}
-          </select>
+          <label className="flex flex-col gap-1 text-sm text-text-gray-100">
+            <span className="text-xs font-semibold">Danh mục</span>
+            <select
+              className="w-full rounded-lg text-sm px-3 py-2.5 border border-border-gray dark:border-border-dark bg-background-light dark:bg-background-dark"
+              value={dataProduct.category_id ?? ""}
+              onChange={(e) =>
+                setDataProduct((prev) => ({
+                  ...prev,
+                  category_id: e.target.value ? Number(e.target.value) : null,
+                }))
+              }
+            >
+              {dataCategories.map((parent) => (
+                <Fragment key={parent.id}>
+                  <option value={parent.id ?? ""}>{parent.name}</option>
+                  {parent.children?.map((child) => (
+                    <option key={child.id} value={child.id ?? ""}>
+                      └─ {child.name}
+                    </option>
+                  ))}
+                </Fragment>
+              ))}
+            </select>
+          </label>
 
           <div className="max-h-50 overflow-y-auto">
+            <p className="text-xs font-semibold text-text-gray-100 mb-2">Bộ sưu tập</p>
             {dataCollections.map((collection) => (
               <Field key={collection.id} className="flex items-start">
                 <Checkbox
