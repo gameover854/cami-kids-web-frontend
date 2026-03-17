@@ -10,8 +10,8 @@ export const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Cami Kids Admin",
-  description: "Trang quản trị Cami Kids",
+  title: "Ngọc Linh Admin ",
+  description: "Trang quản trị Thời Trang Ngọc Linh",
 };
 
 export default function RootLayout({

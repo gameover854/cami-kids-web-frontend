@@ -25,50 +25,50 @@ export default function ProductTable({
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="border-b border-border-dark text-xs uppercase tracking-wider text-text-gray-100">
-              <th className="px-6 py-4 font-semibold">Sản phẩm</th>
-              <th className="px-6 py-4 font-semibold">Thương hiệu</th>
-              <th className="px-6 py-4 font-semibold">Danh mục</th>
-              <th className="px-6 py-4 font-semibold text-right">Giá bán</th>
-              <th className="px-6 py-4 font-semibold text-center">Biến thể</th>
-              <th className="px-6 py-4 font-semibold">Trạng thái</th>
-              <th className="px-6 py-4 font-semibold text-right">Thao tác</th>
+              <th className="px-6 py-3 font-semibold">Sản phẩm</th>
+              <th className="px-6 py-3 font-semibold">Thương hiệu</th>
+              <th className="px-6 py-3 font-semibold">Danh mục</th>
+              <th className="px-6 py-3 font-semibold text-right">Giá bán</th>
+              <th className="px-6 py-3 font-semibold text-center">Biến thể</th>
+              <th className="px-6 py-3 font-semibold">Trạng thái</th>
+              <th className="px-6 py-3 font-semibold text-right">Thao tác</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-border-dark">
             {products.map((item) => (
-              <tr className="group hover:bg-hover transition-colors" key={item.id}>
-                <td className="px-6 py-4">
+              <tr className="group hover:bg-hover transition-colors cursor-pointer" key={item.id}>
+                <td className="px-6 py-3">
                   <Link href={`/admin/product/${item.id}`}>
                     <div className="flex items-center gap-4">
-                      <div className="size-12 rounded-lg p-1 border border-border-gray relative group-hover:border-primary/50 transition-colors">
+                      <div className="size-10 rounded-lg p-1 border border-border-gray relative group-hover:border-primary/50 transition-colors">
                         <Image
                           alt="Product thumbnail"
                           className="w-full h-full object-cover rounded"
                           src={item.images?.at(0)?.url ?? "/item_example.png"}
-                          width={48}
-                          height={48}
+                          width={40}
+                          height={40}
                         />
                       </div>
                       <div>
-                        <p className="text-text-gray-100 font-medium text-sm">{item.name}</p>
+                        <p className="text-primary font-semibold text-sm">{item.name}</p>
                         <p className="text-text-gray-100 text-xs mt-0.5">ID:{item.id}</p>
                       </div>
                     </div>
                   </Link>
                 </td>
-                <td className="px-6 py-4 text-center text-xs text-text-gray-100">
+                <td className="px-6 py-3 text-center text-xs text-text-gray-100">
                   {item.brand ? item.brand.name : "Không có"}
                 </td>
-                <td className="px-6 py-4">
+                <td className="px-6 py-3">
                   <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-background-gray text-text-light border border-border-gray">
                     {item.category?.parent ? `${item.category.parent.name} / ` : ""}
                     {item.category?.name ?? "Không có"}
                   </span>
                 </td>
-                <td className="px-6 py-4 text-right text-text-gray-200 font-medium text-sm">
+                <td className="px-6 py-3 text-right text-text-gray-200 font-medium text-sm">
                   {formatVND(item.selling_price)}
                 </td>
-                <td className="px-6 py-4 text-center">
+                <td className="px-6 py-3 text-center">
                   <div className="flex flex-col items-center gap-1">
                     {item.attributes?.length ? (
                       item.attributes.map((attr) => (
@@ -81,7 +81,7 @@ export default function ProductTable({
                     )}
                   </div>
                 </td>
-                <td className="px-6 py-4">
+                <td className="px-6 py-3">
                   {item.is_active ? (
                     <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
                       Hoạt động
@@ -92,7 +92,7 @@ export default function ProductTable({
                     </span>
                   )}
                 </td>
-                <td className="px-6 py-4 text-right">
+                <td className="px-6 py-3 text-right">
                   <div className="flex items-center justify-end gap-2 opacity-60 group-hover:opacity-100 transition-opacity">
                     <Link
                       className="p-1.5 text-text-gray-100 hover:text-white hover:bg-[#283539] rounded-lg transition-colors cursor-pointer"
@@ -125,7 +125,9 @@ export default function ProductTable({
 
       <div className="dark:bg-background-dark px-6 py-4 border-t border-border-dark flex items-center justify-between">
         <div className="text-sm text-text-gray-100">
-          Hiển thị <span className="font-medium">{start}</span> đến <span className="font-medium">{end}</span> trong <span className="font-medium">{totalProduct}</span> kết quả
+          Hiển thị <span className="font-medium">{start}</span> đến {" "}
+          <span className="font-medium">{end}</span> trong {" "}
+          <span className="font-medium">{totalProduct}</span> kết quả
         </div>
         <div className="flex items-center gap-2">
           <button

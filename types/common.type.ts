@@ -77,6 +77,7 @@ type Category = {
   id: number | null;
   name: string;
   parent_id?: number | null;
+  brand_id?: number | null;
   children?: Categories;
   parent?: Category | null;
 };
@@ -426,4 +427,30 @@ type AdminDashboardSummary = {
   average_order_value: number;
   low_stock_variants: number;
   top_products: AdminDashboardTopProduct[];
+};
+
+type PosProductItem = {
+  id: number;
+  name: string;
+  selling_price: number;
+  images?: ProductImage;
+};
+
+type PosVariantItem = {
+  id: number;
+  sku: string;
+  price: number;
+  stock_quantity: number;
+  combo: string;
+};
+
+type PosCartItem = {
+  variant_id: number;
+  product_id: number;
+  name: string;
+  sku: string;
+  price: number;
+  quantity: number;
+  stock: number;
+  combo: string;
 };

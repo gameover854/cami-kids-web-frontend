@@ -30,4 +30,17 @@ select {
   outline:none
 } 
 
+:root {
+  --focus-outline: #5aa5bf;
+}
+
+.dark {
+  --focus-outline: #6fbad3;
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus-outline);
+  outline-offset: 2px;
+}
+
 

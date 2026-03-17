@@ -150,6 +150,24 @@ export default function ProductFilter({
   keyword: string;
   setKeyword: (value: string) => void;
 }) {
+  const filteredCategories = useMemo(() => {
+    if (!selectedBrandIds.length) return categories;
+    const allowed = new Set(selectedBrandIds);
+
+    const filterByBrand = (items: Category[]): Category[] => {
+      return items
+        .map((item) => {
+          const children = Array.isArray(item.children) ? filterByBrand(item.children) : [];
+          const match = typeof item.brand_id === "number" && allowed.has(item.brand_id);
+          if (!match && children.length === 0) return null;
+          return { ...item, children };
+        })
+        .filter(Boolean) as Category[];
+    };
+
+    return filterByBrand(categories);
+  }, [categories, selectedBrandIds]);
+
   const categoryOptions = useMemo(() => {
     const buildOptions = (items: Category[], depth: number): SelectOption[] => {
       return items.flatMap((item) => {
@@ -169,8 +187,8 @@ export default function ProductFilter({
       });
     };
 
-    return buildOptions(categories, 0);
-  }, [categories]);
+    return buildOptions(filteredCategories, 0);
+  }, [filteredCategories]);
   const statusOptions = useMemo(
     () =>
       isActive
@@ -185,6 +203,15 @@ export default function ProductFilter({
         .map((item) => ({ id: item.id as number, name: item.name })),
     [brands],
   );
+
+  useEffect(() => {
+    if (!selectedCategoryIds.length) return;
+    const allowedIds = new Set(categoryOptions.map((option) => option.id));
+    const nextSelected = selectedCategoryIds.filter((id) => allowedIds.has(id));
+    if (nextSelected.length !== selectedCategoryIds.length) {
+      setSelectedCategoryIds(nextSelected);
+    }
+  }, [categoryOptions, selectedCategoryIds, setSelectedCategoryIds]);
 
   return (
     <div className="dark:bg-background-dark bg-background-light rounded-xl border-1 border-border-gray p-4 flex flex-col lg:flex-row gap-4 justify-between items-start lg:items-center">

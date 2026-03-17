@@ -50,3 +50,19 @@ export function updateOrderPayment(
 ) {
   return axios.put(`/orders/${id}/payment`, payload);
 }
+
+export function createOrder(payload: {
+  items: Array<{ variant_id: number; quantity: number }>;
+  shipping_address: string;
+  user_id?: number | null;
+  customer_name?: string | null;
+  customer_phone?: string | null;
+  payment?: {
+    amount?: number;
+    method?: PaymentMethod;
+    status?: PaymentStatus;
+    transaction_id?: string | null;
+  };
+}) {
+  return axios.post("/orders", payload);
+}
