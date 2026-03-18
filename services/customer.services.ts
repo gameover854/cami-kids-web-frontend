@@ -18,7 +18,7 @@ export function createCustomer(payload: {
   name?: string;
   email: string;
   phone?: string;
-  password: string;
+  password?: string;
 }) {
   return axios.post("/customers", payload);
 }

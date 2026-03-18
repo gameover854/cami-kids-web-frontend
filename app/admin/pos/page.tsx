@@ -1,7 +1,7 @@
+﻿
 "use client";
 
 import Header from "@/components/layout/header";
-import Loading from "@/components/notification/loading";
 import { PAYMENT_METHODS } from "@/constants/order";
 import { getBrand } from "@/services/brand.services";
 import { getCategory } from "@/services/category.services";
@@ -11,6 +11,7 @@ import { getProduct, getProductById } from "@/services/product.services";
 import { formatVND } from "@/utils/formatCurrency";
 import Image from "next/image";
 import { useCallback, useEffect, useMemo, useState } from "react";
+import { sileo } from "sileo";
 
 const PAYMENT_METHOD_LABELS: Record<(typeof PAYMENT_METHODS)[number], string> = {
   COD: "Tiền mặt",
@@ -19,6 +20,9 @@ const PAYMENT_METHOD_LABELS: Record<(typeof PAYMENT_METHODS)[number], string> = 
   VNPAY: "VNPay",
   CREDIT_CARD: "Thẻ",
 };
+
+const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const PHONE_REGEX = /^(0|\+84)\d{9,10}$/;
 
 export default function PosPage() {
   const [products, setProducts] = useState<PosProductItem[]>([]);
@@ -33,11 +37,27 @@ export default function PosPage() {
   const [showVariantPicker, setShowVariantPicker] = useState(false);
   const [customerName, setCustomerName] = useState("");
   const [customerPhone, setCustomerPhone] = useState("");
+  const [customerResults, setCustomerResults] = useState<AdminCustomerItem[]>([]);
+  const [selectedCustomer, setSelectedCustomer] = useState<AdminCustomerItem | null>(null);
+  const [isCustomerSearching, setIsCustomerSearching] = useState(false);
+  const [showCreateCustomer, setShowCreateCustomer] = useState(false);
+  const [customerSearchError, setCustomerSearchError] = useState<string | null>(null);
+  const [newCustomerForm, setNewCustomerForm] = useState({
+    name: "",
+    email: "",
+    phone: "",
+  });
+  const [newCustomerErrors, setNewCustomerErrors] = useState<{
+    name?: string;
+    email?: string;
+    phone?: string;
+  }>({});
+  const [isCreatingCustomer, setIsCreatingCustomer] = useState(false);
   const [shippingAddress, setShippingAddress] = useState("Tại quầy");
   const [paymentMethod, setPaymentMethod] = useState<(typeof PAYMENT_METHODS)[number]>("COD");
-  const [isLoading, setIsLoading] = useState(false);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [, setIsSubmitting] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  const [stockWarnings, setStockWarnings] = useState<Record<number, boolean>>({});
 
   const filters = useMemo<Filters>(() => {
     return {
@@ -54,13 +74,8 @@ export default function PosPage() {
   }, []);
 
   const loadProducts = useCallback(async () => {
-    setIsLoading(true);
-    try {
-      const res = await getProduct(1, 12, filters);
-      setProducts(res.data.products);
-    } finally {
-      setIsLoading(false);
-    }
+    const res = await getProduct(1, 12, filters);
+    setProducts(res.data.products);
   }, [filters]);
 
   useEffect(() => {
@@ -70,6 +85,123 @@ export default function PosPage() {
   useEffect(() => {
     loadProducts();
   }, [loadProducts]);
+
+  useEffect(() => {
+    const query = customerPhone.trim();
+    if (query.length < 2) {
+      setCustomerResults([]);
+      setShowCreateCustomer(false);
+      setCustomerSearchError(null);
+      setNewCustomerForm({ name: "", email: "", phone: "" });
+      setNewCustomerErrors({});
+      return undefined;
+    }
+
+    const timer = window.setTimeout(async () => {
+      setIsCustomerSearching(true);
+      setCustomerSearchError(null);
+      try {
+        const res = await getCustomer(1, 5, query);
+        setCustomerResults(res?.data?.customers || []);
+      } catch (error) {
+        console.error("Customer search failed", error);
+        setCustomerSearchError("Không thể tìm khách hàng.");
+      } finally {
+        setIsCustomerSearching(false);
+      }
+    }, 300);
+
+    return () => window.clearTimeout(timer);
+  }, [customerPhone]);
+
+  const handleSelectCustomer = (customer: AdminCustomerItem) => {
+    setSelectedCustomer(customer);
+    setCustomerName(customer.name || "");
+    setCustomerPhone(customer.phone || "");
+    setCustomerResults([]);
+    setShowCreateCustomer(false);
+    setCustomerSearchError(null);
+    setNewCustomerErrors({});
+  };
+
+  const handleCreateCustomer = async () => {
+    const nameValue = newCustomerForm.name.trim();
+    const emailValue = newCustomerForm.email.trim();
+    const phoneValue = newCustomerForm.phone.trim().replace(/\s+/g, "");
+    const nextErrors: {
+      name?: string;
+      email?: string;
+      phone?: string;
+    } = {};
+
+    if (!emailValue) {
+      nextErrors.email = "Email là bắt buộc.";
+    } else if (!EMAIL_REGEX.test(emailValue)) {
+      nextErrors.email = "Email không hợp lệ.";
+    }
+
+    if (!phoneValue) {
+      nextErrors.phone = "Số điện thoại là bắt buộc.";
+    } else if (!PHONE_REGEX.test(phoneValue)) {
+      nextErrors.phone = "Số điện thoại không hợp lệ.";
+    }
+
+    setNewCustomerErrors(nextErrors);
+    if (Object.keys(nextErrors).length > 0) {
+      return;
+    }
+
+    setIsCreatingCustomer(true);
+    setCustomerSearchError(null);
+    const createPromise = createCustomer({
+      name: nameValue || undefined,
+      email: emailValue,
+      phone: phoneValue || undefined,
+    });
+    sileo.promise(createPromise, {
+      loading: {
+        title: "Đang chờ",
+        description: "Đang tạo khách hàng...",
+      },
+      success: {
+        title: "Thành công",
+        description: "Tạo khách hàng mới thành công.",
+      },
+      error: (err) => {
+        const status = (err as { response?: { status?: number } })?.response?.status;
+        if (status === 409) {
+          return {
+            title: "Thất bại",
+            description: "Email đã tồn tại. Vui lòng dùng email khác.",
+          };
+        }
+        return {
+          title: "Thất bại",
+          description: "Không thể tạo khách hàng.",
+        };
+      },
+    });
+    try {
+      const res = await createPromise;
+      const created = res?.data?.customer as AdminCustomerItem | undefined;
+      if (created) {
+        handleSelectCustomer(created);
+      }
+      setShowCreateCustomer(false);
+      setNewCustomerForm({ name: "", email: "", phone: "" });
+      setNewCustomerErrors({});
+    } catch (error) {
+      console.error("Create customer failed", error);
+      const status = (error as { response?: { status?: number } })?.response?.status;
+      if (status === 409) {
+        setCustomerSearchError("Email đã tồn tại. Vui lòng dùng email khác.");
+      } else {
+        setCustomerSearchError("Không thể tạo khách hàng.");
+      }
+    } finally {
+      setIsCreatingCustomer(false);
+    }
+  };
 
   const buildVariantCombo = (variant: ProductDetailVariant) => {
     if (!variant.attributes?.length) return variant.sku || "Biến thể";
@@ -81,7 +213,11 @@ export default function PosPage() {
 
   const openVariantPicker = async (productId: number) => {
     setMessage(null);
-    setIsLoading(true);
+    const loadingId = sileo.info({
+      title: "Đang chờ",
+      description: "Đang tải chi tiết sản phẩm...",
+      duration: null,
+    });
     try {
       const res = await getProductById(productId);
       const product = res.data.product;
@@ -103,20 +239,26 @@ export default function PosPage() {
     } catch (error) {
       console.error("Failed to load product detail", error);
       setMessage("Không thể tải chi tiết sản phẩm.");
+      sileo.error({
+        title: "Thất bại",
+        description: "Không thể tải chi tiết sản phẩm.",
+      });
     } finally {
-      setIsLoading(false);
+      sileo.dismiss(loadingId);
     }
   };
-
   const handleAddToCart = (product: ProductDetail, variant: PosVariantItem) => {
     setShowVariantPicker(false);
     setSelectedProduct(null);
     setVariantOptions([]);
+    if (variant.stock_quantity <= 0) {
+      return;
+    }
     setCartItems((prev) => {
       const existing = prev.find((item) => item.variant_id === variant.id);
       if (existing) {
         if (existing.quantity + 1 > variant.stock_quantity) {
-          setMessage("Tồn kho không đủ để tăng số lượng.");
+          setStockWarnings((prevWarnings) => ({ ...prevWarnings, [variant.id]: true }));
           return prev;
         }
         return prev.map((item) =>
@@ -147,6 +289,21 @@ export default function PosPage() {
         .map((item) => {
           if (item.variant_id !== variantId) return item;
           const nextQuantity = item.quantity + delta;
+          if (delta < 0 && nextQuantity <= item.stock) {
+            setStockWarnings((prevWarnings) => {
+              if (!prevWarnings[variantId]) return prevWarnings;
+              const next = { ...prevWarnings };
+              delete next[variantId];
+              return next;
+            });
+          }
+          if (nextQuantity > item.stock) {
+            setStockWarnings((prevWarnings) => ({
+              ...prevWarnings,
+              [variantId]: true,
+            }));
+            return item;
+          }
           if (nextQuantity < 1 || nextQuantity > item.stock) return item;
           return { ...item, quantity: nextQuantity };
         })
@@ -156,6 +313,12 @@ export default function PosPage() {
 
   const removeItem = (variantId: number) => {
     setCartItems((prev) => prev.filter((item) => item.variant_id !== variantId));
+    setStockWarnings((prevWarnings) => {
+      if (!prevWarnings[variantId]) return prevWarnings;
+      const next = { ...prevWarnings };
+      delete next[variantId];
+      return next;
+    });
   };
 
   const subtotal = useMemo(
@@ -170,29 +333,46 @@ export default function PosPage() {
       return;
     }
     setIsSubmitting(true);
+    const checkoutPromise = createOrder({
+      items: cartItems.map((item) => ({
+        variant_id: item.variant_id,
+        quantity: item.quantity,
+      })),
+      shipping_address: shippingAddress || "Tại quầy",
+      user_id: selectedCustomer?.id ?? null,
+      customer_name: selectedCustomer?.name || customerName || null,
+      customer_phone: selectedCustomer?.phone || customerPhone || null,
+      payment: {
+        amount: subtotal,
+        method: paymentMethod,
+        status: "SUCCESS",
+      },
+    });
+    sileo.promise(checkoutPromise, {
+      loading: {
+        title: "Đang chờ",
+        description: "Đang xử lý thanh toán...",
+      },
+      success: {
+        title: "Thành công",
+        description: "Thanh toán thành công.",
+      },
+      error: {
+        title: "Thất bại",
+        description: "Không thể thanh toán. Vui lòng kiểm tra tồn kho.",
+      },
+    });
     try {
-      await createOrder({
-        items: cartItems.map((item) => ({
-          variant_id: item.variant_id,
-          quantity: item.quantity,
-        })),
-        shipping_address: shippingAddress || "Tại quầy",
-        customer_name: customerName || null,
-        customer_phone: customerPhone || null,
-        payment: {
-          amount: subtotal,
-          method: paymentMethod,
-          status: "SUCCESS",
-        },
-      });
+      await checkoutPromise;
       setCartItems([]);
+      setStockWarnings({});
       setCustomerName("");
       setCustomerPhone("");
+      setSelectedCustomer(null);
+      setCustomerResults([]);
       setShippingAddress("Tại quầy");
-      setMessage("Thanh toán thành công.");
     } catch (error) {
       console.error("Checkout failed", error);
-      setMessage("Không thể thanh toán. Vui lòng kiểm tra tồn kho.");
     } finally {
       setIsSubmitting(false);
     }
@@ -218,6 +398,17 @@ export default function PosPage() {
                 onClick={() => {
                   setCartItems([]);
                   setMessage(null);
+                  setStockWarnings({});
+                  setSelectedCustomer(null);
+                  setCustomerResults([]);
+                  setShowCreateCustomer(false);
+                  setCustomerSearchError(null);
+                  setNewCustomerForm({ name: "", email: "", phone: "" });
+                  setNewCustomerErrors({});
+                  sileo.success({
+                    title: "Thành công",
+                    description: "Đã tạo đơn hàng mới.",
+                  });
                 }}
               >
                 <span className="material-symbols-outlined">add_shopping_cart</span>
@@ -236,7 +427,7 @@ export default function PosPage() {
                     </span>
                     <input
                       className="w-full pl-10 pr-3 py-2.5 rounded-lg border border-border-gray dark:border-border-dark bg-background-light dark:bg-background-dark text-text-gray-200 text-sm"
-                      placeholder="Tìm theo tên sản phẩm hoặc SKU"
+                      placeholder="Tìm theo tên sản phẩm, SKU hoặc barcode"
                       value={keyword}
                       onChange={(event) => setKeyword(event.target.value)}
                     />
@@ -337,6 +528,11 @@ export default function PosPage() {
                         <p className="text-xs text-text-gray-100">
                           {formatVND(item.price)} VNĐ
                         </p>
+                        {stockWarnings[item.variant_id] ? (
+                          <p className="mt-1 text-xs text-red-400">
+                            Sản phẩm không khả dụng do tồn kho không đủ.
+                          </p>
+                        ) : null}
                       </div>
                       <div className="flex flex-col items-end gap-2">
                         <div className="flex items-center gap-2">
@@ -375,16 +571,164 @@ export default function PosPage() {
                 <h2 className="text-lg font-semibold text-text-gray-200">Thông tin khách</h2>
                 <input
                   className="w-full rounded-lg border border-border-gray dark:border-border-dark bg-background-light dark:bg-background-dark text-text-gray-200 text-sm px-3 py-2.5"
+                  type="text"
                   placeholder="Tên khách hàng"
                   value={customerName}
-                  onChange={(event) => setCustomerName(event.target.value)}
+                  onChange={(event) => {
+                    setCustomerName(event.target.value);
+                    if (selectedCustomer) setSelectedCustomer(null);
+                  }}
                 />
                 <input
                   className="w-full rounded-lg border border-border-gray dark:border-border-dark bg-background-light dark:bg-background-dark text-text-gray-200 text-sm px-3 py-2.5"
+                  type="search"
+                  inputMode="tel"
                   placeholder="Số điện thoại"
                   value={customerPhone}
-                  onChange={(event) => setCustomerPhone(event.target.value)}
+                  onChange={(event) => {
+                    setCustomerPhone(event.target.value);
+                    if (selectedCustomer) setSelectedCustomer(null);
+                  }}
                 />
+                <div className="space-y-2">
+                  {selectedCustomer ? (
+                    <div className="text-xs text-text-gray-100">
+                      Đã chọn:{" "}
+                      <span className="text-text-gray-200 font-semibold">
+                        {selectedCustomer.name || "Khách hàng"}
+                      </span>{" "}
+                      ({selectedCustomer.phone || "-"})
+                    </div>
+                  ) : null}
+                  {!selectedCustomer && customerPhone.trim().length >= 2 ? (
+                    <div className="rounded-lg border border-border-gray dark:border-border-dark bg-white/70 dark:bg-[#1a2230] p-2 text-xs text-text-gray-100">
+                      {isCustomerSearching ? <div>Đang tìm khách hàng...</div> : null}
+                      {!isCustomerSearching && customerResults.length > 0 ? (
+                        <div className="flex flex-col gap-1">
+                          {customerResults.map((customer) => (
+                            <button
+                              key={customer.id}
+                              type="button"
+                              className="flex items-center justify-between rounded-md px-2 py-1 text-left hover:bg-hover"
+                              onClick={() => handleSelectCustomer(customer)}
+                            >
+                              <span className="text-text-gray-200">
+                                {customer.name || "Khách hàng"} -{" "}
+                                {customer.phone || "Không có số"}
+                              </span>
+                              <span className="text-text-gray-100">{customer.email}</span>
+                            </button>
+                          ))}
+                        </div>
+                      ) : null}
+                      {!isCustomerSearching && customerResults.length === 0 ? (
+                        <div className="flex items-center justify-between gap-2">
+                          <span>Không tìm thấy khách hàng phù hợp.</span>
+                          <button
+                            type="button"
+                            className="text-primary hover:opacity-80"
+                            onClick={() => {
+                              setShowCreateCustomer(true);
+                              setNewCustomerForm({
+                                name: customerName.trim(),
+                                email: "",
+                                phone: customerPhone.trim(),
+                              });
+                              setNewCustomerErrors({});
+                            }}
+                          >
+                            Tạo khách hàng mới
+                          </button>
+                        </div>
+                      ) : null}
+                      {customerSearchError ? (
+                        <div className="mt-2 text-red-400">{customerSearchError}</div>
+                      ) : null}
+                    </div>
+                  ) : null}
+                </div>
+                {showCreateCustomer ? (
+                  <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/40 p-4">
+                    <div className="w-full max-w-md rounded-xl bg-background-light dark:bg-background-dark border border-border-gray dark:border-border-dark p-4 space-y-3">
+                      <div className="flex items-center justify-between">
+                        <h3 className="text-lg font-semibold text-text-gray-200">
+                          Tạo khách hàng mới
+                        </h3>
+                        <button
+                          type="button"
+                          className="text-text-gray-100 hover:text-text-gray-200"
+                          onClick={() => setShowCreateCustomer(false)}
+                        >
+                          Đóng
+                        </button>
+                      </div>
+                      <div className="grid grid-cols-1 gap-2">
+                        <input
+                          className="w-full rounded-lg border border-border-gray dark:border-border-dark bg-background-light dark:bg-background-dark text-text-gray-200 text-sm px-3 py-2"
+                          placeholder="Tên khách hàng"
+                          value={newCustomerForm.name}
+                          onChange={(event) =>
+                            setNewCustomerForm((prev) => ({
+                              ...prev,
+                              name: event.target.value,
+                            }))
+                          }
+                        />
+                        {newCustomerErrors.name ? (
+                          <div className="text-xs text-red-400">{newCustomerErrors.name}</div>
+                        ) : null}
+                        <input
+                          className="w-full rounded-lg border border-border-gray dark:border-border-dark bg-background-light dark:bg-background-dark text-text-gray-200 text-sm px-3 py-2"
+                          placeholder="Email"
+                          value={newCustomerForm.email}
+                          onChange={(event) =>
+                            setNewCustomerForm((prev) => ({
+                              ...prev,
+                              email: event.target.value,
+                            }))
+                          }
+                        />
+                        {newCustomerErrors.email ? (
+                          <div className="text-xs text-red-400">{newCustomerErrors.email}</div>
+                        ) : null}
+                        <input
+                          className="w-full rounded-lg border border-border-gray dark:border-border-dark bg-background-light dark:bg-background-dark text-text-gray-200 text-sm px-3 py-2"
+                          placeholder="Số điện thoại"
+                          value={newCustomerForm.phone}
+                          onChange={(event) =>
+                            setNewCustomerForm((prev) => ({
+                              ...prev,
+                              phone: event.target.value,
+                            }))
+                          }
+                        />
+                        {newCustomerErrors.phone ? (
+                          <div className="text-xs text-red-400">{newCustomerErrors.phone}</div>
+                        ) : null}
+                      </div>
+                      {customerSearchError ? (
+                        <div className="text-sm text-red-400">{customerSearchError}</div>
+                      ) : null}
+                      <div className="flex items-center gap-2 justify-end">
+                        <button
+                          type="button"
+                          className="rounded-lg px-3 py-2 text-sm font-semibold border border-border-gray text-text-gray-200 hover:ring-1"
+                          onClick={() => setShowCreateCustomer(false)}
+                        >
+                          Hủy
+                        </button>
+                        <button
+                          type="button"
+                          className="rounded-lg px-3 py-2 text-sm font-semibold bg-background-primary text-background-dark hover:opacity-90 disabled:opacity-60"
+                          disabled={isCreatingCustomer}
+                          onClick={handleCreateCustomer}
+                        >
+                          Lưu khách hàng
+                        </button>
+                      </div>
+                    </div>
+                  </div>
+                ) : null}
                 <input
                   className="w-full rounded-lg border border-border-gray dark:border-border-dark bg-background-light dark:bg-background-dark text-text-gray-200 text-sm px-3 py-2.5"
                   placeholder="Địa chỉ giao hàng"
@@ -431,14 +775,11 @@ export default function PosPage() {
           </div>
         </div>
       </main>
-      {isLoading || isSubmitting ? <Loading /> : null}
       {showVariantPicker && selectedProduct ? (
         <div className="fixed inset-0 z-40 flex items-center justify-center bg-black/40">
           <div className="w-full max-w-lg rounded-xl bg-background-light dark:bg-background-dark border border-border-gray dark:border-border-dark p-5">
             <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold text-text-gray-200">
-                Chọn biến thể
-              </h3>
+              <h3 className="text-lg font-semibold text-text-gray-200">Chọn biến thể</h3>
               <button
                 className="text-text-gray-100 hover:text-text-gray-200"
                 onClick={() => setShowVariantPicker(false)}
