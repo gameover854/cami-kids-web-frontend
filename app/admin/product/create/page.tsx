@@ -2,14 +2,14 @@
 
 import Header from "@/components/layout/header";
 import ProductForm from "@/components/product/ProductForm";
-import Loading from "@/components/notification/loading";
 import useProductForm from "@/hooks/useProductForm";
 import { getBrand } from "@/services/brand.services";
 import { getCategory } from "@/services/category.services";
 import { getCollection } from "@/services/collections.services";
 import { createProduct } from "@/services/product.services";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { sileo } from "sileo";
 
 export default function CreateProductPage() {
   const router = useRouter();
@@ -17,6 +17,7 @@ export default function CreateProductPage() {
   const [dataCategories, setDataCategories] = useState<Categories>([]);
   const [dataCollections, setDataCollections] = useState<Collections>([]);
   const [dataBrand, setDataBrand] = useState<Brands>([]);
+  const loadingToastId = useRef<string | null>(null);
 
   const {
     dataProduct,
@@ -60,6 +61,24 @@ export default function CreateProductPage() {
     fetchData();
   }, []);
 
+  useEffect(() => {
+    if (isLoading) {
+      if (loadingToastId.current) {
+        sileo.dismiss(loadingToastId.current);
+      }
+      loadingToastId.current = sileo.show({
+        title: "Đang chờ",
+        description: "Đang xử lý dữ liệu sản phẩm...",
+        duration: null,
+      });
+      return;
+    }
+    if (loadingToastId.current) {
+      sileo.dismiss(loadingToastId.current);
+      loadingToastId.current = null;
+    }
+  }, [isLoading]);
+
   const submitCreate = async () => {
     try {
       setIsLoading(true);
@@ -99,7 +118,6 @@ export default function CreateProductPage() {
           onCheckCollections={handleCheckCollections}
           onSubmit={submitCreate}
         />
-        {isLoading ? <Loading /> : null}
       </main>
     </div>
   );

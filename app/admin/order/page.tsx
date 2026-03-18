@@ -1,7 +1,6 @@
 "use client";
 
 import Header from "@/components/layout/header";
-import Loading from "@/components/notification/loading";
 import {
   ORDER_STATUSES,
   ORDER_STATUS_TRANSITIONS,
@@ -18,7 +17,8 @@ import {
   updateOrderStatus,
 } from "@/services/order.services";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { sileo } from "sileo";
 
 const statuses: OrderStatus[] = [...ORDER_STATUSES];
 const statusTransitions: Record<OrderStatus, OrderStatus[]> = ORDER_STATUS_TRANSITIONS;
@@ -51,6 +51,7 @@ export default function OrderPage() {
   const [limit] = useState(10);
   const [totalPage, setTotalPage] = useState(1);
   const [totalOrder, setTotalOrder] = useState(0);
+  const loadingToastId = useRef<string | null>(null);
   const [paymentForm, setPaymentForm] = useState({
     amount: "",
     method: "" as PaymentMethod | "",
@@ -92,6 +93,24 @@ export default function OrderPage() {
     syncQuery();
     loadOrders();
   }, [loadOrders, syncQuery]);
+
+  useEffect(() => {
+    if (loading) {
+      if (loadingToastId.current) {
+        sileo.dismiss(loadingToastId.current);
+      }
+      loadingToastId.current = sileo.show({
+        title: "Đang chờ",
+        description: "Đang xử lý đơn hàng...",
+        duration: null,
+      });
+      return;
+    }
+    if (loadingToastId.current) {
+      sileo.dismiss(loadingToastId.current);
+      loadingToastId.current = null;
+    }
+  }, [loading]);
 
   useEffect(() => {
     setPage(1);
@@ -389,7 +408,6 @@ export default function OrderPage() {
           ) : null}
         </div>
       </main>
-      {loading ? <Loading /> : null}
     </div>
   );
 }

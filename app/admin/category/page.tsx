@@ -1,7 +1,6 @@
 ﻿"use client";
 
 import Header from "@/components/layout/header";
-import Loading from "@/components/notification/loading";
 import { getBrand } from "@/services/brand.services";
 import {
   createCategory,
@@ -9,7 +8,8 @@ import {
   getCategory,
   updateCategory,
 } from "@/services/category.services";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { sileo } from "sileo";
 
 const emptyForm = {
   name: "",
@@ -25,6 +25,7 @@ export default function CategoryPage() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const loadingToastId = useRef<string | null>(null);
 
   const flattened = useMemo(() => {
     const rows: AdminCategoryItem[] = [];
@@ -61,6 +62,24 @@ export default function CategoryPage() {
   useEffect(() => {
     loadData();
   }, []);
+
+  useEffect(() => {
+    if (loading) {
+      if (loadingToastId.current) {
+        sileo.dismiss(loadingToastId.current);
+      }
+      loadingToastId.current = sileo.show({
+        title: "Đang chờ",
+        description: "Đang xử lý dữ liệu danh mục...",
+        duration: null,
+      });
+      return;
+    }
+    if (loadingToastId.current) {
+      sileo.dismiss(loadingToastId.current);
+      loadingToastId.current = null;
+    }
+  }, [loading]);
 
   function resetForm() {
     setForm(emptyForm);
@@ -264,7 +283,6 @@ export default function CategoryPage() {
           </section>
         </div>
       </main>
-      {loading && <Loading />}
     </div>
   );
 }

@@ -1,13 +1,13 @@
 "use client";
 
 import Header from "@/components/layout/header";
-import Loading from "@/components/notification/loading";
 import { getBrand } from "@/services/brand.services";
 import { getCategory } from "@/services/category.services";
 import { deleteProduct, getProduct } from "@/services/product.services";
 import Link from "next/link";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { sileo } from "sileo";
 import ProductFilter from "./ProductFilter";
 import ProductTable from "./ProductTable";
 
@@ -44,8 +44,8 @@ export default function ProductPage() {
 
   const [totalPage, setTotalPage] = useState(0);
   const [totalProduct, setTotalProduct] = useState(0);
-  const [isLoading, setIsLoading] = useState(false);
   const [version, setVersion] = useState(0);
+  const listLoadingToastId = useRef<string | null>(null);
 
   useEffect(() => {
     const fetchFilters = async () => {
@@ -99,15 +99,29 @@ export default function ProductPage() {
 
   const fetchProducts = useCallback(async () => {
     try {
-      setIsLoading(true);
+      if (listLoadingToastId.current) {
+        sileo.dismiss(listLoadingToastId.current);
+      }
+      listLoadingToastId.current = sileo.show({
+        title: "Đang chờ",
+        description: "Đang tải danh sách sản phẩm...",
+        duration: null,
+      });
       const res = await getProduct(page, limit, filters);
       setProducts(res.data.products);
       setTotalPage(res.data.totalPage);
       setTotalProduct(res.data.totalProduct);
     } catch (error) {
       console.error("Error fetching products:", error);
+      sileo.error({
+        title: "Thất bại",
+        description: "Không thể tải danh sách sản phẩm.",
+      });
     } finally {
-      setIsLoading(false);
+      if (listLoadingToastId.current) {
+        sileo.dismiss(listLoadingToastId.current);
+        listLoadingToastId.current = null;
+      }
     }
   }, [filters, limit, page]);
 
@@ -127,13 +141,22 @@ export default function ProductPage() {
 
   const remove = async (id: number) => {
     try {
-      setIsLoading(true);
       await deleteProduct(id);
       setVersion((current) => current + 1);
+      sileo.success({
+        title: "Thành công",
+        description: "Đã xóa sản phẩm.",
+      });
     } catch (error) {
       console.error("Error deleting product:", error);
+      const apiMessage =
+        (error as { response?: { data?: { message?: string } } })?.response?.data?.message ||
+        "Không thể xóa sản phẩm. Vui lòng thử lại.";
+      sileo.error({
+        title: "Thất bại",
+        description: apiMessage,
+      });
     } finally {
-      setIsLoading(false);
     }
   };
 
@@ -195,7 +218,6 @@ export default function ProductPage() {
           />
         </div>
 
-        {isLoading ? <Loading /> : null}
       </main>
     </div>
   );

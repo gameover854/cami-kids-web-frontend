@@ -1,10 +1,10 @@
 "use client";
 
 import Header from "@/components/layout/header";
-import Loading from "@/components/notification/loading";
 import { getDashboardSummary } from "@/services/dashboard.services";
 import { formatVND } from "@/utils/formatCurrency";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { sileo } from "sileo";
 
 const emptySummary: AdminDashboardSummary = {
   total_revenue: 0,
@@ -21,6 +21,7 @@ export default function AdminPage() {
   const [summary, setSummary] = useState<AdminDashboardSummary>(emptySummary);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const loadingToastId = useRef<string | null>(null);
 
   useEffect(() => {
     const loadSummary = async () => {
@@ -38,6 +39,24 @@ export default function AdminPage() {
 
     loadSummary();
   }, []);
+
+  useEffect(() => {
+    if (loading) {
+      if (loadingToastId.current) {
+        sileo.dismiss(loadingToastId.current);
+      }
+      loadingToastId.current = sileo.show({
+        title: "Đang chờ",
+        description: "Đang tải dữ liệu dashboard...",
+        duration: null,
+      });
+      return;
+    }
+    if (loadingToastId.current) {
+      sileo.dismiss(loadingToastId.current);
+      loadingToastId.current = null;
+    }
+  }, [loading]);
 
   return (
     <div className="flex-1 flex flex-col h-full overflow-hidden relative">
@@ -124,7 +143,6 @@ export default function AdminPage() {
           </div>
         </div>
       </div>
-      {loading ? <Loading /> : null}
     </div>
   );
 }

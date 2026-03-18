@@ -3,9 +3,9 @@
 import { Checkbox, Field, Label } from "@headlessui/react";
 import Image from "next/image";
 import Link from "next/link";
-import { Fragment, useState } from "react";
-import Loading from "@/components/notification/loading";
+import { Fragment, useEffect, useRef, useState } from "react";
 import { formatVND } from "@/utils/formatCurrency";
+import { sileo } from "sileo";
 
 export default function ProductForm({
   title,
@@ -32,6 +32,7 @@ export default function ProductForm({
   onSubmit,
 }: ProductFormProps) {
   const [isUploading, setIsUploading] = useState(false);
+  const uploadToastId = useRef<string | null>(null);
 
   const canLinkVariant = (variantId?: number | string) =>
     Number.isInteger(productId) && Number.isInteger(variantId);
@@ -44,6 +45,24 @@ export default function ProductForm({
       setIsUploading(false);
     }
   };
+
+  useEffect(() => {
+    if (isUploading) {
+      if (uploadToastId.current) {
+        sileo.dismiss(uploadToastId.current);
+      }
+      uploadToastId.current = sileo.show({
+        title: "Đang chờ",
+        description: "Đang tải ảnh sản phẩm...",
+        duration: null,
+      });
+      return;
+    }
+    if (uploadToastId.current) {
+      sileo.dismiss(uploadToastId.current);
+      uploadToastId.current = null;
+    }
+  }, [isUploading]);
 
   return (
     <div className="max-w-[1200px] mx-auto flex flex-col gap-6">
@@ -305,7 +324,6 @@ export default function ProductForm({
                 </div>
               ))}
             </div>
-            {isUploading ? <Loading /> : null}
           </section>
         </div>
 

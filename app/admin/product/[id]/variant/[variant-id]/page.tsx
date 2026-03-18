@@ -1,11 +1,11 @@
 "use client";
 
 import Header from "@/components/layout/header";
-import Loading from "@/components/notification/loading";
 import { getVariantById, updateVariant } from "@/services/variant.services";
 import Image from "next/image";
 import { useParams, useRouter } from "next/navigation";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
+import { sileo } from "sileo";
 
 export default function ProductVariantDetailPage() {
   const router = useRouter();
@@ -27,6 +27,7 @@ export default function ProductVariantDetailPage() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const loadingToastId = useRef<string | null>(null);
 
   const loadVariant = useCallback(async () => {
     try {
@@ -53,6 +54,24 @@ export default function ProductVariantDetailPage() {
     if (Number.isNaN(productId) || Number.isNaN(variantId)) return;
     loadVariant();
   }, [loadVariant, productId, rawProductId, rawVariantId, variantId]);
+
+  useEffect(() => {
+    if (loading) {
+      if (loadingToastId.current) {
+        sileo.dismiss(loadingToastId.current);
+      }
+      loadingToastId.current = sileo.show({
+        title: "Đang chờ",
+        description: "Đang xử lý biến thể...",
+        duration: null,
+      });
+      return;
+    }
+    if (loadingToastId.current) {
+      sileo.dismiss(loadingToastId.current);
+      loadingToastId.current = null;
+    }
+  }, [loading]);
 
   async function saveVariant() {
     setMessage("");
@@ -223,7 +242,6 @@ export default function ProductVariantDetailPage() {
           </div>
         </div>
       </main>
-      {loading && <Loading />}
     </div>
   );
 }

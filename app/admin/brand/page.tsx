@@ -1,14 +1,14 @@
 ﻿"use client";
 
 import Header from "@/components/layout/header";
-import Loading from "@/components/notification/loading";
 import {
   createBrand,
   deleteBrand,
   getBrand,
   updateBrand,
 } from "@/services/brand.services";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { sileo } from "sileo";
 
 const emptyForm = {
   name: "",
@@ -25,6 +25,7 @@ export default function BrandPage() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const loadingToastId = useRef<string | null>(null);
 
   async function loadBrands() {
     try {
@@ -42,6 +43,24 @@ export default function BrandPage() {
   useEffect(() => {
     loadBrands();
   }, []);
+
+  useEffect(() => {
+    if (loading) {
+      if (loadingToastId.current) {
+        sileo.dismiss(loadingToastId.current);
+      }
+      loadingToastId.current = sileo.show({
+        title: "Đang chờ",
+        description: "Đang xử lý dữ liệu thương hiệu...",
+        duration: null,
+      });
+      return;
+    }
+    if (loadingToastId.current) {
+      sileo.dismiss(loadingToastId.current);
+      loadingToastId.current = null;
+    }
+  }, [loading]);
 
   function resetForm() {
     setForm(emptyForm);
@@ -244,7 +263,6 @@ export default function BrandPage() {
           </section>
         </div>
       </main>
-      {loading && <Loading />}
     </div>
   );
 }

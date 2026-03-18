@@ -2,7 +2,6 @@
 
 import Header from "@/components/layout/header";
 import ProductForm from "@/components/product/ProductForm";
-import Loading from "@/components/notification/loading";
 import useProductForm from "@/hooks/useProductForm";
 import { getBrand } from "@/services/brand.services";
 import { getCategory } from "@/services/category.services";
@@ -10,7 +9,8 @@ import { getCollection } from "@/services/collections.services";
 import { getProductById, updateProduct } from "@/services/product.services";
 import { mapProductDetailToFormData } from "@/utils/product.mapper";
 import { useParams, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { sileo } from "sileo";
 
 export default function EditProductPage() {
   const params = useParams<{ id: string }>();
@@ -22,6 +22,7 @@ export default function EditProductPage() {
   const [dataCategories, setDataCategories] = useState<Categories>([]);
   const [dataCollections, setDataCollections] = useState<Collections>([]);
   const [dataBrand, setDataBrand] = useState<Brands>([]);
+  const loadingToastId = useRef<string | null>(null);
 
   const {
     dataProduct,
@@ -77,6 +78,24 @@ export default function EditProductPage() {
     fetchData();
   }, [productId, rawProductId, router, setInitialFormData]);
 
+  useEffect(() => {
+    if (isLoading) {
+      if (loadingToastId.current) {
+        sileo.dismiss(loadingToastId.current);
+      }
+      loadingToastId.current = sileo.show({
+        title: "Đang chờ",
+        description: "Đang xử lý dữ liệu sản phẩm...",
+        duration: null,
+      });
+      return;
+    }
+    if (loadingToastId.current) {
+      sileo.dismiss(loadingToastId.current);
+      loadingToastId.current = null;
+    }
+  }, [isLoading]);
+
   const submitUpdate = async () => {
     if (!Number.isInteger(productId) || productId <= 0) return;
     setIsLoading(true);
@@ -118,7 +137,6 @@ export default function EditProductPage() {
           onCheckCollections={handleCheckCollections}
           onSubmit={submitUpdate}
         />
-        {isLoading ? <Loading /> : null}
       </main>
     </div>
   );

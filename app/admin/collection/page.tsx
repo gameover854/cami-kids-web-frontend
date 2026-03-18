@@ -1,7 +1,6 @@
 ﻿"use client";
 
 import Header from "@/components/layout/header";
-import Loading from "@/components/notification/loading";
 import {
   createCollection,
   deleteCollection,
@@ -9,7 +8,8 @@ import {
   updateCollection,
 } from "@/services/collections.services";
 import { getPromotion } from "@/services/promotion.services";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
+import { sileo } from "sileo";
 
 const emptyForm = {
   name: "",
@@ -25,6 +25,7 @@ export default function CollectionPage() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const loadingToastId = useRef<string | null>(null);
 
   const promotionsByCollection = useMemo(() => {
     const map = new Map<number, string[]>();
@@ -60,6 +61,24 @@ export default function CollectionPage() {
   useEffect(() => {
     loadData();
   }, []);
+
+  useEffect(() => {
+    if (loading) {
+      if (loadingToastId.current) {
+        sileo.dismiss(loadingToastId.current);
+      }
+      loadingToastId.current = sileo.show({
+        title: "Đang chờ",
+        description: "Đang xử lý bộ sưu tập...",
+        duration: null,
+      });
+      return;
+    }
+    if (loadingToastId.current) {
+      sileo.dismiss(loadingToastId.current);
+      loadingToastId.current = null;
+    }
+  }, [loading]);
 
   function resetForm() {
     setForm(emptyForm);
@@ -271,7 +290,6 @@ export default function CollectionPage() {
           </section>
         </div>
       </main>
-      {loading && <Loading />}
     </div>
   );
 }

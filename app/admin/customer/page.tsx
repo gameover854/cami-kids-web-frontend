@@ -1,15 +1,15 @@
 "use client";
 
 import Header from "@/components/layout/header";
-import Loading from "@/components/notification/loading";
 import {
   createCustomer,
   deleteCustomer,
   getCustomer,
   updateCustomer,
 } from "@/services/customer.services";
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { sileo } from "sileo";
 
 const emptyForm = {
   name: "",
@@ -34,6 +34,7 @@ export default function CustomerPage() {
   const [error, setError] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | "active" | "inactive">("all");
   const [sortBy, setSortBy] = useState<"newest" | "oldest">("newest");
+  const loadingToastId = useRef<string | null>(null);
   const statusLabelMap = {
     all: "Tất cả",
     active: "Hoạt động",
@@ -65,6 +66,24 @@ export default function CustomerPage() {
   useEffect(() => {
     loadCustomers();
   }, [loadCustomers]);
+
+  useEffect(() => {
+    if (loading) {
+      if (loadingToastId.current) {
+        sileo.dismiss(loadingToastId.current);
+      }
+      loadingToastId.current = sileo.show({
+        title: "Đang chờ",
+        description: "Đang xử lý khách hàng...",
+        duration: null,
+      });
+      return;
+    }
+    if (loadingToastId.current) {
+      sileo.dismiss(loadingToastId.current);
+      loadingToastId.current = null;
+    }
+  }, [loading]);
 
   function resetForm() {
     setForm(emptyForm);
@@ -360,7 +379,6 @@ export default function CustomerPage() {
           </section>
         </div>
       </main>
-      {loading && <Loading />}
     </div>
   );
 }

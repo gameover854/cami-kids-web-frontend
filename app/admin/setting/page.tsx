@@ -1,9 +1,9 @@
 "use client";
 
 import Header from "@/components/layout/header";
-import Loading from "@/components/notification/loading";
 import { getSetting, updateSetting } from "@/services/setting.services";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { sileo } from "sileo";
 const defaultForm: AdminSettingForm = {
   store_name: "",
   support_email: "",
@@ -19,6 +19,7 @@ export default function SettingPage() {
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const loadingToastId = useRef<string | null>(null);
 
   async function loadSettings() {
     try {
@@ -36,6 +37,24 @@ export default function SettingPage() {
   useEffect(() => {
     loadSettings();
   }, []);
+
+  useEffect(() => {
+    if (loading) {
+      if (loadingToastId.current) {
+        sileo.dismiss(loadingToastId.current);
+      }
+      loadingToastId.current = sileo.show({
+        title: "Đang chờ",
+        description: "Đang xử lý cài đặt...",
+        duration: null,
+      });
+      return;
+    }
+    if (loadingToastId.current) {
+      sileo.dismiss(loadingToastId.current);
+      loadingToastId.current = null;
+    }
+  }, [loading]);
 
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -184,7 +203,6 @@ export default function SettingPage() {
           </form>
         </div>
       </main>
-      {loading && <Loading />}
     </div>
   );
 }
